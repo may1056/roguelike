@@ -8,19 +8,33 @@ public class Enemy : MonoBehaviour //적
     float H;
     bool inAttackArea = false; //플레이어의 공격 범위 내에 있는지
 
+    int hp;
+    SpriteRenderer sr;
+    public Sprite Hurt;
+
+
+    void Start()
+    {
+        hp = 3;
+        sr = GetComponent<SpriteRenderer>();
+    }
 
     void Update()
     {
-        //플레이어를 향해 이동 방향을 변경한다
-        if (transform.position.x > Player.player.transform.position.x) H = -1;
-        else H = 1;
+        //플레이어를 향해 이동 방향을 변경한다 (아프면 빨라짐)
+        if (transform.position.x > Player.player.transform.position.x)
+            H = hp == 3 ? -1 : -5;
+        else H = hp == 3 ? 1 : 5;
 
-        //일단은 공격당하면 사망인데 우리는 이걸 피 닳는 시스템으로 바꿔야 한다
+        //피 닳는 시스템
         if (inAttackArea && Input.GetKeyDown(KeyCode.DownArrow))
-            Destroy(gameObject);
+        {
+            hp--;
+            sr.sprite = Hurt;
+        }
 
-        //빠른 재시작
-        if (Input.GetKeyDown(KeyCode.Backspace)) SceneManager.LoadScene(0);
+        //쉐이망
+        if (hp <= 0) Destroy(this.gameObject);
     }
 
     void FixedUpdate()

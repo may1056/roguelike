@@ -5,6 +5,8 @@ using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour //플레이어
 {
+    public GameManager manager;
+
     public static Player player;
     //public static으로 설정한 변수는 다른 스크립트에서 맘대로 퍼갈 수 있다
 
@@ -15,6 +17,8 @@ public class Player : MonoBehaviour //플레이어
     public Sprite[] players = new Sprite[3];
     //애니메이션 만들기 귀찮아서 임시방편으로 스프라이트 교체용
     //0: 평소 상태(멈춤), 1: 걷기(달리기), 2: 뛰기(점프)
+
+    public int hp;
 
     bool isWalking = false;
     bool isJumping = false;
@@ -76,6 +80,8 @@ public class Player : MonoBehaviour //플레이어
         isAttacking = Input.GetKey(KeyCode.DownArrow);
         if (isAttacking) attacksr.color = new Color(1, 1, 1, 1); //불투명함
         else attacksr.color = new Color(1, 1, 1, 0); //투명함
+
+        if (hp <= 0) SceneManager.LoadScene(0); //쉐이망
     }
 
 
@@ -116,8 +122,11 @@ public class Player : MonoBehaviour //플레이어
         if (collision.gameObject.CompareTag("Platform")) isJumping = false;
         //플랫폼 닿으면 점프 상태 냅다 해제
 
-        if (collision.gameObject.CompareTag("Enemy")) SceneManager.LoadScene(0);
-        //쉐이망
+        if (collision.gameObject.CompareTag("Enemy")) //아픔
+        {
+            hp--;
+            manager.ChangeHP();
+        }
     }
 
 } //Player End
