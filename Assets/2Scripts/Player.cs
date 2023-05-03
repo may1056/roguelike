@@ -22,8 +22,8 @@ public class Player : MonoBehaviour //플레이어
 
     bool isWalking = false;
     bool isJumping = false;
-    public float jumpPower;
-    float jumpTime = 0;
+    public float jumpPower; //뛰는 힘
+    float notJumpTime = 0; //가만히 있는 시간
 
     bool isAttacking = false;
     SpriteRenderer attacksr;
@@ -48,7 +48,7 @@ public class Player : MonoBehaviour //플레이어
     void Update()
     {
         //점프
-        if (Input.GetButtonDown("Jump") && !isJumping)
+        if (Input.GetKeyDown("w") && !isJumping)
         {
             rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
             isJumping = true;
@@ -56,10 +56,9 @@ public class Player : MonoBehaviour //플레이어
         }
 
         //연직 방향 속력이 0인 상태가 0.1초 이상이면 점프 중단
-        //왜인지는 모르겠으나 콜라이더 충돌이 잘 안 먹혀서 임시로 만들었음
-        if (rigid.velocity.y == 0) jumpTime += Time.deltaTime;
-        else jumpTime = 0;
-        isJumping = jumpTime < 0.1f;
+        if (rigid.velocity.y == 0) notJumpTime += Time.deltaTime;
+        else notJumpTime = 0;
+        isJumping = notJumpTime < 0.1f;
 
         //방향 전환
         if (Input.GetButton("Horizontal"))
@@ -76,8 +75,8 @@ public class Player : MonoBehaviour //플레이어
             else sr.sprite = players[0]; //멈춰 있으면 멈춘 스프라이트
         }
 
-        //아래 화살표 눌러 공격인데 필히 키 교체가 필요
-        isAttacking = Input.GetKey(KeyCode.DownArrow);
+        //공격인데 필히 키 교체가 필요
+        isAttacking = Input.GetKey("k");
         if (isAttacking) attacksr.color = new Color(1, 1, 1, 1); //불투명함
         else attacksr.color = new Color(1, 1, 1, 0); //투명함
 
@@ -120,7 +119,7 @@ public class Player : MonoBehaviour //플레이어
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Platform")) isJumping = false;
-        //플랫폼 닿으면 점프 상태 냅다 해제
+        //플랫폼 닿으면 점프 상태 냅다 해제 (잘 안 먹힘..)
 
         if (collision.gameObject.CompareTag("Enemy")) //아픔
         {

@@ -9,20 +9,24 @@ public class GameManager : MonoBehaviour //게임 총괄
     public Player player;
     public Image[] hps = new Image[6]; //hp 구슬들
 
-    public static int killed;
+    public int enemies; //적들 수
+
+    public static int killed; //킬 수
     public Text killText;
 
     void Start()
     {
         killed = 0;
+        ChangeHP();
     }
 
 
     void Update()
     {
-        killText.text = killed.ToString() + " / 6";
+        //킬 수 표시
+        killText.text = killed.ToString() + " / " + enemies.ToString();
 
-        if (killed == 6) Debug.LogError("클리어");
+        if (killed == enemies) Debug.LogWarning("클리어");
 
         //빠른 재시작
         if (Input.GetKeyDown(KeyCode.Backspace)) SceneManager.LoadScene(0);
