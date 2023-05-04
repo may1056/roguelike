@@ -19,6 +19,7 @@ public class Player : MonoBehaviour //플레이어
     //0: 평소 상태(멈춤), 1: 걷기(달리기), 2: 뛰기(점프)
 
     public int hp;
+    float hurtTime = 0; //피격 시 사용할 시간 변수
 
     bool isWalking = false;
     bool isJumping = false;
@@ -27,7 +28,9 @@ public class Player : MonoBehaviour //플레이어
 
     bool isAttacking = false;
     SpriteRenderer attacksr;
-    //공격 오브젝트의 스프라이트렌더러긴 한데 나중에 개편할 때 삭제하자
+    //공격 오브젝트의 스프라이트렌더러, flipX 때문에 필요할 듯
+
+    //무기는 획득 시 플레이어의 자손 목록 맨 첫 번째에 들어가도록 합시다!!!
 
 
     void Awake()
@@ -66,8 +69,8 @@ public class Player : MonoBehaviour //플레이어
 
         //근?접 공격 오브젝트도 뒤집고 위치 변경. 이건 좀 많이 손봐야 한다.
         attacksr.flipX = sr.flipX;
-        float X = sr.flipX ? -2f : 2f;
-        transform.GetChild(0).transform.localPosition = new Vector2(X, 0);
+        transform.GetChild(0).transform.localPosition
+            = new Vector2(sr.flipX ? -2f : 2f, 0);
 
         if (!isJumping) //점프 ㄴ
         {
@@ -75,10 +78,13 @@ public class Player : MonoBehaviour //플레이어
             else sr.sprite = players[0]; //멈춰 있으면 멈춘 스프라이트
         }
 
-        //공격인데 필히 키 교체가 필요
-        isAttacking = Input.GetKey("k");
+        //공격
+        isAttacking = Input.GetMouseButtonDown(0);
         if (isAttacking) attacksr.color = new Color(1, 1, 1, 1); //불투명함
         else attacksr.color = new Color(1, 1, 1, 0); //투명함
+
+        if (hurtTime >= 0) Hurt(); //아플 때
+        else sr.color = Color.white; //기본
 
         if (hp <= 0) SceneManager.LoadScene(0); //쉐이망
     }
@@ -125,7 +131,15 @@ public class Player : MonoBehaviour //플레이어
         {
             hp--;
             manager.ChangeHP();
+            hurtTime = 1;
         }
+    }
+
+
+    void Hurt() //잠깐 붉은색 되었다가 서서히 회복
+    {
+        sr.color = new Color(1, 1 - hurtTime, 1 - hurtTime);
+        hurtTime -= 4 * Time.deltaTime;
     }
 
 } //Player End
