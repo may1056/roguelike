@@ -14,13 +14,13 @@ TagManager:
   - 
   - Water
   - UI
-  - Platform
+  - 
   - Enemy
+  - Block
+  - Ground
   - 
-  - 
-  - 
-  - 
-  - 
+  - Player
+  - PlayerDash
   - 
   - 
   - 

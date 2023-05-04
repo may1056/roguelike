@@ -48,7 +48,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxhp: 2
-  noticeDist: 5
+  noticeDist: 8
   Hurt: {fileID: 21300000, guid: b6c3170a0dfd6e344ae859561f48c71b, type: 3}
 --- !u!212 &3711459579996582488
 SpriteRenderer:

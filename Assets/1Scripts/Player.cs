@@ -26,6 +26,11 @@ public class Player : MonoBehaviour //플레이어
     public float jumpPower; //뛰는 힘
     float notJumpTime = 0; //가만히 있는 시간
 
+    bool isDashing = false;
+    public float maxDash; //최대 대쉬 가능 시간
+    public float dashSpeed; //대쉬 빠르기
+    float dashTime = 0; //대쉬하는 시간
+
     bool isAttacking = false;
     SpriteRenderer attacksr;
     //공격 오브젝트의 스프라이트렌더러, flipX 때문에 필요할 듯
@@ -72,14 +77,23 @@ public class Player : MonoBehaviour //플레이어
         transform.GetChild(0).transform.localPosition
             = new Vector2(sr.flipX ? -2f : 2f, 0);
 
+
         if (!isJumping) //점프 ㄴ
         {
             if (isWalking) sr.sprite = players[1]; //걷고 있으면 걷는 스프라이트
             else sr.sprite = players[0]; //멈춰 있으면 멈춘 스프라이트
         }
 
+
+        if (Input.GetMouseButtonDown(1)) //마우스 우클릭 대쉬
+        {
+            isDashing = true;
+            gameObject.layer = 12; //12PlayerDash
+        }
+
+
         //공격
-        isAttacking = Input.GetMouseButtonDown(0);
+        isAttacking = Input.GetMouseButton(0);
         if (isAttacking) attacksr.color = new Color(1, 1, 1, 1); //불투명함
         else attacksr.color = new Color(1, 1, 1, 0); //투명함
 
@@ -97,6 +111,22 @@ public class Player : MonoBehaviour //플레이어
         transform.Translate(10 * Time.deltaTime * new Vector2(h, 0));
 
         isWalking = h != 0;
+
+
+        if (isDashing) //대쉬 중이다
+        {
+            dashTime += Time.deltaTime;
+            rigid.AddForce(dashSpeed * (sr.flipX ? Vector2.left : Vector2.right),
+                ForceMode2D.Impulse);
+            rigid.velocity = new Vector2(rigid.velocity.x, 0);
+        }
+        if (dashTime >= maxDash) //대쉬 시간
+        {
+            isDashing = false;
+            rigid.velocity = new Vector2(0, 0);
+            gameObject.layer = 11; //11Player
+            dashTime = 0;
+        }
 
         /*
         //플랫폼 착지
@@ -124,16 +154,19 @@ public class Player : MonoBehaviour //플레이어
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Platform")) isJumping = false;
         //플랫폼 닿으면 점프 상태 냅다 해제 (잘 안 먹힘..)
+        if (collision.gameObject.CompareTag("Platform")) isJumping = false;
 
-        if (collision.gameObject.CompareTag("Enemy")) //아픔
+        //아픔
+        if (gameObject.layer == 11 && collision.gameObject.CompareTag("Enemy"))
         {
             hp--;
             manager.ChangeHP();
             hurtTime = 1;
         }
     }
+
+    //왜인지는 모르겠으나 콜라이더 관련 함수들이 죄다 이상하게 작동한다. 슬프다
 
 
     void Hurt() //잠깐 붉은색 되었다가 서서히 회복

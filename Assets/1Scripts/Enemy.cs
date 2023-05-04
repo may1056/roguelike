@@ -37,7 +37,7 @@ public class Enemy : MonoBehaviour //적
             Vector2.Distance(transform.position, Player.player.transform.position);
 
         //피 닳는 시스템
-        if (inAttackArea && Input.GetKeyDown("k"))
+        if (inAttackArea && Input.GetMouseButtonDown(0))
         {
             hp--;
             sr.sprite = Hurt;
