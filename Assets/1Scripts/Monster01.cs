@@ -29,10 +29,11 @@ public class Monster01 : MonoBehaviour
 	void Update()
 	{
         if (inAttackArea && (Input.GetMouseButtonDown(0)
-       || Input.GetKeyDown("j")) && Player.attackCooltime <= 0) 
+            || Input.GetKeyDown("j")) && Player.curAttackCooltime >= Player.maxAttackCooltime) //내가 마우스가 없어서 임시로 설정한 키
         {
             hp--;
             sr.sprite = Hurt;
+            Player.curAttackCooltime = 0;
         }
 
         if (Mathf.Abs(Player.skillP.y) < 20 &&
