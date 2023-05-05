@@ -21,10 +21,18 @@ public class Player : MonoBehaviour //플레이어
     public int hp;
     float hurtTime = 0; //피격 시 사용할 시간 변수
 
+    public float speed = 10; //달리기 속도
+
+    public float attackCooltime = 0;
+    public float attackSpeed = 0; // 추가 공격속도
+    bool attackuse;
+
+
     bool isWalking = false;
     bool isJumping = false;
     public float jumpPower; //뛰는 힘
     float notJumpTime = 0; //가만히 있는 시간
+
 
     bool isDashing = false;
     bool onceDashed = false; //공중에서 대쉬를 이미 했는지
@@ -108,8 +116,13 @@ public class Player : MonoBehaviour //플레이어
 
 
         //공격
+        if (attackCooltime > 0) attackCooltime -= Time.deltaTime;
         isAttacking = Input.GetMouseButton(0) || Input.GetKey("j"); //j는 임시 공격 키
-        if (isAttacking) attacksr.color = new Color(1, 1, 1, 1); //불투명함
+        if (isAttacking == true && attackCooltime <= 0) 
+        {
+            attackCooltime = 0.1f;
+            attacksr.color = new Color(1, 1, 1, 1); //불투명함
+        }
         else attacksr.color = new Color(1, 1, 1, 0); //투명함
 
 
@@ -138,7 +151,7 @@ public class Player : MonoBehaviour //플레이어
     {
         //좌우 이동 (등속, 손 떼면 바로 멈춤)
         float h = Input.GetAxisRaw("Horizontal");
-        transform.Translate(10 * Time.deltaTime * new Vector2(h, 0));
+        transform.Translate((10+speed) * Time.deltaTime * new Vector2(h, 0)); // 속도 기본 값 10 + speed
 
         isWalking = h != 0;
 

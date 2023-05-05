@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour //°ÔÀÓ ÃÑ°ı
     public Text killText;
 
     public Text coolText; //ÄğÅ¸ÀÓ
+    public Text atkcoolText; //ÀÏ¹İ°ø°İ ÄğÅ¸ÀÓ
 
 
     void Start()
@@ -27,6 +28,7 @@ public class GameManager : MonoBehaviour //°ÔÀÓ ÃÑ°ı
 
     void Update()
     {
+        atkcoolText.text = "ÄğÅ¸ÀÓ: " + player.attackCooltime.ToString("N0") + "ÃÊ";
         coolText.text = "ÄğÅ¸ÀÓ: " + player.cooltime.ToString("N0") + "ÃÊ";
 
         //Å³ ¼ö Ç¥½Ã
