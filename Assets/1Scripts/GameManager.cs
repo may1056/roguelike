@@ -28,7 +28,6 @@ public class GameManager : MonoBehaviour //게임 총괄
 
     void Update()
     {
-        atkcoolText.text = "쿨타임: " + Player.attackCooltime.ToString("N0") + "초";
         coolText.text = "쿨타임: " + player.cooltime.ToString("N0") + "초";
 
         //킬 수 표시

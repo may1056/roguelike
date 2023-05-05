@@ -23,8 +23,9 @@ public class Player : MonoBehaviour //플레이어
 
     public float speed = 10; //달리기 속도
 
-    public static float attackCooltime = 0; // 쿨타임
-    public float attackSpeed = 0; // 추가 공격속도
+    public static float maxAttackCooltime = 0.2f; // 쿨타임 시간
+    public static float curAttackCooltime = 0; // 현재 쿨타임
+    public float attackspeed = 0; // 현재 쿨타임
     public static Vector2 attackP;
     public Sprite attackSprite;
     bool attackuse = false;
@@ -116,17 +117,17 @@ public class Player : MonoBehaviour //플레이어
         }
 
 
-        //공격 (임시로 스킬에서 코드 가져온거라 페이드 들어감,
-        if (attackCooltime > 0) attackCooltime -= Time.deltaTime;
-        attackuse = (Input.GetMouseButtonDown(0) || Input.GetKeyDown("j")) && attackCooltime <= 0; //j는 임시 공격 키
+        //일반공격 쿨타임, 애니메이션
+        if (curAttackCooltime <= maxAttackCooltime + 20) curAttackCooltime += Time.deltaTime;
+        attackuse = (Input.GetMouseButton(0) || Input.GetKey("j")) && (curAttackCooltime >= maxAttackCooltime); //j는 임시 공격 키
         if (attackuse)
         {
-            attackCooltime = 0.2f-attackSpeed; // 기본값 소수점 단위에 추가 공격속도 값만큼 빼니 음수로 안가게 주의
+            
             float x = sr.flipX ? -2 : 2;
             attackP = new Vector2(transform.position.x + x, transform.position.y);
-            MakeEffect(attackP, attackSprite, -2);
+            attacksr.color = new Color(1, 1, 1, 1);
         }
-        else attackP = new Vector2(9999, 9999); //저 멀리
+        else attacksr.color = new Color(1, 1, 1, 0);
 
         //스킬
         if (cooltime > 0) cooltime -= Time.deltaTime;

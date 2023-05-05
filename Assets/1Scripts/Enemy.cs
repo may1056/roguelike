@@ -30,6 +30,8 @@ public class Enemy : MonoBehaviour //적
         hp = maxhp;
 
         sr = GetComponent<SpriteRenderer>();
+
+        inAttackArea = false;
     } //Start End
 
 
@@ -47,13 +49,14 @@ public class Enemy : MonoBehaviour //적
 
         //가까우면 이동 시작
         if (dist < noticeDist) moving = true;
-
+        
         //피 닳는 시스템
         if (inAttackArea && (Input.GetMouseButtonDown(0)
-            || Input.GetKeyDown("j")) && Player.attackCooltime <= 0) //내가 마우스가 없어서 임시로 설정한 키
+            || Input.GetKeyDown("j")) && Player.curAttackCooltime >= Player.maxAttackCooltime) //내가 마우스가 없어서 임시로 설정한 키
         {
             hp--;
             sr.sprite = Hurt;
+            Player.curAttackCooltime = 0;
         }
 
         if (Mathf.Abs(Player.skillP.y) < 20 &&
@@ -94,6 +97,7 @@ public class Enemy : MonoBehaviour //적
     {
         if (collision.gameObject.CompareTag("Attack"))
             inAttackArea = true; //들어간다
+        Debug.Log("공범 들어옴");
     }
 
 
@@ -101,6 +105,7 @@ public class Enemy : MonoBehaviour //적
     {
         if (collision.gameObject.CompareTag("Attack"))
             inAttackArea = false; //빠져나온다
+        Debug.Log("공범 나감");
     }
 
 } //Enemy End
