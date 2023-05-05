@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour //게임 총괄
 {
     public Player player;
     public Image[] hps = new Image[6]; //hp 구슬들
+    public Image[] mps = new Image[6]; //mp 구슬들
 
     public int enemies; //적들 수
 
@@ -17,7 +18,7 @@ public class GameManager : MonoBehaviour //게임 총괄
     void Start()
     {
         killed = 0;
-        ChangeHP();
+        ChangeHPMP();
     }
 
 
@@ -33,12 +34,12 @@ public class GameManager : MonoBehaviour //게임 총괄
     }
 
 
-    public void ChangeHP() //hp 구슬 최신화
+    public void ChangeHPMP() //hp, mp 구슬 최신화
     {
         for(int i = 0; i < 6; i++)
         {
-            bool v = i < player.hp;
-            hps[i].gameObject.SetActive(v);
+            hps[i].gameObject.SetActive(i < player.hp);
+            mps[i].gameObject.SetActive(i < player.mp);
         }
     }
 

@@ -30,12 +30,17 @@ public class Player : MonoBehaviour //플레이어
     public float maxDash; //최대 대쉬 가능 시간
     public float dashSpeed; //대쉬 빠르기
     float dashTime = 0; //대쉬하는 시간
+    public GameObject dashEffect;
+    public Sprite dashImage;
 
     bool isAttacking = false;
     SpriteRenderer attacksr;
     //공격 오브젝트의 스프라이트렌더러, flipX 때문에 필요할 듯
 
     //무기는 획득 시 플레이어의 자손 목록 맨 첫 번째에 들어가도록 합시다!!!
+
+    public int mp;
+    float cooltime = 0;
 
 
     void Awake()
@@ -85,7 +90,8 @@ public class Player : MonoBehaviour //플레이어
         }
 
 
-        if (Input.GetMouseButtonDown(1)) //마우스 우클릭 대쉬
+        if ((Input.GetMouseButtonDown(1)) //마우스 우클릭 대쉬
+            || Input.GetKeyDown("k")) //k는 임시 대쉬 키
         {
             isDashing = true;
             gameObject.layer = 12; //12PlayerDash
@@ -93,9 +99,15 @@ public class Player : MonoBehaviour //플레이어
 
 
         //공격
-        isAttacking = Input.GetMouseButton(0);
+        isAttacking = Input.GetMouseButton(0) || Input.GetKey("j"); //j는 임시 공격 키
         if (isAttacking) attacksr.color = new Color(1, 1, 1, 1); //불투명함
         else attacksr.color = new Color(1, 1, 1, 0); //투명함
+
+
+        if (cooltime <= 0 && Input.GetKeyDown("s")) //약한 스킬
+        {
+
+        }
 
         if (hurtTime >= 0) Hurt(); //아플 때
         else sr.color = Color.white; //기본
@@ -119,6 +131,13 @@ public class Player : MonoBehaviour //플레이어
             rigid.AddForce(dashSpeed * (sr.flipX ? Vector2.left : Vector2.right),
                 ForceMode2D.Impulse);
             rigid.velocity = new Vector2(rigid.velocity.x, 0);
+
+            GameObject effect =
+                Instantiate(dashEffect, transform.position, Quaternion.identity);
+            SpriteRenderer esr = effect.transform.GetComponent<SpriteRenderer>();
+            esr.sprite = dashImage;
+            esr.flipX = sr.flipX;
+            esr.sortingOrder = -1;
         }
         if (dashTime >= maxDash) //대쉬 시간
         {
@@ -161,7 +180,7 @@ public class Player : MonoBehaviour //플레이어
         if (gameObject.layer == 11 && collision.gameObject.CompareTag("Enemy"))
         {
             hp--;
-            manager.ChangeHP();
+            manager.ChangeHPMP();
             hurtTime = 1;
         }
     }
