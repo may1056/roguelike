@@ -23,11 +23,11 @@ public class Player : MonoBehaviour //플레이어
 
     public float speed = 10; //달리기 속도
 
-    public float attackCooltime = 0.2f; // 쿨타임
+    public static float attackCooltime = 0; // 쿨타임
     public float attackSpeed = 0; // 추가 공격속도
     public static Vector2 attackP;
     public Sprite attackSprite;
-    bool attackuse;
+    bool attackuse = false;
 
 
     bool isWalking = false;
@@ -44,7 +44,6 @@ public class Player : MonoBehaviour //플레이어
     public GameObject dashEffect;
     public Sprite dashSprite;
 
-    bool isAttacking = false;
     SpriteRenderer attacksr;
     //공격 오브젝트의 스프라이트렌더러, flipX 때문에 필요할 듯
 
@@ -119,8 +118,8 @@ public class Player : MonoBehaviour //플레이어
 
         //공격 (임시로 스킬에서 코드 가져온거라 페이드 들어감,
         if (attackCooltime > 0) attackCooltime -= Time.deltaTime;
-        isAttacking = (Input.GetMouseButton(0) || Input.GetKey("j")) && attackCooltime <= 0; //j는 임시 공격 키
-        if (isAttacking)
+        attackuse = (Input.GetMouseButtonDown(0) || Input.GetKeyDown("j")) && attackCooltime <= 0; //j는 임시 공격 키
+        if (attackuse)
         {
             attackCooltime = 0.2f-attackSpeed; // 기본값 소수점 단위에 추가 공격속도 값만큼 빼니 음수로 안가게 주의
             float x = sr.flipX ? -2 : 2;

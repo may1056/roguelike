@@ -35,6 +35,7 @@ public class Enemy : MonoBehaviour //적
 
     void Update()
     {
+  
         //플레이어를 향해 이동 방향을 변경한다 (아프면 빨라짐)
         if (transform.position.x > Player.player.transform.position.x)
             H = hp == maxhp ? -1 : -5;
@@ -49,7 +50,7 @@ public class Enemy : MonoBehaviour //적
 
         //피 닳는 시스템
         if (inAttackArea && (Input.GetMouseButtonDown(0)
-            || Input.GetKeyDown("j"))) //내가 마우스가 없어서 임시로 설정한 키
+            || Input.GetKeyDown("j")) && Player.attackCooltime <= 0) //내가 마우스가 없어서 임시로 설정한 키
         {
             hp--;
             sr.sprite = Hurt;
