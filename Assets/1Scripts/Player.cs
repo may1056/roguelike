@@ -27,11 +27,12 @@ public class Player : MonoBehaviour //플레이어
     float notJumpTime = 0; //가만히 있는 시간
 
     bool isDashing = false;
+    bool onceDashed = false; //공중에서 대쉬를 이미 했는지
     public float maxDash; //최대 대쉬 가능 시간
     public float dashSpeed; //대쉬 빠르기
     float dashTime = 0; //대쉬하는 시간
     public GameObject dashEffect;
-    public Sprite dashImage;
+    public Sprite dashSprite;
 
     bool isAttacking = false;
     SpriteRenderer attacksr;
@@ -40,7 +41,11 @@ public class Player : MonoBehaviour //플레이어
     //무기는 획득 시 플레이어의 자손 목록 맨 첫 번째에 들어가도록 합시다!!!
 
     public int mp;
-    float cooltime = 0;
+    public float cooltime = 0;
+
+    bool skilluse; //스킬 시전하는지
+    public static Vector2 skillP; //스킬 원 위치
+    public Sprite skillSprite;
 
 
     void Awake()
@@ -55,7 +60,7 @@ public class Player : MonoBehaviour //플레이어
         //허접한 근접 공격을 만들기 위함.
         attacksr = transform.GetChild(0).GetComponent<SpriteRenderer>();
         attacksr.color = new Color(1, 1, 1, 0);
-    }
+    } //Awake End
 
 
     void Update()
@@ -68,8 +73,8 @@ public class Player : MonoBehaviour //플레이어
             sr.sprite = players[2];
         }
 
-        //연직 방향 속력이 0인 상태가 0.1초 이상이면 점프 중단
-        if (rigid.velocity.y == 0) notJumpTime += Time.deltaTime;
+        //연직 방향 속력이 거의 0인 상태가 0.1초 이상이면 점프 중단
+        if (Mathf.Abs(rigid.velocity.y) < 0.01f) notJumpTime += Time.deltaTime;
         else notJumpTime = 0;
         isJumping = notJumpTime < 0.1f;
 
@@ -85,15 +90,19 @@ public class Player : MonoBehaviour //플레이어
 
         if (!isJumping) //점프 ㄴ
         {
+            onceDashed = false;
+
             if (isWalking) sr.sprite = players[1]; //걷고 있으면 걷는 스프라이트
             else sr.sprite = players[0]; //멈춰 있으면 멈춘 스프라이트
         }
 
 
-        if ((Input.GetMouseButtonDown(1)) //마우스 우클릭 대쉬
-            || Input.GetKeyDown("k")) //k는 임시 대쉬 키
+        //마우스 우클릭 대쉬
+        if (isJumping && !onceDashed && (Input.GetMouseButtonDown(1)
+            || Input.GetKeyDown("k"))) //k는 임시 대쉬 키
         {
             isDashing = true;
+            onceDashed = true;
             gameObject.layer = 12; //12PlayerDash
         }
 
@@ -104,16 +113,25 @@ public class Player : MonoBehaviour //플레이어
         else attacksr.color = new Color(1, 1, 1, 0); //투명함
 
 
-        if (cooltime <= 0 && Input.GetKeyDown("s")) //약한 스킬
+        if (cooltime > 0) cooltime -= Time.deltaTime;
+        skilluse = cooltime <= 0 && Input.GetKeyDown("s") && mp >= 1;
+        if (skilluse) //약한 스킬
         {
-
+            cooltime = 3;
+            float x = sr.flipX ? -3 : 3;
+            skillP = new Vector2(transform.position.x + x, transform.position.y);
+            MakeEffect(skillP, true, skillSprite, -2);
+            mp--;
+            manager.ChangeHPMP();
         }
+        else skillP = new Vector2(9999, 9999); //저 멀리
+
 
         if (hurtTime >= 0) Hurt(); //아플 때
         else sr.color = Color.white; //기본
 
         if (hp <= 0) SceneManager.LoadScene(0); //쉐이망
-    }
+    } //Update End
 
 
     void FixedUpdate()
@@ -131,13 +149,7 @@ public class Player : MonoBehaviour //플레이어
             rigid.AddForce(dashSpeed * (sr.flipX ? Vector2.left : Vector2.right),
                 ForceMode2D.Impulse);
             rigid.velocity = new Vector2(rigid.velocity.x, 0);
-
-            GameObject effect =
-                Instantiate(dashEffect, transform.position, Quaternion.identity);
-            SpriteRenderer esr = effect.transform.GetComponent<SpriteRenderer>();
-            esr.sprite = dashImage;
-            esr.flipX = sr.flipX;
-            esr.sortingOrder = -1;
+            MakeEffect(transform.position, false, dashSprite, -1);
         }
         if (dashTime >= maxDash) //대쉬 시간
         {
@@ -147,28 +159,7 @@ public class Player : MonoBehaviour //플레이어
             dashTime = 0;
         }
 
-        /*
-        //플랫폼 착지
-        if (rigid.velocity.y < 0)
-        {
-            //에디터상에서만 Ray를 그려주는 함수
-            Debug.DrawRay(rigid.position, Vector3.down, new Color(0, 1, 0));
-
-            //Ray에 닿은 오브젝트
-            RaycastHit2D rayHit = Physics2D.Raycast(rigid.position, Vector3.down,
-                2, LayerMask.GetMask("Platform"));
-
-            if (rayHit.collider != null)
-            {
-                if (rayHit.distance < 2.5f)
-                {
-                    isJumping = false;
-                    sr.sprite = players[0];
-                }
-            }
-        }
-        */ //레이캐스트 저리 가
-    }
+    } //FixedUpdate End
 
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -192,6 +183,17 @@ public class Player : MonoBehaviour //플레이어
     {
         sr.color = new Color(1, 1 - hurtTime, 1 - hurtTime);
         hurtTime -= 4 * Time.deltaTime;
+    }
+
+
+    void MakeEffect(Vector2 p, bool d, Sprite s, int l) //Fade 스크립트가 붙은 오브젝트 생성
+    {
+        GameObject effect = Instantiate(dashEffect, p, Quaternion.identity);
+        if (d) effect.tag = "SkillCircle";
+        SpriteRenderer esr = effect.transform.GetComponent<SpriteRenderer>();
+        esr.sprite = s;
+        esr.flipX = sr.flipX;
+        esr.sortingOrder = l;
     }
 
 } //Player End

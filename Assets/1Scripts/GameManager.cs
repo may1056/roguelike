@@ -15,6 +15,9 @@ public class GameManager : MonoBehaviour //°ÔÀÓ ÃÑ°ı
     public static int killed; //Å³ ¼ö
     public Text killText;
 
+    public Text coolText; //ÄğÅ¸ÀÓ
+
+
     void Start()
     {
         killed = 0;
@@ -24,6 +27,8 @@ public class GameManager : MonoBehaviour //°ÔÀÓ ÃÑ°ı
 
     void Update()
     {
+        coolText.text = "ÄğÅ¸ÀÓ: " + player.cooltime.ToString("N0") + "ÃÊ";
+
         //Å³ ¼ö Ç¥½Ã
         killText.text = killed.ToString() + " / " + enemies.ToString();
 

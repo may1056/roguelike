@@ -7,6 +7,7 @@ TagManager:
   - Platform
   - Attack
   - Enemy
+  - SkillCircle
   layers:
   - Default
   - TransparentFX
