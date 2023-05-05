@@ -48,13 +48,14 @@ public class Enemy : MonoBehaviour //적
         if (dist < noticeDist) moving = true;
 
         //피 닳는 시스템
+        //일반공격
         if (inAttackArea && (Input.GetMouseButtonDown(0)
-            || Input.GetKeyDown("j"))) //내가 마우스가 없어서 임시로 설정한 키
+            || Input.GetKeyDown("j")) && Player.player.attackCooltime <= 0) //내가 마우스가 없어서 임시로 설정한 키
         {
             hp--;
             sr.sprite = Hurt;
         }
-
+        //스킬
         if (Mathf.Abs(Player.skillP.y) < 20 &&
             Vector2.Distance(transform.position, Player.skillP) < 3.5f)
         {
