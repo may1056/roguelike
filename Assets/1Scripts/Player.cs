@@ -117,15 +117,15 @@ public class Player : MonoBehaviour //플레이어
         }
 
 
-        //공격 (임시로 스킬에서 코드 가져온거라 페이드 들어감, 
+        //공격 (임시로 스킬에서 코드 가져온거라 페이드 들어감,
         if (attackCooltime > 0) attackCooltime -= Time.deltaTime;
         isAttacking = (Input.GetMouseButton(0) || Input.GetKey("j")) && attackCooltime <= 0; //j는 임시 공격 키
-        if (isAttacking) 
+        if (isAttacking)
         {
-            attackCooltime = 0.2f-attackSpeed; // 기본값 소수점 단위에 추가 공격속도 값만큼 빼니 음수로 안가게 주의 
+            attackCooltime = 0.2f-attackSpeed; // 기본값 소수점 단위에 추가 공격속도 값만큼 빼니 음수로 안가게 주의
             float x = sr.flipX ? -2 : 2;
             attackP = new Vector2(transform.position.x + x, transform.position.y);
-            MakeEffect(attackP, true, attackSprite, -2);
+            MakeEffect(attackP, attackSprite, -2);
         }
         else attackP = new Vector2(9999, 9999); //저 멀리
 
@@ -137,7 +137,7 @@ public class Player : MonoBehaviour //플레이어
             cooltime = 3;
             float x = sr.flipX ? -3 : 3;
             skillP = new Vector2(transform.position.x + x, transform.position.y);
-            MakeEffect(skillP, true, skillSprite, -2);
+            MakeEffect(skillP, skillSprite, -2);
             mp--;
             manager.ChangeHPMP();
         }
@@ -166,7 +166,7 @@ public class Player : MonoBehaviour //플레이어
             rigid.AddForce(dashSpeed * (sr.flipX ? Vector2.left : Vector2.right),
                 ForceMode2D.Impulse);
             rigid.velocity = new Vector2(rigid.velocity.x, 0);
-            MakeEffect(transform.position, false, dashSprite, -1);
+            MakeEffect(transform.position, dashSprite, -1);
         }
         if (dashTime >= maxDash) //대쉬 시간
         {
@@ -203,10 +203,10 @@ public class Player : MonoBehaviour //플레이어
     }
 
 
-    void MakeEffect(Vector2 p, bool d, Sprite s, int l) //Fade 스크립트가 붙은 오브젝트 생성
+    //position, damage, sprite, layer
+    void MakeEffect(Vector2 p, Sprite s, int l) //Fade 스크립트가 붙은 오브젝트 생성
     {
         GameObject effect = Instantiate(dashEffect, p, Quaternion.identity);
-        if (d) effect.tag = "SkillCircle";
         SpriteRenderer esr = effect.transform.GetComponent<SpriteRenderer>();
         esr.sprite = s;
         esr.flipX = sr.flipX;
