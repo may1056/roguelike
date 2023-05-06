@@ -1,16 +1,13 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
-public class Monster01packman : MonoBehaviour
+public class Monster01packman : MonoBehaviour //팩맨
 {
-   
-
-    Rigidbody2D rigid;
     Vector2 nowPosition;
 
-    bool inAttackArea = false; 
+    bool inAttackArea = false;
 
-    int hp; 
+    int hp;
     public int maxhp;
     bool leejong;
     SpriteRenderer sr;
@@ -18,13 +15,13 @@ public class Monster01packman : MonoBehaviour
 
     void Start()
 	{
-        rigid = GetComponent<Rigidbody2D>();
         nowPosition = new Vector2(999, 999);
 
         hp = maxhp;
 
         sr = GetComponent<SpriteRenderer>();
-    }
+
+    } //Start End
 
 	void Update()
 	{
@@ -45,8 +42,10 @@ public class Monster01packman : MonoBehaviour
 
         //���̸�
         if (hp <= 0) Destroy(this.gameObject);
-    }
-   void FixedUpdate() 
+    } //Update End
+
+
+   void FixedUpdate()
     {
         float h = leejong ? 3 : -3;
         transform.Translate(h * Time.deltaTime * Vector2.right);
@@ -57,8 +56,9 @@ public class Monster01packman : MonoBehaviour
         sr.flipX = leejong;
 
         nowPosition = transform.position;
-        
-    }
+    } //FixedUpdate End
+
+
     private void OnDestroy()
     {
         GameManager.killed++; //�����鼭 ų �� �ø��� ��
@@ -79,6 +79,6 @@ public class Monster01packman : MonoBehaviour
     }
 
 
-}//monster01 and 
+} //Monster01packman End
 
 

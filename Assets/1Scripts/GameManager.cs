@@ -6,6 +6,43 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour //게임 총괄
 {
+    //아이템
+    readonly string[] legendItems = { "알파 수정" };
+    readonly string[] rareItems =
+        { "부활 아이템", "자동 공격", "자해", "버서커", "강한 대쉬", "극진공수도 비급",};
+    readonly string[] commonItems =
+        { "붉은 수정", "hp색 수정", "초록 수정", "노란 수정", "푸른 수정", "주황 수정", "독" };
+
+    //아이템별 확률
+    readonly float[] legendItems_p = { 0.1f };
+    readonly float[] rareItems_p = { 3, 3, 3, 3, 3, 3 };
+    readonly float[] commonItems_p = { 10, 10, 10, 10, 10, 10, 10, };
+
+    //무기
+    readonly string[] weapon =
+        { "채찍", "검", "활", "총지팡이",
+        "열라짱짱 쎈 킹왕짱 울트라 슈퍼 매지컬 치즈스틱 롱치즈 이거 ㄹㅇ실화냐...", "방패" };
+    //무기별 확률
+    readonly float[] weapon_p = { 9.9f, 30, 20, 20, 0.1f, 20 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     public Player player;
     public Image[] hps = new Image[6]; //hp 구슬들
     public Image[] mps = new Image[6]; //mp 구슬들

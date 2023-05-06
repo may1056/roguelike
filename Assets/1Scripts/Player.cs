@@ -79,6 +79,9 @@ public class Player : MonoBehaviour //플레이어
 
     void Update()
     {
+        transform.GetChild(2).transform.localPosition
+            = -0.1f * transform.position;
+
         //점프
         if ((Input.GetKeyDown("w") || Input.GetKeyDown(KeyCode.Space))
             && !isJumping)
@@ -220,6 +223,13 @@ public class Player : MonoBehaviour //플레이어
     }
 
     //왜인지는 모르겠으나 콜라이더 관련 함수들이 죄다 이상하게 작동한다. 슬프다
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Respawn"))
+            SceneManager.LoadScene(0); //낙사
+    }
+
 
     private void OnTriggerExit2D(Collider2D other)
     {

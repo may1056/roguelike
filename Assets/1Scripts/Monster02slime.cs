@@ -1,12 +1,11 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class Monster02slime : MonoBehaviour //적
+public class Monster02slime : MonoBehaviour //슬라임
 {
     Rigidbody2D rigid;
-    Vector2 nowPosition;
 
     float H; //이동 상?수
     bool inAttackArea = false; //플레이어의 공격 범위 내에 있는지
@@ -26,13 +25,13 @@ public class Monster02slime : MonoBehaviour //적
     void Start()
     {
         rigid = GetComponent<Rigidbody2D>();
-        nowPosition = new Vector2(999, 999);
 
         hp = maxhp;
 
         sr = GetComponent<SpriteRenderer>();
 
         inAttackArea = false;
+
     } //Start End
 
 
@@ -52,7 +51,8 @@ public class Monster02slime : MonoBehaviour //적
 
         //피 닳는 시스템
         if (inAttackArea && (Input.GetMouseButtonDown(0)
-            || Input.GetKeyDown("j")) && Player.curAttackCooltime >= Player.maxAttackCooltime) //내가 마우스가 없어서 임시로 설정한 키
+            || Input.GetKeyDown("j")) && //내가 마우스가 없어서 임시로 설정한 키
+            Player.curAttackCooltime >= Player.maxAttackCooltime)
         {
             hp--;
             sr.sprite = Hurt;
@@ -69,29 +69,22 @@ public class Monster02slime : MonoBehaviour //적
         //쉐이망
         if (hp <= 0) Destroy(this.gameObject);
 
-        //점프
-
-        if (moving && Mathf.Abs(rigid.velocity.y)< 0.1f)
-        {
-            lezong -= Time.deltaTime;
-        }
+        //점프를 위한 시간 변수 값 조정
+        if (moving && Mathf.Abs(rigid.velocity.y) < 0.1f) lezong -= Time.deltaTime;
 
     } //Update End
 
     void FixedUpdate()
     {
         //플레이어를 감지한 후에는 계속 이동
-        if (moving)
-        {
-            transform.Translate(H * Time.deltaTime * Vector2.right);
+        if (moving) transform.Translate(H * Time.deltaTime * Vector2.right);
 
-         
-        }
         if (lezong<=0)
         {
             rigid.AddForce(Vector2.up*lezonghan, ForceMode2D.Impulse);
             lezong = 0.3f;
         }
+
     } //FixedUpdate End
 
 
@@ -114,4 +107,4 @@ public class Monster02slime : MonoBehaviour //적
             inAttackArea = false; //빠져나온다
     }
 
-} //Enemy End
+} //Monster02slime End

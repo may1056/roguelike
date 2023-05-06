@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class Enemy : MonoBehaviour //적
+public class Monster00Spider : MonoBehaviour //거미
 {
     Rigidbody2D rigid;
     Vector2 nowPosition;
