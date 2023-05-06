@@ -97,7 +97,6 @@ public class Enemy : MonoBehaviour //적
     {
         if (collision.gameObject.CompareTag("Attack"))
             inAttackArea = true; //들어간다
-        Debug.Log("공범 들어옴");
     }
 
 
@@ -105,7 +104,6 @@ public class Enemy : MonoBehaviour //적
     {
         if (collision.gameObject.CompareTag("Attack"))
             inAttackArea = false; //빠져나온다
-        Debug.Log("공범 나감");
     }
 
 } //Enemy End
