@@ -2,13 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Fade : MonoBehaviour //¼­¼­È÷ »ç¶óÁö´Â È¿°ú
+public class Fade : MonoBehaviour //ì„œì„œíˆ ì‚¬ë¼ì§€ëŠ” íš¨ê³¼
 {
     private SpriteRenderer sr;
     float fadetimegoes = 0;
-
-
-    //ÇÑ±Û ÁÖ¼® À¸¾Ë¾Æ¤Ó³Ê¤Ó¤·¶õ¾Ë¹Ì¤¿¤¸´ô¤Ç¤Ì¤Ì¤·ÇÇ¤ÇÅ¸Á¦¹öÁÖµå½¢Æ÷ÄÑ
 
     void Start()
     {

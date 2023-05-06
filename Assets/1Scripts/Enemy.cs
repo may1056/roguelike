@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class Enemy : MonoBehaviour //Àû
+public class Enemy : MonoBehaviour //ì 
 {
     Rigidbody2D rigid;
     Vector2 nowPosition;
 
-    float H; //ÀÌµ¿ »ó?¼ö
-    bool inAttackArea = false; //ÇÃ·¹ÀÌ¾îÀÇ °ø°İ ¹üÀ§ ³»¿¡ ÀÖ´ÂÁö
+    float H; //ì´ë™ ìƒ?ìˆ˜
+    bool inAttackArea = false; //í”Œë ˆì´ì–´ì˜ ê³µê²© ë²”ìœ„ ë‚´ì— ìˆëŠ”ì§€
 
-    int hp; //Ã¼·Â
-    public int maxhp; //ÃÖ´ë Ã¼·Â
+    int hp; //ì²´ë ¥
+    public int maxhp; //ìµœëŒ€ ì²´ë ¥
 
-    float dist; //ÇÃ·¹ÀÌ¾î¿ÍÀÇ °Å¸®
-    public float noticeDist; //ÇÃ·¹ÀÌ¾î ÀÎ½Ä °¡´É ¹üÀ§
+    float dist; //í”Œë ˆì´ì–´ì™€ì˜ ê±°ë¦¬
+    public float noticeDist; //í”Œë ˆì´ì–´ ì¸ì‹ ê°€ëŠ¥ ë²”ìœ„
     bool moving = false;
 
     SpriteRenderer sr;
@@ -37,22 +37,23 @@ public class Enemy : MonoBehaviour //Àû
 
     void Update()
     {
-  
-        //ÇÃ·¹ÀÌ¾î¸¦ ÇâÇØ ÀÌµ¿ ¹æÇâÀ» º¯°æÇÑ´Ù (¾ÆÇÁ¸é »¡¶óÁü)
+        //í”Œë ˆì´ì–´ë¥¼ í–¥í•´ ì´ë™ ë°©í–¥ì„ ë³€ê²½í•œë‹¤ (ì•„í”„ë©´ ë¹¨ë¼ì§)
         if (transform.position.x > Player.player.transform.position.x)
-            H = hp == maxhp ? -1 : -5;
-        else H = hp == maxhp ? 1 : 5;
+            H = hp == maxhp ? -1 : -2;
+        else H = hp == maxhp ? 1 : 2;
 
-        //ÇÃ·¹ÀÌ¾î¿Í Àû »çÀÌÀÇ °Å¸®
+        sr.flipX = transform.position.x < Player.player.transform.position.x - 0.1f;
+
+        //í”Œë ˆì´ì–´ì™€ ì  ì‚¬ì´ì˜ ê±°ë¦¬
         dist =
             Vector2.Distance(transform.position, Player.player.transform.position);
 
-        //°¡±î¿ì¸é ÀÌµ¿ ½ÃÀÛ
+        //ê°€ê¹Œìš°ë©´ ì´ë™ ì‹œì‘
         if (dist < noticeDist) moving = true;
-        
-        //ÇÇ ´â´Â ½Ã½ºÅÛ
+
+        //í”¼ ë‹³ëŠ” ì‹œìŠ¤í…œ
         if (inAttackArea && (Input.GetMouseButtonDown(0)
-            || Input.GetKeyDown("j")) && Player.curAttackCooltime >= Player.maxAttackCooltime) //³»°¡ ¸¶¿ì½º°¡ ¾ø¾î¼­ ÀÓ½Ã·Î ¼³Á¤ÇÑ Å°
+            || Input.GetKeyDown("j")) && Player.curAttackCooltime >= Player.maxAttackCooltime) //ë‚´ê°€ ë§ˆìš°ìŠ¤ê°€ ì—†ì–´ì„œ ì„ì‹œë¡œ ì„¤ì •í•œ í‚¤
         {
             hp--;
             sr.sprite = Hurt;
@@ -66,19 +67,19 @@ public class Enemy : MonoBehaviour //Àû
             sr.sprite = Hurt;
         }
 
-        //½¦ÀÌ¸Á
+        //ì‰ì´ë§
         if (hp <= 0) Destroy(this.gameObject);
 
     } //Update End
 
     void FixedUpdate()
     {
-        //ÇÃ·¹ÀÌ¾î¸¦ °¨ÁöÇÑ ÈÄ¿¡´Â °è¼Ó ÀÌµ¿
+        //í”Œë ˆì´ì–´ë¥¼ ê°ì§€í•œ í›„ì—ëŠ” ê³„ì† ì´ë™
         if (moving)
         {
             transform.Translate(H * Time.deltaTime * Vector2.right);
 
-            //º®¿¡ ¸·Çô ¾È ¿òÁ÷ÀÌ¸é Á¡ÇÁ
+            //ë²½ì— ë§‰í˜€ ì•ˆ ì›€ì§ì´ë©´ ì í”„
             if (Mathf.Abs(transform.position.x - nowPosition.x) < 0.01f)
                 rigid.AddForce(0.3f * Vector2.up, ForceMode2D.Impulse);
 
@@ -89,21 +90,21 @@ public class Enemy : MonoBehaviour //Àû
 
     private void OnDestroy()
     {
-        GameManager.killed++; //Á×À¸¸é¼­ Å³ ¼ö ¿Ã¸®°í °¨
+        GameManager.killed++; //ì£½ìœ¼ë©´ì„œ í‚¬ ìˆ˜ ì˜¬ë¦¬ê³  ê°
     }
 
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("Attack"))
-            inAttackArea = true; //µé¾î°£´Ù
+            inAttackArea = true; //ë“¤ì–´ê°„ë‹¤
     }
 
 
     private void OnTriggerExit2D(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("Attack"))
-            inAttackArea = false; //ºüÁ®³ª¿Â´Ù
+            inAttackArea = false; //ë¹ ì ¸ë‚˜ì˜¨ë‹¤
     }
 
 } //Enemy End
