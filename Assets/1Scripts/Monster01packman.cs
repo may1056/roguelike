@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Monster01 : MonoBehaviour
+public class Monster01packman : MonoBehaviour
 {
    
 
