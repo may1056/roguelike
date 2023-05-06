@@ -3,29 +3,29 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class Player : MonoBehaviour //ÇÃ·¹ÀÌ¾î
+public class Player : MonoBehaviour //í”Œë ˆì´ì–´
 {
     public GameManager manager;
 
     public static Player player;
-    //public staticÀ¸·Î ¼³Á¤ÇÑ º¯¼ö´Â ´Ù¸¥ ½ºÅ©¸³Æ®¿¡¼­ ¸¾´ë·Î ÆÛ°¥ ¼ö ÀÖ´Ù
+    //public staticìœ¼ë¡œ ì„¤ì •í•œ ë³€ìˆ˜ëŠ” ë‹¤ë¥¸ ìŠ¤í¬ë¦½íŠ¸ì—ì„œ ë§˜ëŒ€ë¡œ í¼ê°ˆ ìˆ˜ ìˆë‹¤
 
     Rigidbody2D rigid;
     SpriteRenderer sr;
     Animator anim;
 
     public Sprite[] players = new Sprite[3];
-    //¾Ö´Ï¸ŞÀÌ¼Ç ¸¸µé±â ±ÍÂú¾Æ¼­ ÀÓ½Ã¹æÆíÀ¸·Î ½ºÇÁ¶óÀÌÆ® ±³Ã¼¿ë
-    //0: Æò¼Ò »óÅÂ(¸ØÃã), 1: °È±â(´Ş¸®±â), 2: ¶Ù±â(Á¡ÇÁ)
+    //ì• ë‹ˆë©”ì´ì…˜ ë§Œë“¤ê¸° ê·€ì°®ì•„ì„œ ì„ì‹œë°©í¸ìœ¼ë¡œ ìŠ¤í”„ë¼ì´íŠ¸ êµì²´ìš©
+    //0: í‰ì†Œ ìƒíƒœ(ë©ˆì¶¤), 1: ê±·ê¸°(ë‹¬ë¦¬ê¸°), 2: ë›°ê¸°(ì í”„)
 
     public int hp;
-    float hurtTime = 0; //ÇÇ°İ ½Ã »ç¿ëÇÒ ½Ã°£ º¯¼ö
+    float hurtTime = 0; //í”¼ê²© ì‹œ ì‚¬ìš©í•  ì‹œê°„ ë³€ìˆ˜
 
-    public float speed = 0; //´Ş¸®±â ¼Óµµ
+    public float speed = 0; //ë‹¬ë¦¬ê¸° ì†ë„
 
-    public static float maxAttackCooltime = 0.2f; // ÄğÅ¸ÀÓ ½Ã°£
-    public static float curAttackCooltime = 0; // ÇöÀç ÄğÅ¸ÀÓ
-    public float attackspeed = 0; // ÇöÀç ÄğÅ¸ÀÓ
+    public static float maxAttackCooltime = 0.2f; // ì¿¨íƒ€ì„ ì‹œê°„
+    public static float curAttackCooltime = 0; // í˜„ì¬ ì¿¨íƒ€ì„
+    public float attackspeed = 0; // í˜„ì¬ ì¿¨íƒ€ì„
     public static Vector2 attackP;
     public Sprite attackSprite;
     bool attackuse = false;
@@ -33,41 +33,41 @@ public class Player : MonoBehaviour //ÇÃ·¹ÀÌ¾î
 
     bool isWalking = false;
     bool isJumping = false;
-    public float jumpPower; //¶Ù´Â Èû
-    float notJumpTime = 0; //°¡¸¸È÷ ÀÖ´Â ½Ã°£
+    public float jumpPower; //ë›°ëŠ” í˜
+    float notJumpTime = 0; //ê°€ë§Œíˆ ìˆëŠ” ì‹œê°„
 
 
     bool isDashing = false;
-    bool onceDashed = false; //°øÁß¿¡¼­ ´ë½¬¸¦ ÀÌ¹Ì Çß´ÂÁö
-    public float maxDash; //ÃÖ´ë ´ë½¬ °¡´É ½Ã°£
-    public float dashSpeed; //´ë½¬ ºü¸£±â
-    float dashTime = 0; //´ë½¬ÇÏ´Â ½Ã°£
+    bool onceDashed = false; //ê³µì¤‘ì—ì„œ ëŒ€ì‰¬ë¥¼ ì´ë¯¸ í–ˆëŠ”ì§€
+    public float maxDash; //ìµœëŒ€ ëŒ€ì‰¬ ê°€ëŠ¥ ì‹œê°„
+    public float dashSpeed; //ëŒ€ì‰¬ ë¹ ë¥´ê¸°
+    float dashTime = 0; //ëŒ€ì‰¬í•˜ëŠ” ì‹œê°„
     public GameObject dashEffect;
     public Sprite dashSprite;
 
     SpriteRenderer attacksr;
-    //°ø°İ ¿ÀºêÁ§Æ®ÀÇ ½ºÇÁ¶óÀÌÆ®·»´õ·¯, flipX ¶§¹®¿¡ ÇÊ¿äÇÒ µí
+    //ê³µê²© ì˜¤ë¸Œì íŠ¸ì˜ ìŠ¤í”„ë¼ì´íŠ¸ë Œë”ëŸ¬, flipX ë•Œë¬¸ì— í•„ìš”í•  ë“¯
 
-    //¹«±â´Â È¹µæ ½Ã ÇÃ·¹ÀÌ¾îÀÇ ÀÚ¼Õ ¸ñ·Ï ¸Ç Ã¹ ¹øÂ°¿¡ µé¾î°¡µµ·Ï ÇÕ½Ã´Ù!!!
+    //ë¬´ê¸°ëŠ” íšë“ ì‹œ í”Œë ˆì´ì–´ì˜ ìì† ëª©ë¡ ë§¨ ì²« ë²ˆì§¸ì— ë“¤ì–´ê°€ë„ë¡ í•©ì‹œë‹¤!!!
 
     public int mp;
     public float cooltime = 0;
 
-    bool skilluse; //½ºÅ³ ½ÃÀüÇÏ´ÂÁö
-    public static Vector2 skillP; //½ºÅ³ ¿ø À§Ä¡
+    bool skilluse; //ìŠ¤í‚¬ ì‹œì „í•˜ëŠ”ì§€
+    public static Vector2 skillP; //ìŠ¤í‚¬ ì› ìœ„ì¹˜
     public Sprite skillSprite;
 
 
     void Awake()
     {
-        player = this; //ÀÌ°Ô ³ª´Ù
+        player = this; //ì´ê²Œ ë‚˜ë‹¤
 
         rigid = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
 
-        //ÇÃ·¹ÀÌ¾îÀÇ 0¹øÂ° ÀÚ¼ÕÀÎ AttackÀÇ ½ºÇÁ¶óÀÌÆ®·»´õ·¯¸¦ ²ø°í ¿Â´Ù.
-        //ÇãÁ¢ÇÑ ±ÙÁ¢ °ø°İÀ» ¸¸µé±â À§ÇÔ.
+        //í”Œë ˆì´ì–´ì˜ 0ë²ˆì§¸ ìì†ì¸ Attackì˜ ìŠ¤í”„ë¼ì´íŠ¸ë Œë”ëŸ¬ë¥¼ ëŒê³  ì˜¨ë‹¤.
+        //í—ˆì ‘í•œ ê·¼ì ‘ ê³µê²©ì„ ë§Œë“¤ê¸° ìœ„í•¨.
         attacksr = transform.GetChild(0).GetComponent<SpriteRenderer>();
         attacksr.color = new Color(1, 1, 1, 0);
     } //Awake End
@@ -75,41 +75,42 @@ public class Player : MonoBehaviour //ÇÃ·¹ÀÌ¾î
 
     void Update()
     {
-        //Á¡ÇÁ
-        if (Input.GetKeyDown("w") && !isJumping)
+        //ì í”„
+        if ((Input.GetKeyDown("w") || Input.GetKeyDown(KeyCode.Space))
+            && !isJumping)
         {
             rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
             isJumping = true;
             sr.sprite = players[2];
         }
 
-        //¿¬Á÷ ¹æÇâ ¼Ó·ÂÀÌ °ÅÀÇ 0ÀÎ »óÅÂ°¡ 0.1ÃÊ ÀÌ»óÀÌ¸é Á¡ÇÁ Áß´Ü
+        //ì—°ì§ ë°©í–¥ ì†ë ¥ì´ ê±°ì˜ 0ì¸ ìƒíƒœê°€ 0.1ì´ˆ ì´ìƒì´ë©´ ì í”„ ì¤‘ë‹¨
         if (Mathf.Abs(rigid.velocity.y) < 0.01f) notJumpTime += Time.deltaTime;
         else notJumpTime = 0;
         isJumping = notJumpTime < 0.1f;
 
-        //¹æÇâ ÀüÈ¯
+        //ë°©í–¥ ì „í™˜
         if (Input.GetButton("Horizontal"))
             sr.flipX = Input.GetAxisRaw("Horizontal") == -1;
 
-        //±Ù?Á¢ °ø°İ ¿ÀºêÁ§Æ®µµ µÚÁı°í À§Ä¡ º¯°æ. ÀÌ°Ç Á» ¸¹ÀÌ ¼ÕºÁ¾ß ÇÑ´Ù.
+        //ê·¼?ì ‘ ê³µê²© ì˜¤ë¸Œì íŠ¸ë„ ë’¤ì§‘ê³  ìœ„ì¹˜ ë³€ê²½. ì´ê±´ ì¢€ ë§ì´ ì†ë´ì•¼ í•œë‹¤.
         attacksr.flipX = sr.flipX;
         transform.GetChild(0).transform.localPosition
             = new Vector2(sr.flipX ? -2f : 2f, 0);
 
 
-        if (!isJumping) //Á¡ÇÁ ¤¤
+        if (!isJumping) //ì í”„ ã„´
         {
             onceDashed = false;
 
-            if (isWalking) sr.sprite = players[1]; //°È°í ÀÖÀ¸¸é °È´Â ½ºÇÁ¶óÀÌÆ®
-            else sr.sprite = players[0]; //¸ØÃç ÀÖÀ¸¸é ¸ØÃá ½ºÇÁ¶óÀÌÆ®
+            if (isWalking) sr.sprite = players[1]; //ê±·ê³  ìˆìœ¼ë©´ ê±·ëŠ” ìŠ¤í”„ë¼ì´íŠ¸
+            else sr.sprite = players[0]; //ë©ˆì¶° ìˆìœ¼ë©´ ë©ˆì¶˜ ìŠ¤í”„ë¼ì´íŠ¸
         }
 
 
-        //¸¶¿ì½º ¿ìÅ¬¸¯ ´ë½¬
+        //ë§ˆìš°ìŠ¤ ìš°í´ë¦­ ëŒ€ì‰¬
         if (isJumping && !onceDashed && (Input.GetMouseButtonDown(1)
-            || Input.GetKeyDown("k"))) //k´Â ÀÓ½Ã ´ë½¬ Å°
+            || Input.GetKeyDown("k"))) //këŠ” ì„ì‹œ ëŒ€ì‰¬ í‚¤
         {
             isDashing = true;
             onceDashed = true;
@@ -117,12 +118,11 @@ public class Player : MonoBehaviour //ÇÃ·¹ÀÌ¾î
         }
 
 
-        //ÀÏ¹İ°ø°İ ÄğÅ¸ÀÓ, ¾Ö´Ï¸ŞÀÌ¼Ç
+        //ì¼ë°˜ê³µê²© ì¿¨íƒ€ì„, ì• ë‹ˆë©”ì´ì…˜
         if (curAttackCooltime <= maxAttackCooltime + 2) curAttackCooltime += Time.deltaTime;
-        attackuse = (Input.GetMouseButton(0) || Input.GetKey("j")) && (curAttackCooltime >= maxAttackCooltime); //j´Â ÀÓ½Ã °ø°İ Å°
+        attackuse = (Input.GetMouseButton(0) || Input.GetKey("j")) && (curAttackCooltime >= maxAttackCooltime); //jëŠ” ì„ì‹œ ê³µê²© í‚¤
         if (attackuse)
         {
-            
             float x = sr.flipX ? -2 : 2;
             attackP = new Vector2(transform.position.x + x, transform.position.y);
             attacksr.color = new Color(1, 1, 1, 1);
@@ -130,10 +130,10 @@ public class Player : MonoBehaviour //ÇÃ·¹ÀÌ¾î
         }
         else attacksr.color = new Color(1, 1, 1, 0);
 
-        //½ºÅ³
+        //ìŠ¤í‚¬
         if (cooltime > 0) cooltime -= Time.deltaTime;
         skilluse = cooltime <= 0 && Input.GetKeyDown("s") && mp >= 1;
-        if (skilluse) //¾àÇÑ ½ºÅ³
+        if (skilluse) //ì•½í•œ ìŠ¤í‚¬
         {
             cooltime = 3;
             float x = sr.flipX ? -3 : 3;
@@ -142,26 +142,29 @@ public class Player : MonoBehaviour //ÇÃ·¹ÀÌ¾î
             mp--;
             manager.ChangeHPMP();
         }
-        else skillP = new Vector2(9999, 9999); //Àú ¸Ö¸®
+        else skillP = new Vector2(9999, 9999); //ì € ë©€ë¦¬
 
 
-        if (hurtTime >= 0) Hurt(); //¾ÆÇÃ ¶§
-        else sr.color = Color.white; //±âº»
+        if (hurtTime >= 0) Hurt(); //ì•„í”Œ ë•Œ
+        else sr.color = Color.white; //ê¸°ë³¸
 
-        if (hp <= 0) SceneManager.LoadScene(0); //½¦ÀÌ¸Á
+        if (hp <= 0) SceneManager.LoadScene(0); //ì‰ì´ë§
+
+
+
     } //Update End
 
 
     void FixedUpdate()
     {
-        //ÁÂ¿ì ÀÌµ¿ (µî¼Ó, ¼Õ ¶¼¸é ¹Ù·Î ¸ØÃã)
+        //ì¢Œìš° ì´ë™ (ë“±ì†, ì† ë–¼ë©´ ë°”ë¡œ ë©ˆì¶¤)
         float h = Input.GetAxisRaw("Horizontal");
-        transform.Translate((10+speed) * Time.deltaTime * new Vector2(h, 0)); // ¼Óµµ ±âº» °ª 10 + speed
+        transform.Translate((10+speed) * Time.deltaTime * new Vector2(h, 0)); // ì†ë„ ê¸°ë³¸ ê°’ 10 + speed
 
         isWalking = h != 0;
 
 
-        if (isDashing) //´ë½¬ ÁßÀÌ´Ù
+        if (isDashing) //ëŒ€ì‰¬ ì¤‘ì´ë‹¤
         {
             dashTime += Time.deltaTime;
             rigid.AddForce(dashSpeed * (sr.flipX ? Vector2.left : Vector2.right),
@@ -169,7 +172,7 @@ public class Player : MonoBehaviour //ÇÃ·¹ÀÌ¾î
             rigid.velocity = new Vector2(rigid.velocity.x, 0);
             MakeEffect(transform.position, dashSprite, -1);
         }
-        if (dashTime >= maxDash) //´ë½¬ ½Ã°£
+        if (dashTime >= maxDash) //ëŒ€ì‰¬ ì‹œê°„
         {
             isDashing = false;
             rigid.velocity = new Vector2(0, 0);
@@ -182,10 +185,10 @@ public class Player : MonoBehaviour //ÇÃ·¹ÀÌ¾î
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        //ÇÃ·§Æû ´êÀ¸¸é Á¡ÇÁ »óÅÂ ³À´Ù ÇØÁ¦ (Àß ¾È ¸ÔÈû..)
+        //í”Œë«í¼ ë‹¿ìœ¼ë©´ ì í”„ ìƒíƒœ ëƒ…ë‹¤ í•´ì œ (ì˜ ì•ˆ ë¨¹í˜..)
         if (collision.gameObject.CompareTag("Platform")) isJumping = false;
 
-        //¾ÆÇÄ
+        //ì•„í””
         if (gameObject.layer == 11 && collision.gameObject.CompareTag("Enemy"))
         {
             hp--;
@@ -194,10 +197,10 @@ public class Player : MonoBehaviour //ÇÃ·¹ÀÌ¾î
         }
     }
 
-    //¿ÖÀÎÁö´Â ¸ğ¸£°ÚÀ¸³ª Äİ¶óÀÌ´õ °ü·Ã ÇÔ¼öµéÀÌ ÁË´Ù ÀÌ»óÇÏ°Ô ÀÛµ¿ÇÑ´Ù. ½½ÇÁ´Ù
+    //ì™œì¸ì§€ëŠ” ëª¨ë¥´ê² ìœ¼ë‚˜ ì½œë¼ì´ë” ê´€ë ¨ í•¨ìˆ˜ë“¤ì´ ì£„ë‹¤ ì´ìƒí•˜ê²Œ ì‘ë™í•œë‹¤. ìŠ¬í”„ë‹¤
 
 
-    void Hurt() //Àá±ñ ºÓÀº»ö µÇ¾ú´Ù°¡ ¼­¼­È÷ È¸º¹
+    void Hurt() //ì ê¹ ë¶‰ì€ìƒ‰ ë˜ì—ˆë‹¤ê°€ ì„œì„œíˆ íšŒë³µ
     {
         sr.color = new Color(1, 1 - hurtTime, 1 - hurtTime);
         hurtTime -= 4 * Time.deltaTime;
@@ -205,7 +208,7 @@ public class Player : MonoBehaviour //ÇÃ·¹ÀÌ¾î
 
 
     //position, damage, sprite, layer
-    void MakeEffect(Vector2 p, Sprite s, int l) //Fade ½ºÅ©¸³Æ®°¡ ºÙÀº ¿ÀºêÁ§Æ® »ı¼º
+    void MakeEffect(Vector2 p, Sprite s, int l) //Fade ìŠ¤í¬ë¦½íŠ¸ê°€ ë¶™ì€ ì˜¤ë¸Œì íŠ¸ ìƒì„±
     {
         GameObject effect = Instantiate(dashEffect, p, Quaternion.identity);
         SpriteRenderer esr = effect.transform.GetComponent<SpriteRenderer>();

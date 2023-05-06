@@ -4,19 +4,21 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-public class GameManager : MonoBehaviour //°ÔÀÓ ÃÑ°ı
+public class GameManager : MonoBehaviour //ê²Œì„ ì´ê´„
 {
     public Player player;
-    public Image[] hps = new Image[6]; //hp ±¸½½µé
-    public Image[] mps = new Image[6]; //mp ±¸½½µé
+    public Image[] hps = new Image[6]; //hp êµ¬ìŠ¬ë“¤
+    public Image[] mps = new Image[6]; //mp êµ¬ìŠ¬ë“¤
 
-    public int enemies; //Àûµé ¼ö
+    public Text[] stat = new Text[5];
 
-    public static int killed; //Å³ ¼ö
+    public int enemies; //ì ë“¤ ìˆ˜
+
+    public static int killed; //í‚¬ ìˆ˜
     public Text killText;
 
-    public Text coolText; //ÄğÅ¸ÀÓ
-    //public Text atkcoolText; //ÀÏ¹İ°ø°İ ÄğÅ¸ÀÓ
+    public Text coolText; //ì¿¨íƒ€ì„
+    //public Text atkcoolText; //ì¼ë°˜ê³µê²© ì¿¨íƒ€ì„
 
 
     void Start()
@@ -28,19 +30,26 @@ public class GameManager : MonoBehaviour //°ÔÀÓ ÃÑ°ı
 
     void Update()
     {
-        coolText.text = "ÄğÅ¸ÀÓ: " + player.cooltime.ToString("N0") + "ÃÊ";
+        stat[0].text = "ê³µê²©ë ¥: ê³µê²©ë ¥ ë³€ìˆ˜ ì¶”ê°€í•„ìš”" /*+ Player.maxAttackCooltime.ToString()*/;
+        stat[1].text = "ê³µê²©ì†ë„: " + Player.maxAttackCooltime.ToString();
+        stat[2].text = "ì´ë™ì†ë„: " + Player.player.speed.ToString();
+        stat[3].text = "ì í”„ë ¥: " + Player.player.jumpPower.ToString();
+        stat[4].text = "ëŒ€ì‹œì†ë„: " + Player.player.dashSpeed.ToString();
 
-        //Å³ ¼ö Ç¥½Ã
+
+        coolText.text = "ì¿¨íƒ€ì„: " + player.cooltime.ToString("N0") + "ì´ˆ";
+
+        //í‚¬ ìˆ˜ í‘œì‹œ
         killText.text = killed.ToString() + " / " + enemies.ToString();
 
-        if (killed == enemies) Debug.LogWarning("Å¬¸®¾î");
+        if (killed == enemies) Debug.LogWarning("í´ë¦¬ì–´");
 
-        //ºü¸¥ Àç½ÃÀÛ
+        //ë¹ ë¥¸ ì¬ì‹œì‘
         if (Input.GetKeyDown(KeyCode.Backspace)) SceneManager.LoadScene(0);
     }
 
 
-    public void ChangeHPMP() //hp, mp ±¸½½ ÃÖ½ÅÈ­
+    public void ChangeHPMP() //hp, mp êµ¬ìŠ¬ ìµœì‹ í™”
     {
         for(int i = 0; i < 6; i++)
         {
