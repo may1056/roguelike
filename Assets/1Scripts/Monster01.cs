@@ -3,28 +3,28 @@ using System.Collections;
 
 public class Monster01 : MonoBehaviour
 {
-   
-
-    Rigidbody2D rigid;
+    //Rigidbody2D rigid;
     Vector2 nowPosition;
 
-    bool inAttackArea = false; 
+    bool inAttackArea = false;
 
-    int hp; 
+    int hp;
     public int maxhp;
     bool leejong;
     SpriteRenderer sr;
     public Sprite Hurt;
 
+
     void Start()
 	{
-        rigid = GetComponent<Rigidbody2D>();
+        //rigid = GetComponent<Rigidbody2D>();
         nowPosition = new Vector2(999, 999);
 
         hp = maxhp;
 
         sr = GetComponent<SpriteRenderer>();
     }
+
 
 	void Update()
 	{
@@ -46,7 +46,9 @@ public class Monster01 : MonoBehaviour
         //���̸�
         if (hp <= 0) Destroy(this.gameObject);
     }
-   void FixedUpdate() 
+
+
+   void FixedUpdate()
     {
         float h = leejong ? 3 : -3;
         transform.Translate(h * Time.deltaTime * Vector2.right);
@@ -57,8 +59,9 @@ public class Monster01 : MonoBehaviour
         sr.flipX = leejong;
 
         nowPosition = transform.position;
-        
     }
+
+
     private void OnDestroy()
     {
         GameManager.killed++; //�����鼭 ų �� �ø��� ��
@@ -79,6 +82,6 @@ public class Monster01 : MonoBehaviour
     }
 
 
-}//monster01 and 
+} //Monster01 End
 
 
