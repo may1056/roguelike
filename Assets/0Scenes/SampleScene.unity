@@ -1841,6 +1841,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxhp: 100
+  lezonghan: 15
   noticeDist: 15
   Hurt: {fileID: 0}
 --- !u!4 &555680078

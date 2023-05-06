@@ -13,7 +13,8 @@ public class Monster02slime : MonoBehaviour //적
 
     int hp; //체력
     public int maxhp; //최대 체력
-    float lezong = 0.3f;//점프 시간 카운트 
+    float lezong = 0.3f;//점프 시간 카운트
+    public float lezonghan; //점프파워
     float dist; //플레이어와의 거리
     public float noticeDist; //플레이어 인식 가능 범위
     bool moving = false;
@@ -69,8 +70,11 @@ public class Monster02slime : MonoBehaviour //적
         if (hp <= 0) Destroy(this.gameObject);
 
         //점프
-        lezong -= Time.deltaTime;
 
+        if (moving && Mathf.Abs(rigid.velocity.y)< 0.1f)
+        {
+            lezong -= Time.deltaTime;
+        }
 
     } //Update End
 
@@ -81,15 +85,11 @@ public class Monster02slime : MonoBehaviour //적
         {
             transform.Translate(H * Time.deltaTime * Vector2.right);
 
-            //벽에 막혀 안 움직이면 점프
-            if (Mathf.Abs(transform.position.x - nowPosition.x) < 0.01f)
-                rigid.AddForce(0.3f * Vector2.up, ForceMode2D.Impulse);
-
-            nowPosition = transform.position;
+         
         }
         if (lezong<=0)
         {
-            rigid.AddForce(Vector2.up, ForceMode2D.Impulse);
+            rigid.AddForce(Vector2.up*lezonghan, ForceMode2D.Impulse);
             lezong = 0.3f;
         }
     } //FixedUpdate End
