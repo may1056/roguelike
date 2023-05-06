@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4796893471936460583}
   - component: {fileID: 2298593320571031511}
   - component: {fileID: 2165616790800751766}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Ground
   m_TagString: Platform
   m_Icon: {fileID: 0}
@@ -27145,7 +27145,7 @@ Grid:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7208257104684735155}
   m_Enabled: 1
-  m_CellSize: {x: 1.1428572, y: 1.15, z: 0}
+  m_CellSize: {x: 1.1510792, y: 1.1510792, z: 0}
   m_CellGap: {x: 0, y: 0, z: 0}
   m_CellLayout: 0
   m_CellSwizzle: 0
@@ -27161,7 +27161,7 @@ GameObject:
   - component: {fileID: 1678712805116687484}
   - component: {fileID: 3500092676360119506}
   - component: {fileID: 296859408}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Block
   m_TagString: Platform
   m_Icon: {fileID: 0}
@@ -27592,8 +27592,8 @@ Tilemap:
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Origin: {x: -68, y: -27, z: 0}
-  m_Size: {x: 153, y: 51, z: 1}
+  m_Origin: {x: -70, y: -27, z: 0}
+  m_Size: {x: 155, y: 51, z: 1}
   m_TileAnchor: {x: 0.5, y: 0.5, z: 0}
   m_TileOrientation: 0
   m_TileOrientationMatrix:
@@ -27678,7 +27678,7 @@ TilemapCollider2D:
   m_Offset: {x: 0, y: 0}
   m_MaximumTileChangeCount: 1000
   m_ExtrusionFactor: 0
---- !u!114 &6569289800633990285
+--- !u!114 &4912401421695155076
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
