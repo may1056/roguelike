@@ -16,7 +16,7 @@ public class GameManager : MonoBehaviour //게임 총괄
     public Text killText;
 
     public Text coolText; //쿨타임
-    //public Text atkcoolText; //일반공격 쿨타임
+    public Text atkcoolText; //일반공격 쿨타임
 
 
     void Start()

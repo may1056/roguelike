@@ -21,7 +21,7 @@ public class Player : MonoBehaviour //플레이어
     public int hp;
     float hurtTime = 0; //피격 시 사용할 시간 변수
 
-    public float speed = 0; //달리기 속도
+    public float speed = 10; //달리기 속도
 
     public static float maxAttackCooltime = 0.2f; // 쿨타임 시간
     public static float curAttackCooltime = 0; // 현재 쿨타임
