@@ -21,7 +21,7 @@ public class Player : MonoBehaviour //플레이어
     public int hp;
     float hurtTime = 0; //피격 시 사용할 시간 변수
 
-    public float speed = 10; //달리기 속도
+    public float speed = 0; //달리기 속도
 
     public static float maxAttackCooltime = 0.2f; // 쿨타임 시간
     public static float curAttackCooltime = 0; // 현재 쿨타임
@@ -58,10 +58,6 @@ public class Player : MonoBehaviour //플레이어
     public Sprite skillSprite;
 
 
-    bool isSliding; //vmffotvhadmf sofudhsms wnddlswl
-    Vector2 slideP;
-
-
     void Awake()
     {
         player = this; //이게 나다
@@ -80,12 +76,11 @@ public class Player : MonoBehaviour //플레이어
     void Update()
     {
         //점프
-        if ((Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown("w"))
-            && !isJumping)
+        if (Input.GetKeyDown("w") && !isJumping)
         {
             rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
             isJumping = true;
-            //sr.sprite = players[2];
+            sr.sprite = players[2];
         }
 
         //연직 방향 속력이 거의 0인 상태가 0.1초 이상이면 점프 중단
@@ -107,8 +102,8 @@ public class Player : MonoBehaviour //플레이어
         {
             onceDashed = false;
 
-            //if (isWalking) sr.sprite = players[1]; //걷고 있으면 걷는 스프라이트
-            //else sr.sprite = players[0]; //멈춰 있으면 멈춘 스프라이트
+            if (isWalking) sr.sprite = players[1]; //걷고 있으면 걷는 스프라이트
+            else sr.sprite = players[0]; //멈춰 있으면 멈춘 스프라이트
         }
 
 
@@ -123,20 +118,21 @@ public class Player : MonoBehaviour //플레이어
 
 
         //일반공격 쿨타임, 애니메이션
-        if (curAttackCooltime <= maxAttackCooltime + 20) curAttackCooltime += Time.deltaTime;
+        if (curAttackCooltime <= maxAttackCooltime + 2) curAttackCooltime += Time.deltaTime;
         attackuse = (Input.GetMouseButton(0) || Input.GetKey("j")) && (curAttackCooltime >= maxAttackCooltime); //j는 임시 공격 키
         if (attackuse)
         {
+            
             float x = sr.flipX ? -2 : 2;
             attackP = new Vector2(transform.position.x + x, transform.position.y);
             attacksr.color = new Color(1, 1, 1, 1);
+            Debug.Log(curAttackCooltime);
         }
         else attacksr.color = new Color(1, 1, 1, 0);
 
-
         //스킬
         if (cooltime > 0) cooltime -= Time.deltaTime;
-        skilluse = cooltime <= 0 && Input.GetKeyDown("z") && mp >= 1;
+        skilluse = cooltime <= 0 && Input.GetKeyDown("s") && mp >= 1;
         if (skilluse) //약한 스킬
         {
             cooltime = 3;
@@ -153,20 +149,6 @@ public class Player : MonoBehaviour //플레이어
         else sr.color = Color.white; //기본
 
         if (hp <= 0) SceneManager.LoadScene(0); //쉐이망
-
-
-        if (Input.GetKeyDown("s")) //vmffotvha sofudhrl
-        {
-            isSliding = true;
-            this.gameObject.layer = 13;
-            slideP = transform.position;
-        }
-        if (isSliding && slideP.y-transform.position.y > 2)
-        {
-            isSliding = false;
-            this.gameObject.layer = 11;
-        }
-
     } //Update End
 
 
@@ -210,28 +192,14 @@ public class Player : MonoBehaviour //플레이어
             manager.ChangeHPMP();
             hurtTime = 1;
         }
-
-        //andjsrkfmf Enfgrh emfdjrkf tn dlTsms tkdxo ahen gowp
-        isSliding = false;
-        this.gameObject.layer = 11;
     }
 
     //왜인지는 모르겠으나 콜라이더 관련 함수들이 죄다 이상하게 작동한다. 슬프다
 
-    private void OnTriggerExit2D(Collider2D other)
-    {
-        if (isSliding && other.gameObject.layer == 8) //vmffotvhadmf ek sofudha
-        {
-            isSliding = false;
-            this.gameObject.layer = 11;
-            Debug.Log("빠져나옴");
-        }
-    }
-
 
     void Hurt() //잠깐 붉은색 되었다가 서서히 회복
     {
-        sr.color = new Color(1, 1 - hurtTime, 1 - hurtTime, 1 - 0.5f * hurtTime);
+        sr.color = new Color(1, 1 - hurtTime, 1 - hurtTime);
         hurtTime -= 4 * Time.deltaTime;
     }
 
