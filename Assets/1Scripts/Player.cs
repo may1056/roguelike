@@ -118,7 +118,7 @@ public class Player : MonoBehaviour //플레이어
 
 
         //일반공격 쿨타임, 애니메이션
-        if (curAttackCooltime <= maxAttackCooltime + 2) curAttackCooltime += Time.deltaTime;
+        if (curAttackCooltime <= maxAttackCooltime + 20) curAttackCooltime += Time.deltaTime;
         attackuse = (Input.GetMouseButton(0) || Input.GetKey("j")) && (curAttackCooltime >= maxAttackCooltime); //j는 임시 공격 키
         if (attackuse)
         {
@@ -126,7 +126,6 @@ public class Player : MonoBehaviour //플레이어
             float x = sr.flipX ? -2 : 2;
             attackP = new Vector2(transform.position.x + x, transform.position.y);
             attacksr.color = new Color(1, 1, 1, 1);
-            Debug.Log(curAttackCooltime);
         }
         else attacksr.color = new Color(1, 1, 1, 0);
 
