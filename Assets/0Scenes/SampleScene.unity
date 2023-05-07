@@ -820,7 +820,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3711459579996582490, guid: 969b70a8b9cbcb5408919c05a9bf4d98, type: 3}
       propertyPath: m_RootOrder
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3711459579996582490, guid: 969b70a8b9cbcb5408919c05a9bf4d98, type: 3}
       propertyPath: m_LocalPosition.x
@@ -4060,7 +4060,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1107603332
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12563,7 +12563,7 @@ MonoBehaviour:
   speed: 4
   attackspeed: 0
   attackSprite: {fileID: 21300000, guid: fe450ee90c349de40a2e28cfa0ba7b7f, type: 3}
-  jumpPower: 30
+  jumpPower: 28
   maxDash: 0.2
   dashSpeed: 10
   dashEffect: {fileID: 8326106217213998104, guid: c32a19154cf10874f974978490ab09ef, type: 3}
@@ -13760,7 +13760,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!61 &2014752752
 BoxCollider2D:
   m_ObjectHideFlags: 0
