@@ -81,7 +81,13 @@ public class Monster00Spider : MonoBehaviour //거미
 
             //벽에 막혀 안 움직이면 점프
             if (Mathf.Abs(transform.position.x - nowPosition.x) < 0.01f)
+            {
                 rigid.AddForce(0.3f * Vector2.up, ForceMode2D.Impulse);
+
+                if (Mathf.Abs(transform.position.y - nowPosition.y) < 0.01f)
+                    rigid.AddForce((sr.flipX ? 0.1f : -0.1f) * Vector2.right,
+                        ForceMode2D.Impulse);
+            }
 
             nowPosition = transform.position;
         }
