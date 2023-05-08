@@ -19,6 +19,7 @@ public class Player : MonoBehaviour //플레이어
     //0: 평소 상태(멈춤), 1: 걷기(달리기), 2: 뛰기(점프)
 
     public int hp;
+    public int maxhp;
     float hurtTime = 0; //피격 시 사용할 시간 변수
 
     public float speed = 0; //달리기 속도
@@ -45,12 +46,18 @@ public class Player : MonoBehaviour //플레이어
     public GameObject dashEffect;
     public Sprite dashSprite;
 
+    bool inGround; //끼임
+    float inGroundTime;
+    Vector2 outGroundP;
+
+
     SpriteRenderer attacksr;
     //공격 오브젝트의 스프라이트렌더러, flipX 때문에 필요할 듯
 
     //무기는 획득 시 플레이어의 자손 목록 맨 첫 번째에 들어가도록 합시다!!!
 
     public int mp;
+    public int maxmp;
     public float cooltime = 0;
 
     bool skilluse; //스킬 시전하는지
@@ -60,6 +67,7 @@ public class Player : MonoBehaviour //플레이어
     bool isSliding; //플랫폼 내려가는 중인지
     Vector2 slideP;
 
+    public static bool getOrb;
 
 
     void Awake()
@@ -74,6 +82,12 @@ public class Player : MonoBehaviour //플레이어
         //허접한 근접 공격을 만들기 위함.
         attacksr = transform.GetChild(0).GetComponent<SpriteRenderer>();
         attacksr.color = new Color(1, 1, 1, 0);
+
+        getOrb = false;
+
+        inGround = false;
+        inGroundTime = 0;
+
     } //Awake End
 
 
@@ -116,7 +130,7 @@ public class Player : MonoBehaviour //플레이어
 
 
         //마우스 우클릭 대쉬
-        if (isJumping && !onceDashed && (Input.GetMouseButtonDown(1)
+        if (!onceDashed && (Input.GetMouseButtonDown(1)
             || Input.GetKeyDown("k"))) //k는 임시 대쉬 키
         {
             isDashing = true;
@@ -162,6 +176,7 @@ public class Player : MonoBehaviour //플레이어
         if (hurtTime >= 0) Hurt(); //아플 때
         else sr.color = Color.white; //기본
 
+        if (hp > maxhp) hp = maxhp;
         if (hp <= 0) SceneManager.LoadScene(0); //쉐이망
 
 
@@ -173,6 +188,36 @@ public class Player : MonoBehaviour //플레이어
         }
 
         if (slideP.y - transform.position.y > 2) SlideCheck();
+
+        if (getOrb)
+        {
+            manager.ChangeHPMP();
+            getOrb = false;
+        }
+        if (mp > maxmp) mp = maxmp;
+
+        if (isDashing) //대쉬 중이다
+        {
+            dashTime += Time.deltaTime;
+            rigid.AddForce(dashSpeed * 0.1f * (sr.flipX ? Vector2.left : Vector2.right),
+                ForceMode2D.Impulse);
+            rigid.velocity = new Vector2(rigid.velocity.x, 0);
+            Time.timeScale = 2;
+            MakeEffect(transform.position, dashSprite, -1);
+        }
+        else Time.timeScale = 1;
+
+        if (inGround)
+        {
+            inGroundTime += Time.deltaTime;
+
+            if (inGroundTime > 1)
+            {
+                //transform.position = outGroundP;
+                inGround = false;
+            }
+        }
+        else inGroundTime = 0;
 
     } //Update End
 
@@ -186,15 +231,6 @@ public class Player : MonoBehaviour //플레이어
 
         isWalking = h != 0;
 
-
-        if (isDashing) //대쉬 중이다
-        {
-            dashTime += Time.deltaTime;
-            rigid.AddForce(dashSpeed * (sr.flipX ? Vector2.left : Vector2.right),
-                ForceMode2D.Impulse);
-            rigid.velocity = new Vector2(rigid.velocity.x, 0);
-            MakeEffect(transform.position, dashSprite, -1);
-        }
         if (dashTime >= maxDash) //대쉬 시간
         {
             isDashing = false;
@@ -222,12 +258,19 @@ public class Player : MonoBehaviour //플레이어
         SlideCheck();
     }
 
-    //왜인지는 모르겠으나 콜라이더 관련 함수들이 죄다 이상하게 작동한다. 슬프다
 
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Respawn"))
             SceneManager.LoadScene(0); //낙사
+
+        if (other.gameObject.layer == 9) //9Ground
+        {
+            //outGroundP = new Vector2(transform.position.x - rigid.velocity.x,
+            //    transform.position.y - rigid.velocity.y);
+            rigid.AddForce(-2 * new Vector2(rigid.velocity.x, rigid.velocity.y));
+            inGround = true;
+        }
     }
 
 
@@ -235,6 +278,9 @@ public class Player : MonoBehaviour //플레이어
     {
         if (other.gameObject.layer == 8) //8Block
             SlideCheck();
+
+        if (other.gameObject.layer == 9) //9Ground
+            inGround = false;
     }
 
 
@@ -264,5 +310,6 @@ public class Player : MonoBehaviour //플레이어
         esr.flipX = sr.flipX;
         esr.sortingOrder = l;
     }
+
 
 } //Player End

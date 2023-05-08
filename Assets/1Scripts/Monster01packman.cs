@@ -13,6 +13,9 @@ public class Monster01packman : MonoBehaviour //팩맨
     SpriteRenderer sr;
     public Sprite Hurt;
 
+    public GameObject hpOrb;
+    public GameObject mpOrb;
+
     void Start()
 	{
         nowPosition = new Vector2(999, 999);
@@ -41,7 +44,17 @@ public class Monster01packman : MonoBehaviour //팩맨
         }
 
         //���̸�
-        if (hp <= 0) Destroy(this.gameObject);
+        if (hp <= 0)
+        {
+            int r = Random.Range(0, 10);
+            if (r == 1) Instantiate(hpOrb, transform.position, Quaternion.identity);
+
+            r = Random.Range(0, 10);
+            if (r == 1) Instantiate(mpOrb, transform.position, Quaternion.identity);
+
+            Destroy(this.gameObject);
+        }
+
     } //Update End
 
 

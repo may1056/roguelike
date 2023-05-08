@@ -21,6 +21,9 @@ public class Monster02slime : MonoBehaviour //슬라임
     SpriteRenderer sr;
     public Sprite Hurt;
 
+    public GameObject hpOrb;
+    public GameObject mpOrb;
+
 
     void Start()
     {
@@ -67,7 +70,16 @@ public class Monster02slime : MonoBehaviour //슬라임
         }
 
         //쉐이망
-        if (hp <= 0) Destroy(this.gameObject);
+        if (hp <= 0)
+        {
+            int r = Random.Range(0, 10);
+            if (r == 1) Instantiate(hpOrb, transform.position, Quaternion.identity);
+
+            r = Random.Range(0, 10);
+            if (r == 1) Instantiate(mpOrb, transform.position, Quaternion.identity);
+
+            Destroy(this.gameObject);
+        }
 
         //점프를 위한 시간 변수 값 조정
         if (moving && Mathf.Abs(rigid.velocity.y) < 0.1f) lezong -= Time.deltaTime;

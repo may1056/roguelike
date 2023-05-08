@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7937911736823455431}
+  - component: {fileID: -2511397872461085854}
   - component: {fileID: 7937911736823455428}
   - component: {fileID: 7937911736823455429}
   - component: {fileID: 7937911736823455426}
@@ -36,7 +37,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7937911736823455428
+--- !u!114 &-2511397872461085854
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -45,13 +46,34 @@ MonoBehaviour:
   m_GameObject: {fileID: 7937911736823455425}
   m_Enabled: 1
   m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58794ccffaa917843819836eae653c4f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  monsterNum: 2
+  maxhp: 2
+  Hurt: {fileID: 0}
+  hpOrb: {fileID: 6510405994357380013, guid: f298c78827c8618408d5e5c4b44641cc, type: 3}
+  mpOrb: {fileID: 2026748482929784485, guid: dfc753a499df8d14bb6a7fc313dcaa13, type: 3}
+  noticeDist: 10
+  lezonghan: 8
+--- !u!114 &7937911736823455428
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7937911736823455425}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ac3746a357c2347548717f675d82b3b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   maxhp: 2
-  lezonghan: 5
-  noticeDist: 15
+  lezonghan: 10
+  noticeDist: 10
   Hurt: {fileID: 0}
+  hpOrb: {fileID: 6510405994357380013, guid: f298c78827c8618408d5e5c4b44641cc, type: 3}
+  mpOrb: {fileID: 2026748482929784485, guid: dfc753a499df8d14bb6a7fc313dcaa13, type: 3}
 --- !u!212 &7937911736823455429
 SpriteRenderer:
   m_ObjectHideFlags: 0
