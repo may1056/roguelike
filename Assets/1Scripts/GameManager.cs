@@ -20,10 +20,10 @@ public class GameManager : MonoBehaviour //게임 총괄
 
     //무기
     readonly string[] weapon =
-        { "채찍", "검", "활", "총지팡이",
+        { "채찍", "검", "창", "활", "총지팡이",
         "열라짱짱 쎈 킹왕짱 울트라 슈퍼 매지컬 치즈스틱 롱치즈 이거 ㄹㅇ실화냐...", "방패" };
     //무기별 확률
-    readonly float[] weapon_p = { 9.9f, 30, 20, 20, 0.1f, 20 };
+    readonly float[] weapon_p = { 9.9f, 25, 20, 15, 15, 0.1f, 15 };
 
 
 
@@ -57,6 +57,8 @@ public class GameManager : MonoBehaviour //게임 총괄
     public Text coolText; //쿨타임
     //public Text atkcoolText; //일반공격 쿨타임
 
+    public Text respawnText;
+
 
     void Start()
     {
@@ -79,11 +81,17 @@ public class GameManager : MonoBehaviour //게임 총괄
         //킬 수 표시
         killText.text = killed.ToString() + " / " + enemies.ToString();
 
-        if (killed == enemies) Debug.LogWarning("클리어");
+        //if (killed == enemies) Debug.LogWarning("클리어");
 
         //빠른 재시작
         if (Input.GetKeyDown(KeyCode.Backspace)) SceneManager.LoadScene(0);
-    }
+
+        //원위치 - 버그 나면 억울하니까 임시방편으로
+        if (player.respawnCool > 0) respawnText.text =
+                "리스폰 활성화까지 " + player.respawnCool.ToString("N0") + "초";
+        else respawnText.text = "리스폰 가능 (r키)";
+
+    } //Update End
 
 
     public void ChangeHPMP() //hp, mp 구슬 최신화

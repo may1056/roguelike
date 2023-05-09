@@ -20,7 +20,10 @@ public class Player : MonoBehaviour //플레이어
 
     public int hp;
     public int maxhp;
+
     float hurtTime = 0; //피격 시 사용할 시간 변수
+    public static bool hurted;
+    int inEnemies = 0;
 
     public float speed = 0; //달리기 속도
 
@@ -70,6 +73,9 @@ public class Player : MonoBehaviour //플레이어
     public static bool getOrb;
 
 
+    public float respawnCool;
+
+
     void Awake()
     {
         player = this; //이게 나다
@@ -87,6 +93,8 @@ public class Player : MonoBehaviour //플레이어
 
         inGround = false;
         inGroundTime = 0;
+
+        respawnCool = 20;
 
     } //Awake End
 
@@ -164,7 +172,7 @@ public class Player : MonoBehaviour //플레이어
         if (skilluse) //약한 스킬
         {
             cooltime = 3;
-            float x = sr.flipX ? -3 : 3;
+            float x = sr.flipX ? -6 : 6;
             skillP = new Vector2(transform.position.x + x, transform.position.y);
             MakeEffect(skillP, skillSprite, -2);
             mp--;
@@ -172,6 +180,17 @@ public class Player : MonoBehaviour //플레이어
         }
         else skillP = new Vector2(9999, 9999); //저 멀리
 
+
+        if (hurted)
+        {
+            Debug.Log("hurted");
+            hp--;
+            manager.ChangeHPMP();
+            hurtTime = 1;
+            hurted = false;
+        }
+
+        if (inEnemies == 0) hurted = false;
 
         if (hurtTime >= 0) Hurt(); //아플 때
         else sr.color = Color.white; //기본
@@ -196,16 +215,6 @@ public class Player : MonoBehaviour //플레이어
         }
         if (mp > maxmp) mp = maxmp;
 
-        if (isDashing) //대쉬 중이다
-        {
-            dashTime += Time.deltaTime;
-            rigid.AddForce(dashSpeed * 0.1f * (sr.flipX ? Vector2.left : Vector2.right),
-                ForceMode2D.Impulse);
-            rigid.velocity = new Vector2(rigid.velocity.x, 0);
-            Time.timeScale = 2;
-            MakeEffect(transform.position, dashSprite, -1);
-        }
-        else Time.timeScale = 1;
 
         if (inGround)
         {
@@ -219,6 +228,16 @@ public class Player : MonoBehaviour //플레이어
         }
         else inGroundTime = 0;
 
+
+        respawnCool -= Time.deltaTime;
+        if (Input.GetKeyDown("r") && respawnCool <= 0) //원위치
+        {
+            transform.position = Vector2.zero;
+            hp = maxhp;
+            manager.ChangeHPMP();
+            respawnCool = 20;
+        }
+
     } //Update End
 
 
@@ -231,12 +250,20 @@ public class Player : MonoBehaviour //플레이어
 
         isWalking = h != 0;
 
+
         if (dashTime >= maxDash) //대쉬 시간
         {
             isDashing = false;
             rigid.velocity = new Vector2(0, 0);
             gameObject.layer = 11; //11Player
             dashTime = 0;
+        }
+
+        if (isDashing) //대쉬 중이다
+        {
+            dashTime += Time.deltaTime;
+            rigid.velocity = new Vector2(dashSpeed * (sr.flipX ? -1.5f : 1.5f), 0);
+            MakeEffect(transform.position, dashSprite, -1);
         }
 
     } //FixedUpdate End
@@ -247,15 +274,15 @@ public class Player : MonoBehaviour //플레이어
         //플랫폼 닿으면 점프 상태 냅다 해제 (잘 안 먹힘..)
         if (collision.gameObject.CompareTag("Platform")) isJumping = false;
 
-        //아픔
-        if (gameObject.layer == 11 && collision.gameObject.CompareTag("Enemy"))
-        {
-            hp--;
-            manager.ChangeHPMP();
-            hurtTime = 1;
-        }
+        if (collision.gameObject.CompareTag("Enemy")) inEnemies++;
 
         SlideCheck();
+    }
+
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy")) inEnemies--;
     }
 
 

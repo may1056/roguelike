@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public class Monster : MonoBehaviour //잡몹
 {
     public int monsterNum;
-    //00spider 01packman 02slime
+    //00spider 01packman 02slime 03??아무튼원거리
 
     /// <summary>
     /// 공통
@@ -25,6 +25,9 @@ public class Monster : MonoBehaviour //잡몹
 
     public GameObject hpOrb;
     public GameObject mpOrb;
+
+    bool withPlayer = false;
+    float withPlayerTime = 0;
 
 
     /// <summary>
@@ -53,6 +56,16 @@ public class Monster : MonoBehaviour //잡몹
     public float lezonghan; //점프파워
 
 
+    /// <summary>
+    /// 원거리 공격형 몬스터 - 03
+    /// </summary>
+
+    public GameObject bullet;
+    float bulletTime = 0;
+    public float bull_T; //탄막 생성 주기
+
+
+
     void Start()
     {
         rigid = GetComponent<Rigidbody2D>();
@@ -79,10 +92,10 @@ public class Monster : MonoBehaviour //잡몹
                 Targeting();
             break;
 
-            //packman은 없음
+            //packman은 Update 없음
 
             case 2:
-                //플레이어를 향해 이동 방향을 변경한다 (아프면 빨라짐)
+                //플레이어를 향해 이동 방향을 변경한다
                 H = transform.position.x > Player.player.transform.position.x ? -1 : 1;
 
                 Targeting();
@@ -92,12 +105,28 @@ public class Monster : MonoBehaviour //잡몹
                     lezong -= Time.deltaTime;
             break;
 
+            case 3:
+                Targeting();
+
+                //탄막 발사
+                if (bulletTime <= 0 && moving)
+                {
+                    bulletTime = 3;
+                    Instantiate(bullet, transform.position,
+                        Quaternion.Euler(0, 0, Mathf.Rad2Deg * Mathf.Atan2(
+                            Player.player.transform.position.y - transform.position.y,
+                            Player.player.transform.position.x - transform.position.x)));
+                }
+                else bulletTime -= Time.deltaTime;
+            break;
+
         } //switch
 
 
         //피 닳는 시스템
         if (inAttackArea && (Input.GetMouseButtonDown(0)
-            || Input.GetKeyDown("j")) && Player.curAttackCooltime >= Player.maxAttackCooltime) //내가 마우스가 없어서 임시로 설정한 키
+            || Input.GetKeyDown("j")) && //내가 마우스가 없어서 임시로 설정한 키
+            Player.curAttackCooltime >= Player.maxAttackCooltime)
         {
             hp--;
             sr.sprite = Hurt;
@@ -106,7 +135,7 @@ public class Monster : MonoBehaviour //잡몹
 
         //스킬 범위 내에 있음
         if (Mathf.Abs(Player.skillP.y) < 20 &&
-            Vector2.Distance(transform.position, Player.skillP) < 3.5f)
+            Vector2.Distance(transform.position, Player.skillP) < 7f)
         {
             hp--;
             sr.sprite = Hurt;
@@ -122,6 +151,15 @@ public class Monster : MonoBehaviour //잡몹
             if (r == 1) Instantiate(mpOrb, transform.position, Quaternion.identity);
 
             Destroy(this.gameObject);
+        }
+
+        if (withPlayer) withPlayerTime += Time.deltaTime;
+        else withPlayerTime = 0;
+
+        if (withPlayerTime > 0.29f)
+        {
+            withPlayerTime = -0.5f;
+            Player.hurted = true;
         }
 
     } //Update End
@@ -186,6 +224,8 @@ public class Monster : MonoBehaviour //잡몹
                     lezong = 0.3f;
                 }
             break;
+
+            //??아무튼원거리는 FixedUpdate 없음
         }
     } //FixedUpdate End
 
@@ -193,6 +233,21 @@ public class Monster : MonoBehaviour //잡몹
     private void OnDestroy()
     {
         GameManager.killed++; //죽으면서 킬 수 올리고 감
+        withPlayer = false;
+    }
+
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        int l = collision.gameObject.layer;
+        if (l == 11 || l == 13) withPlayer = true;
+    }
+
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        int l = collision.gameObject.layer;
+        if (l >= 11 && l <= 13) withPlayer = false;
     }
 
 
@@ -207,6 +262,9 @@ public class Monster : MonoBehaviour //잡몹
     {
         if (collision.gameObject.CompareTag("Attack"))
             inAttackArea = false; //빠져나온다
+
+        int l = collision.gameObject.layer;
+        if (l >= 11 && l <= 13) withPlayer = false;
     }
 
 } //Enemy End
