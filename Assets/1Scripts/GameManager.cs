@@ -49,6 +49,8 @@ public class GameManager : MonoBehaviour //게임 총괄
 
     public Text[] stat = new Text[5];
 
+    public GameObject menuSet;
+
     public int enemies; //적들 수
 
     public static int killed; //킬 수
@@ -78,6 +80,20 @@ public class GameManager : MonoBehaviour //게임 총괄
 
         coolText.text = "쿨타임: " + player.cooltime.ToString("N0") + "초";
 
+        //메뉴창 표시
+        if (Input.GetButtonDown("Cancel")) {
+            if (menuSet.activeSelf)
+            {
+                menuSet.SetActive(false);
+                Time.timeScale = 1f;
+            }
+            else
+            {
+                menuSet.SetActive(true);
+                Time.timeScale = 0;
+            }
+        }
+            
         //킬 수 표시
         killText.text = killed.ToString() + " / " + enemies.ToString();
 
@@ -103,4 +119,13 @@ public class GameManager : MonoBehaviour //게임 총괄
         }
     }
 
+    public void GameContinuetimeScale() // 계속하기 - 온 클릭용 함수
+    {
+        Time.timeScale = 1f;
+    }
+
+    public void GameExit() // 게임 종료 버튼 - 에디터에선 실행안됨
+    {
+        Application.Quit();
+    }
 } //GameManager End
