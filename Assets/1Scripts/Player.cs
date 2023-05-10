@@ -49,6 +49,10 @@ public class Player : MonoBehaviour //플레이어
     public GameObject dashEffect;
     public Sprite dashSprite;
 
+    public float DashDist; //가능한 대쉬 거리
+    public LayerMask layerMask; //감지할 레이어: 9Ground
+
+
     bool inGround; //끼임
     float inGroundTime;
     Vector2 outGroundP;
@@ -122,10 +126,11 @@ public class Player : MonoBehaviour //플레이어
         if (Input.GetButton("Horizontal"))
             sr.flipX = Input.GetAxisRaw("Horizontal") == -1;
 
+        bool F = sr.flipX; //하도 많이 써서 정의함
+
         //근?접 공격 오브젝트도 뒤집고 위치 변경. 이건 좀 많이 손봐야 한다.
-        attacksr.flipX = sr.flipX;
-        transform.GetChild(0).transform.localPosition
-            = new Vector2(sr.flipX ? -2f : 2f, 0);
+        attacksr.flipX = F;
+        transform.GetChild(0).transform.localPosition = new Vector2(F ? -2f : 2f, 0);
 
 
         if (!isJumping) //점프 ㄴ
@@ -141,10 +146,37 @@ public class Player : MonoBehaviour //플레이어
         if (!onceDashed && (Input.GetMouseButtonDown(1)
             || Input.GetKeyDown("k"))) //k는 임시 대쉬 키
         {
-            isDashing = true;
+            //isDashing = true;
             onceDashed = true;
-            gameObject.layer = 12; //12PlayerDash
-        }
+            //gameObject.layer = 12; //12PlayerDash
+
+            Vector2 d = F ? -1 * transform.right : transform.right; //direction
+            Debug.DrawRay(transform.position, d * DashDist, Color.red, 0.3f);
+
+            RaycastHit2D hit;
+            float[] gx = new float[5]; //감지한 Ground의 x좌표
+
+            for (int i = -2; i <= 2; i++)
+            {
+                Vector2 v = new(transform.position.x, transform.position.y + i * 0.6f);
+                hit = Physics2D.Raycast(v, d, DashDist, layerMask); //레이 맞은 것 저장
+
+                gx[i + 2] = transform.position.x + (F ? -1 : 1)
+                    * (hit.transform != null ? hit.distance : DashDist);
+            }
+            float tpx = transform.position.x;
+
+            transform.position = new Vector2(F ?
+                Mathf.Max(gx[0], gx[1], gx[2], gx[3], gx[4]) + 0.7f :
+                Mathf.Min(gx[0], gx[1], gx[2], gx[3], gx[4]) - 0.7f, transform.position.y);
+
+            tpx = transform.position.x - tpx;
+            for (int i = 0; i < 10; i++) Instantiate(dashEffect,
+                new Vector2(transform.position.x - tpx * i * 0.1f, transform.position.y),
+                Quaternion.identity);
+
+        } //Dash
+
 
 
         //일반공격 쿨타임, 애니메이션
@@ -156,7 +188,7 @@ public class Player : MonoBehaviour //플레이어
 
         if (attackuse)
         {
-            float x = sr.flipX ? -2 : 2;
+            float x = F ? -2 : 2;
             attackP = new Vector2(transform.position.x + x, transform.position.y);
             attacksr.color = new Color(1, 1, 1, 1);
         }
@@ -171,7 +203,7 @@ public class Player : MonoBehaviour //플레이어
         if (skilluse) //약한 스킬
         {
             cooltime = 3;
-            float x = sr.flipX ? -6 : 6;
+            float x = F ? -6 : 6;
             skillP = new Vector2(transform.position.x + x, transform.position.y);
             MakeEffect(skillP, skillSprite, -2);
             mp--;
@@ -182,7 +214,6 @@ public class Player : MonoBehaviour //플레이어
 
         if (hurted)
         {
-            Debug.Log("hurted");
             hp--;
             manager.ChangeHPMP();
             hurtTime = 1;
@@ -249,7 +280,7 @@ public class Player : MonoBehaviour //플레이어
 
         isWalking = h != 0;
 
-
+        /*
         if (dashTime >= maxDash) //대쉬 시간
         {
             isDashing = false;
@@ -264,6 +295,10 @@ public class Player : MonoBehaviour //플레이어
             rigid.velocity = new Vector2(dashSpeed * (sr.flipX ? -1.5f : 1.5f), 0);
             MakeEffect(transform.position, dashSprite, -1);
         }
+        */
+
+        //if (onceDashed) //대쉬 후 이펙트는 계속 만들어줌
+            //Instantiate(dashEffect, transform.position, Quaternion.identity);
 
     } //FixedUpdate End
 
