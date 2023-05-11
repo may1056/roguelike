@@ -20,6 +20,13 @@ public class Monster : MonoBehaviour //잡몹
     int hp; //체력
     public int maxhp; //최대 체력
 
+    Transform C;
+    public Sprite[] hc = new Sprite[5]; //hp circles
+
+    Color darkpurple = new(0.3215f, 0.0588f, 0.6705f); //00
+    Color darkred = new(0.7686f, 0.0862f, 0.0078f); //01, 02
+    Color mol_lu = new(0.1f, 0.1f, 0.1f); //04
+
     SpriteRenderer sr;
     public Sprite Hurt;
 
@@ -72,6 +79,8 @@ public class Monster : MonoBehaviour //잡몹
         nowPosition = new Vector2(999,999);
 
         hp = maxhp;
+        C = transform.GetChild(0);
+        ModifyHp();
 
         sr = GetComponent<SpriteRenderer>();
 
@@ -81,6 +90,11 @@ public class Monster : MonoBehaviour //잡몹
 
     void Update()
     {
+        //플레이어와 적 사이의 거리
+        dist = Vector2.Distance(transform.position,
+            Player.player.transform.position);
+
+
         switch (monsterNum)
         {
             case 0: //spider
@@ -123,6 +137,10 @@ public class Monster : MonoBehaviour //잡몹
         } //switch
 
 
+
+        //가까우면 hp 표시
+        C.gameObject.SetActive(dist < 7);
+
         //피 닳는 시스템
         if (inAttackArea && (Input.GetMouseButtonDown(0)
             || Input.GetKeyDown("j")) && //내가 마우스가 없어서 임시로 설정한 키
@@ -131,6 +149,7 @@ public class Monster : MonoBehaviour //잡몹
             hp--;
             sr.sprite = Hurt;
             Player.curAttackCooltime = 0;
+            ModifyHp();
         }
 
         //스킬 범위 내에 있음
@@ -139,19 +158,21 @@ public class Monster : MonoBehaviour //잡몹
         {
             hp--;
             sr.sprite = Hurt;
+            ModifyHp();
         }
 
         //쉐이망 - hp, mp 오브 확률적으로 내놓기
         if (hp <= 0)
         {
             int r = Random.Range(0, 10);
-            if (r == 1) Instantiate(hpOrb, transform.position, Quaternion.identity);
+            if (r <= 1) Instantiate(hpOrb, transform.position, Quaternion.identity);
 
             r = Random.Range(0, 10);
-            if (r == 1) Instantiate(mpOrb, transform.position, Quaternion.identity);
+            if (r <= 1) Instantiate(mpOrb, transform.position, Quaternion.identity);
 
             Destroy(this.gameObject);
         }
+
 
         if (withPlayer) withPlayerTime += Time.deltaTime;
         else withPlayerTime = 0;
@@ -169,10 +190,6 @@ public class Monster : MonoBehaviour //잡몹
     {
         sr.flipX = transform.position.x <
                     Player.player.transform.position.x - 0.1f;
-
-        //플레이어와 적 사이의 거리
-        dist = Vector2.Distance(transform.position,
-            Player.player.transform.position);
 
         //가까우면 이동 시작
         if (dist < noticeDist) moving = true;
@@ -265,6 +282,12 @@ public class Monster : MonoBehaviour //잡몹
 
         int l = collision.gameObject.layer;
         if (l >= 11 && l <= 13) withPlayer = false;
+    }
+
+
+    void ModifyHp() //hp circle 최신화
+    {
+        if (hp > 0) C.transform.GetComponent<SpriteRenderer>().sprite = hc[hp - 1];
     }
 
 } //Enemy End

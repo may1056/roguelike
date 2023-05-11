@@ -14,6 +14,14 @@ public class Player : MonoBehaviour //플레이어
     SpriteRenderer sr;
     Animator anim;
 
+
+    Transform atk; //공격 범위
+    Transform bg; //배경
+    Transform td; //대쉬 끝 위치
+    public Transform po; //저장된 위치 표시 오브젝트
+    Transform cs; //슬라이드 가능 알림 화살표
+
+
     public Sprite[] players = new Sprite[3]; //지금은 사용 안 하는 중!!!!!!!!
     //애니메이션 만들기 귀찮아서 임시방편으로 스프라이트 교체용
     //0: 평소 상태(멈춤), 1: 걷기(달리기), 2: 뛰기(점프)
@@ -34,6 +42,12 @@ public class Player : MonoBehaviour //플레이어
     public Sprite attackSprite;
     bool attackuse = false;
 
+    SpriteRenderer attacksr;
+    //공격 오브젝트의 스프라이트렌더러, flipX 때문에 필요할 듯
+
+    //무기는 획득 시 플레이어의 자손 목록 두 번째에 들어가도록 합시다!!!
+    //(첫 번째 자리는 카메라의 차지)
+
 
     bool isWalking = false;
     bool isJumping = false;
@@ -41,27 +55,23 @@ public class Player : MonoBehaviour //플레이어
     float notJumpTime = 0; //가만히 있는 시간
 
 
-    bool isDashing = false;
+    //bool isDashing = false;
     bool onceDashed = false; //공중에서 대쉬를 이미 했는지
-    public float maxDash; //최대 대쉬 가능 시간
-    public float dashSpeed; //대쉬 빠르기
-    float dashTime = 0; //대쉬하는 시간
+    //public float maxDash; //최대 대쉬 가능 시간
+    //public float dashSpeed; //대쉬 빠르기
+    //float dashTime = 0; //대쉬하는 시간
     public GameObject dashEffect;
     public Sprite dashSprite;
+    public float dashDist; //가능한 대쉬 거리
+    public LayerMask lg; //Ground
 
-    public float DashDist; //가능한 대쉬 거리
-    public LayerMask layerMask; //감지할 레이어: 9Ground
+    Vector2 pos = Vector2.zero; //위치 저장
+    bool posSaved = false;
 
 
     bool inGround; //끼임
     float inGroundTime;
-    Vector2 outGroundP;
 
-
-    SpriteRenderer attacksr;
-    //공격 오브젝트의 스프라이트렌더러, flipX 때문에 필요할 듯
-
-    //무기는 획득 시 플레이어의 자손 목록 맨 첫 번째에 들어가도록 합시다!!!
 
     public int mp;
     public int maxmp;
@@ -73,6 +83,7 @@ public class Player : MonoBehaviour //플레이어
 
     bool isSliding; //플랫폼 내려가는 중인지
     Vector2 slideP;
+    public LayerMask lb; //Block
 
     public static bool getOrb;
 
@@ -88,9 +99,14 @@ public class Player : MonoBehaviour //플레이어
         sr = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
 
+        atk = transform.GetChild(1);
+        bg = transform.GetChild(2);
+        td = transform.GetChild(3);
+        cs = transform.GetChild(4);
+
         //플레이어의 0번째 자손인 Attack의 스프라이트렌더러를 끌고 온다.
         //허접한 근접 공격을 만들기 위함.
-        attacksr = transform.GetChild(0).GetComponent<SpriteRenderer>();
+        attacksr = atk.GetComponent<SpriteRenderer>();
         attacksr.color = new Color(1, 1, 1, 0);
 
         getOrb = false;
@@ -105,8 +121,7 @@ public class Player : MonoBehaviour //플레이어
 
     void Update()
     {
-        transform.GetChild(2).transform.localPosition
-            = -0.1f * transform.position;
+        bg.transform.localPosition = -0.1f * transform.position; //배경 이동
 
         //점프
         if ((Input.GetKeyDown("w") || Input.GetKeyDown(KeyCode.Space))
@@ -130,7 +145,7 @@ public class Player : MonoBehaviour //플레이어
 
         //근?접 공격 오브젝트도 뒤집고 위치 변경. 이건 좀 많이 손봐야 한다.
         attacksr.flipX = F;
-        transform.GetChild(0).transform.localPosition = new Vector2(F ? -2f : 2f, 0);
+        atk.transform.localPosition = new Vector2(F ? -2f : 2f, 0);
 
 
         if (!isJumping) //점프 ㄴ
@@ -142,6 +157,30 @@ public class Player : MonoBehaviour //플레이어
         }
 
 
+        //이하 내용은 대쉬 관련
+
+        Vector2 d = F ? -1 * transform.right : transform.right; //direction
+
+        RaycastHit2D hit;
+        float[] gx = new float[5]; //감지한 Ground의 x좌표
+
+        for (int i = -2; i <= 2; i++)
+        {
+            Vector2 v = new(transform.position.x, transform.position.y + i * 0.4f);
+            hit = Physics2D.Raycast(v, d, dashDist, lg); //레이 맞은 것 저장
+
+            Debug.DrawRay(v, d * dashDist, Color.red, 0.1f); //시각화
+
+            gx[i + 2] = transform.position.x + (F ? -1 : 1)
+                * (hit.transform != null ? hit.distance : dashDist);
+        }
+        float tpx = transform.position.x;
+
+        float m = F ?
+                Mathf.Max(gx[0], gx[1], gx[2], gx[3], gx[4]) + 0.7f :
+                Mathf.Min(gx[0], gx[1], gx[2], gx[3], gx[4]) - 0.7f;
+
+
         //마우스 우클릭 대쉬
         if (!onceDashed && (Input.GetMouseButtonDown(1)
             || Input.GetKeyDown("k"))) //k는 임시 대쉬 키
@@ -150,25 +189,7 @@ public class Player : MonoBehaviour //플레이어
             onceDashed = true;
             //gameObject.layer = 12; //12PlayerDash
 
-            Vector2 d = F ? -1 * transform.right : transform.right; //direction
-            Debug.DrawRay(transform.position, d * DashDist, Color.red, 0.3f);
-
-            RaycastHit2D hit;
-            float[] gx = new float[5]; //감지한 Ground의 x좌표
-
-            for (int i = -2; i <= 2; i++)
-            {
-                Vector2 v = new(transform.position.x, transform.position.y + i * 0.6f);
-                hit = Physics2D.Raycast(v, d, DashDist, layerMask); //레이 맞은 것 저장
-
-                gx[i + 2] = transform.position.x + (F ? -1 : 1)
-                    * (hit.transform != null ? hit.distance : DashDist);
-            }
-            float tpx = transform.position.x;
-
-            transform.position = new Vector2(F ?
-                Mathf.Max(gx[0], gx[1], gx[2], gx[3], gx[4]) + 0.7f :
-                Mathf.Min(gx[0], gx[1], gx[2], gx[3], gx[4]) - 0.7f, transform.position.y);
+            transform.position = new Vector2(m, transform.position.y);
 
             tpx = transform.position.x - tpx;
             for (int i = 0; i < 10; i++) Instantiate(dashEffect,
@@ -176,6 +197,28 @@ public class Player : MonoBehaviour //플레이어
                 Quaternion.identity);
 
         } //Dash
+
+        //대쉬 도달 위치 표시
+        td.transform.position = new Vector2(m, transform.position.y);
+
+
+        //위치 저장
+        if (Input.GetMouseButtonDown(2) || Input.GetKeyDown("l"))
+        {
+            if (posSaved)
+            {
+                transform.position = pos;
+                posSaved = false;
+            }
+            else
+            {
+                pos = transform.position;
+                po.transform.position = pos;
+                posSaved = true;
+            }
+            po.gameObject.SetActive(posSaved);
+        }
+
 
 
 
@@ -229,7 +272,17 @@ public class Player : MonoBehaviour //플레이어
         if (hp <= 0) SceneManager.LoadScene(0); //쉐이망
 
 
-        if (Input.GetKeyDown("s")) //플랫폼 내려가기
+
+        //내려갈 수 있는가?
+        Debug.DrawRay(transform.position, -1 * transform.up, Color.blue, 0.1f);
+        RaycastHit2D B; //block
+        B = Physics2D.Raycast(transform.position, -1 * transform.up, 1, lb);
+        RaycastHit2D G; //ground
+        G = Physics2D.Raycast(transform.position, -1 * transform.up, 1, lg);
+        cs.gameObject.SetActive(B.transform != null && G.transform == null);
+
+        //플랫폼 내려가기
+        if (Input.GetKeyDown("s"))
         {
             isSliding = true;
             this.gameObject.layer = 13; //13PlayerSlide
@@ -237,6 +290,9 @@ public class Player : MonoBehaviour //플레이어
         }
 
         if (slideP.y - transform.position.y > 2) SlideCheck();
+
+
+
 
         if (getOrb)
         {
@@ -257,16 +313,6 @@ public class Player : MonoBehaviour //플레이어
             }
         }
         else inGroundTime = 0;
-
-
-        respawnCool -= Time.deltaTime;
-        if (Input.GetKeyDown("r") && respawnCool <= 0) //원위치
-        {
-            transform.position = Vector2.zero;
-            hp = maxhp;
-            manager.ChangeHPMP();
-            respawnCool = 20;
-        }
 
     } //Update End
 
