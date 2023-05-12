@@ -134,6 +134,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   monsterNum: 2
+  fadeEffect: {fileID: 8326106217213998104, guid: c32a19154cf10874f974978490ab09ef, type: 3}
+  appear: {fileID: 21300000, guid: a9f73051955ebd74ba003291e5cc5bf2, type: 3}
   maxhp: 2
   hc:
   - {fileID: -508144027, guid: 5e38e6b0e5266ec44ab65d691d41382f, type: 3}
@@ -145,6 +147,9 @@ MonoBehaviour:
   hpOrb: {fileID: 6510405994357380013, guid: f298c78827c8618408d5e5c4b44641cc, type: 3}
   mpOrb: {fileID: 2026748482929784485, guid: dfc753a499df8d14bb6a7fc313dcaa13, type: 3}
   noticeDist: 10
+  pf:
+    serializedVersion: 2
+    m_Bits: 0
   lezonghan: 8
   bullet: {fileID: 0}
   bull_T: 0

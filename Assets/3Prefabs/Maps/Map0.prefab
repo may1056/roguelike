@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &2046150027721915491
+--- !u!1 &1113223325431367646
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,10 +8,10 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 7240915218465237177}
-  - component: {fileID: 4796893471936460583}
-  - component: {fileID: 2298593320571031511}
-  - component: {fileID: 2165616790800751766}
+  - component: {fileID: 8673517624133960530}
+  - component: {fileID: 3695150547900892313}
+  - component: {fileID: 8924296297363683017}
+  - component: {fileID: 2271505573002662125}
   m_Layer: 9
   m_Name: Ground
   m_TagString: Platform
@@ -19,28 +19,28 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &7240915218465237177
+--- !u!4 &8673517624133960530
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2046150027721915491}
+  m_GameObject: {fileID: 1113223325431367646}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 6049036352910752850}
+  m_Father: {fileID: 7314108108413525072}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1839735485 &4796893471936460583
+--- !u!1839735485 &3695150547900892313
 Tilemap:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2046150027721915491}
+  m_GameObject: {fileID: 1113223325431367646}
   m_Enabled: 1
   m_Tiles:
   - first: {x: -62, y: -9, z: 0}
@@ -27038,13 +27038,13 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
---- !u!483693784 &2298593320571031511
+--- !u!483693784 &8924296297363683017
 TilemapRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2046150027721915491}
+  m_GameObject: {fileID: 1113223325431367646}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -27058,7 +27058,7 @@ TilemapRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 688d491f1ae228f418434e695fef780a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -27087,13 +27087,13 @@ TilemapRenderer:
   m_Mode: 0
   m_DetectChunkCullingBounds: 0
   m_MaskInteraction: 0
---- !u!19719996 &2165616790800751766
+--- !u!19719996 &2271505573002662125
 TilemapCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2046150027721915491}
+  m_GameObject: {fileID: 1113223325431367646}
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
@@ -27103,7 +27103,7 @@ TilemapCollider2D:
   m_Offset: {x: 0, y: 0}
   m_MaximumTileChangeCount: 1000
   m_ExtrusionFactor: 0
---- !u!1 &7208257104684735155
+--- !u!1 &1288616352244959304
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -27111,45 +27111,45 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 6049036352910752850}
-  - component: {fileID: 3061443985891788331}
+  - component: {fileID: 7314108108413525072}
+  - component: {fileID: 2523249795631627826}
   m_Layer: 0
-  m_Name: GroundTile
+  m_Name: Map0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &6049036352910752850
+--- !u!4 &7314108108413525072
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7208257104684735155}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_GameObject: {fileID: 1288616352244959304}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 7261787268982941926}
-  - {fileID: 7240915218465237177}
+  - {fileID: 1328344663768188094}
+  - {fileID: 8673517624133960530}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!156049354 &3061443985891788331
+--- !u!156049354 &2523249795631627826
 Grid:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7208257104684735155}
+  m_GameObject: {fileID: 1288616352244959304}
   m_Enabled: 1
   m_CellSize: {x: 1, y: 1, z: 0}
   m_CellGap: {x: 0, y: 0, z: 0}
   m_CellLayout: 0
   m_CellSwizzle: 0
---- !u!1 &9083884782031133544
+--- !u!1 &7396516255533485184
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -27157,10 +27157,10 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 7261787268982941926}
-  - component: {fileID: 1678712805116687484}
-  - component: {fileID: 3500092676360119506}
-  - component: {fileID: 296859408}
+  - component: {fileID: 1328344663768188094}
+  - component: {fileID: 4934879163942039479}
+  - component: {fileID: 8316480129542041082}
+  - component: {fileID: 6600302082474899285}
   m_Layer: 8
   m_Name: Block
   m_TagString: Platform
@@ -27168,28 +27168,28 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &7261787268982941926
+--- !u!4 &1328344663768188094
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9083884782031133544}
+  m_GameObject: {fileID: 7396516255533485184}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 6049036352910752850}
+  m_Father: {fileID: 7314108108413525072}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1839735485 &1678712805116687484
+--- !u!1839735485 &4934879163942039479
 Tilemap:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9083884782031133544}
+  m_GameObject: {fileID: 7396516255533485184}
   m_Enabled: 1
   m_Tiles:
   - first: {x: -68, y: 0, z: 0}
@@ -27623,13 +27623,13 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
---- !u!483693784 &3500092676360119506
+--- !u!483693784 &8316480129542041082
 TilemapRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9083884782031133544}
+  m_GameObject: {fileID: 7396516255533485184}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -27672,13 +27672,13 @@ TilemapRenderer:
   m_Mode: 0
   m_DetectChunkCullingBounds: 0
   m_MaskInteraction: 0
---- !u!19719996 &296859408
+--- !u!19719996 &6600302082474899285
 TilemapCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9083884782031133544}
+  m_GameObject: {fileID: 7396516255533485184}
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
@@ -27688,18 +27688,3 @@ TilemapCollider2D:
   m_Offset: {x: 0, y: 0}
   m_MaximumTileChangeCount: 1000
   m_ExtrusionFactor: 0
---- !u!114 &2682685121929989138
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 12395, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: Palette Settings
-  m_EditorClassIdentifier: 
-  cellSizing: 0
-  m_TransparencySortMode: 0
-  m_TransparencySortAxis: {x: 0, y: 0, z: 1}

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour //플레이어
 {
@@ -15,11 +16,19 @@ public class Player : MonoBehaviour //플레이어
     Animator anim;
 
 
+    public static int itemNum;
+    public static int weaponNum;
+    //0채찍,
+
+
     Transform atk; //공격 범위
     Transform bg; //배경
     Transform td; //대쉬 끝 위치
     public Transform po; //저장된 위치 표시 오브젝트
     Transform cs; //슬라이드 가능 알림 화살표
+
+
+    public GameObject fadeEffect;
 
 
     public Sprite[] players = new Sprite[3]; //지금은 사용 안 하는 중!!!!!!!!
@@ -45,22 +54,15 @@ public class Player : MonoBehaviour //플레이어
     SpriteRenderer attacksr;
     //공격 오브젝트의 스프라이트렌더러, flipX 때문에 필요할 듯
 
-    //무기는 획득 시 플레이어의 자손 목록 두 번째에 들어가도록 합시다!!!
-    //(첫 번째 자리는 카메라의 차지)
 
-
-    bool isWalking = false;
+    //bool isWalking = false;
     bool isJumping = false;
     public float jumpPower; //뛰는 힘
     float notJumpTime = 0; //가만히 있는 시간
 
 
-    //bool isDashing = false;
+
     bool onceDashed = false; //공중에서 대쉬를 이미 했는지
-    //public float maxDash; //최대 대쉬 가능 시간
-    //public float dashSpeed; //대쉬 빠르기
-    //float dashTime = 0; //대쉬하는 시간
-    public GameObject dashEffect;
     public Sprite dashSprite;
     public float dashDist; //가능한 대쉬 거리
     public LayerMask lg; //Ground
@@ -68,9 +70,6 @@ public class Player : MonoBehaviour //플레이어
     Vector2 pos = Vector2.zero; //위치 저장
     bool posSaved = false;
 
-
-    bool inGround; //끼임
-    float inGroundTime;
 
 
     public int mp;
@@ -88,7 +87,21 @@ public class Player : MonoBehaviour //플레이어
     public static bool getOrb;
 
 
-    public float respawnCool;
+    //weapon skill
+    public Text wsText;
+    float wsCool = 0;
+    public static Vector2 wsP;
+    bool wsAvailable = false;
+    float wsgoing = 3;
+    int wscount = 0;
+    public Sprite ws0sprite;
+    //아 모르겠다 코드 막 짜야지.. 변수만 몇 개야
+
+
+    SpriteRenderer bgsr; //배경 스프라이트렌더러
+    float bgtime = 0;
+    Color cloud = new Color(0.7f, 0.8f, 0.9f); //구름 약간 어두움
+
 
 
     void Awake()
@@ -98,6 +111,9 @@ public class Player : MonoBehaviour //플레이어
         rigid = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
+
+        weaponNum = 0;
+        wsP = new Vector2(9999, 9999);
 
         atk = transform.GetChild(1);
         bg = transform.GetChild(2);
@@ -111,10 +127,7 @@ public class Player : MonoBehaviour //플레이어
 
         getOrb = false;
 
-        inGround = false;
-        inGroundTime = 0;
-
-        respawnCool = 20;
+        bgsr = bg.GetComponent<SpriteRenderer>();
 
     } //Awake End
 
@@ -122,6 +135,9 @@ public class Player : MonoBehaviour //플레이어
     void Update()
     {
         bg.transform.localPosition = -0.1f * transform.position; //배경 이동
+
+
+        //ㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍ
 
         //점프
         if ((Input.GetKeyDown("w") || Input.GetKeyDown(KeyCode.Space))
@@ -136,6 +152,13 @@ public class Player : MonoBehaviour //플레이어
         if (Mathf.Abs(rigid.velocity.y) < 0.01f) notJumpTime += Time.deltaTime;
         else notJumpTime = 0;
         isJumping = notJumpTime < 0.1f;
+
+
+
+
+
+
+        //ㅂㅎㅂㅎㅂㅎㅂㅎㅂㅎㅂㅎㅂㅎㅂㅎㅂㅎㅂㅎㅂㅎㅂㅎㅂㅎㅂㅎ
 
         //방향 전환
         if (Input.GetButton("Horizontal"))
@@ -156,6 +179,13 @@ public class Player : MonoBehaviour //플레이어
             //else sr.sprite = players[0]; //멈춰 있으면 멈춘 스프라이트
         }
 
+
+
+
+
+
+
+        //ㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅ
 
         //이하 내용은 대쉬 관련
 
@@ -192,7 +222,7 @@ public class Player : MonoBehaviour //플레이어
             transform.position = new Vector2(m, transform.position.y);
 
             tpx = transform.position.x - tpx;
-            for (int i = 0; i < 10; i++) Instantiate(dashEffect,
+            for (int i = 0; i < 10; i++) Instantiate(fadeEffect,
                 new Vector2(transform.position.x - tpx * i * 0.1f, transform.position.y),
                 Quaternion.identity);
 
@@ -201,6 +231,13 @@ public class Player : MonoBehaviour //플레이어
         //대쉬 도달 위치 표시
         td.transform.position = new Vector2(m, transform.position.y);
 
+
+
+
+
+
+
+        //ㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊ
 
         //위치 저장
         if (Input.GetMouseButtonDown(2) || Input.GetKeyDown("l"))
@@ -222,6 +259,9 @@ public class Player : MonoBehaviour //플레이어
 
 
 
+
+        //ㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱ
+
         //일반공격 쿨타임, 애니메이션
         if (curAttackCooltime <= maxAttackCooltime + 2)
             curAttackCooltime += Time.deltaTime;
@@ -238,7 +278,14 @@ public class Player : MonoBehaviour //플레이어
         else attacksr.color = new Color(1, 1, 1, 0);
 
 
-        //스킬
+
+
+
+
+
+        //ㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋ
+
+        //기본 탑재 스킬
         if (cooltime > 0) cooltime -= Time.deltaTime;
 
         skilluse = cooltime <= 0 && Input.GetKeyDown("z") && mp >= 1;
@@ -255,6 +302,44 @@ public class Player : MonoBehaviour //플레이어
         else skillP = new Vector2(9999, 9999); //저 멀리
 
 
+        //무기 파생 스킬
+        if (wsCool > 0)
+        {
+            wsCool -= Time.deltaTime;
+            wsText.text = wsCool.ToString("N1");
+        }
+        else wsText.text = "0";
+
+        if (wsCool <= 0 && Input.GetKeyDown("x") && mp >= 2)
+        {
+            wsAvailable = true;
+            wsgoing = 3;
+            wscount = 3;
+            wsCool = 20;
+            mp -= 2;
+            manager.ChangeHPMP();
+        }
+
+        if (wsAvailable)
+        {
+            switch (weaponNum)
+            {
+                case 0:
+                    Wsgc(wscount);
+                    wsgoing -= 2 * Time.deltaTime;
+                break;
+            }
+
+            wsAvailable = wsgoing > 0;
+        }
+
+
+
+
+
+        //ㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍ
+
+        //공격당함
         if (hurted)
         {
             hp--;
@@ -272,6 +357,11 @@ public class Player : MonoBehaviour //플레이어
         if (hp <= 0) SceneManager.LoadScene(0); //쉐이망
 
 
+
+
+
+
+        //ㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹ
 
         //내려갈 수 있는가?
         Debug.DrawRay(transform.position, -1 * transform.up, Color.blue, 0.1f);
@@ -294,6 +384,10 @@ public class Player : MonoBehaviour //플레이어
 
 
 
+
+
+        //ㅇㅂㅇㅂㅇㅂㅇㅂㅇㅂㅇㅂㅇㅂㅇㅂㅇㅂㅇㅂㅇㅂㅇㅂㅇㅂㅇㅂㅇㅂ
+
         if (getOrb)
         {
             manager.ChangeHPMP();
@@ -302,17 +396,19 @@ public class Player : MonoBehaviour //플레이어
         if (mp > maxmp) mp = maxmp;
 
 
-        if (inGround)
-        {
-            inGroundTime += Time.deltaTime;
 
-            if (inGroundTime > 1)
-            {
-                //transform.position = outGroundP;
-                inGround = false;
-            }
+
+
+
+        //ㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱ
+
+        if (bgtime > 0)
+        {
+            //배경 흰색으로 갔다가 돌아온다 - 다른 배경에도 일반화하려고 복잡하게 썼음
+            bgsr.color = new Color(cloud.r + bgtime * (1 - cloud.r),
+                cloud.g + bgtime * (1 - cloud.g), cloud.b + bgtime * (1 - cloud.b));
+            bgtime -= Time.deltaTime;
         }
-        else inGroundTime = 0;
 
     } //Update End
 
@@ -324,24 +420,7 @@ public class Player : MonoBehaviour //플레이어
         // 속도 기본 값 10 + speed
         transform.Translate((10+speed) * Time.deltaTime * new Vector2(h, 0));
 
-        isWalking = h != 0;
-
-        /*
-        if (dashTime >= maxDash) //대쉬 시간
-        {
-            isDashing = false;
-            rigid.velocity = new Vector2(0, 0);
-            gameObject.layer = 11; //11Player
-            dashTime = 0;
-        }
-
-        if (isDashing) //대쉬 중이다
-        {
-            dashTime += Time.deltaTime;
-            rigid.velocity = new Vector2(dashSpeed * (sr.flipX ? -1.5f : 1.5f), 0);
-            MakeEffect(transform.position, dashSprite, -1);
-        }
-        */
+        //isWalking = h != 0;
 
         //if (onceDashed) //대쉬 후 이펙트는 계속 만들어줌
             //Instantiate(dashEffect, transform.position, Quaternion.identity);
@@ -370,14 +449,6 @@ public class Player : MonoBehaviour //플레이어
     {
         if (other.CompareTag("Respawn"))
             SceneManager.LoadScene(0); //낙사
-
-        if (other.gameObject.layer == 9) //9Ground
-        {
-            //outGroundP = new Vector2(transform.position.x - rigid.velocity.x,
-            //    transform.position.y - rigid.velocity.y);
-            rigid.AddForce(-2 * new Vector2(rigid.velocity.x, rigid.velocity.y));
-            inGround = true;
-        }
     }
 
 
@@ -385,9 +456,6 @@ public class Player : MonoBehaviour //플레이어
     {
         if (other.gameObject.layer == 8) //8Block
             SlideCheck();
-
-        if (other.gameObject.layer == 9) //9Ground
-            inGround = false;
     }
 
 
@@ -411,12 +479,38 @@ public class Player : MonoBehaviour //플레이어
     //position, sprite, layer
     void MakeEffect(Vector2 p, Sprite s, int l) //Fade 스크립트가 붙은 오브젝트 생성
     {
-        GameObject effect = Instantiate(dashEffect, p, Quaternion.identity);
+        GameObject effect = Instantiate(fadeEffect, p, Quaternion.identity);
         SpriteRenderer esr = effect.transform.GetComponent<SpriteRenderer>();
         esr.sprite = s;
         esr.flipX = sr.flipX;
         esr.sortingOrder = l;
     }
 
+
+    void WeaponSkill0() //채찍 전용 스킬
+    {
+        GameObject ws0 = Instantiate(
+            fadeEffect, transform.position, Quaternion.identity);
+        SpriteRenderer wssr = ws0.transform.GetComponent<SpriteRenderer>();
+        wssr.sprite = ws0sprite;
+        wssr.sortingOrder = 10;
+    }
+    void Wsgc(int co) //채찍 전용 스킬 발현을 매개해주는 역할
+    {
+        if (wsgoing <= co)
+        {
+            wsP = transform.position;
+            wscount--;
+            WeaponSkill0();
+        }
+        else wsP = new Vector2(9999, 9999);
+    }
+
+
+    public void ClearBG() //클리어 시 배경 색상 변동
+    {
+        bgsr.color = Color.white;
+        bgtime = 1;
+    }
 
 } //Player End

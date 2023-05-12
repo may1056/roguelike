@@ -8,7 +8,7 @@ public class Mainmenu : MonoBehaviour // 게임매니저 사용하려했는데 �
 {
     public GameObject Option;
 
-    public void GameExit2() // 게임 종료 버튼 - 에디터에선 실행안됨
+    public void GameExit() // 게임 종료 버튼 - 에디터에선 실행안됨
     {
         Application.Quit();
     }

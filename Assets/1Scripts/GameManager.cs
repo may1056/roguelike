@@ -29,12 +29,26 @@ public class GameManager : MonoBehaviour //게임 총괄
 
 
 
+    public static int mapNum; //맵 번호
+    GameObject map; //맵이 들어가는 공간
+
+    public GameObject[] maps; //맵 프리팹
+    public GameObject[] mons; //맵 내 몬스터 집합 프리팹
+
+    //맵별 페이즈 수
+    readonly int[] phases = { 1, 1, 3, };
+
+    //페이즈별 잡아야 할 몬스터 수 (함정 제외), -1: 안 잡아도 된다
+    readonly int[,] enemies = { { 23, 0, 0, }, { -1, 0, 0, }, { 12, 13, 23, } };
+
+    bool making; //진행 중인지
+    int nowPhase; //현재 페이즈
+    float phaseTime; //페이즈 진행 시간
+    bool appeared; //적들 등장했는지
 
 
 
-
-
-
+    public static bool mapouterror; //맵뚫 오류가 발생한 것 같다!
 
 
 
@@ -51,20 +65,37 @@ public class GameManager : MonoBehaviour //게임 총괄
 
     public GameObject menuSet;
 
-    public int enemies; //적들 수
-
     public static int killed; //킬 수
     public Text killText;
+    public static int realkilled; //실속 있는 킬 수
 
     public Text coolText; //쿨타임
     //public Text atkcoolText; //일반공격 쿨타임
 
 
+
+
     void Start()
     {
+        if (transform.childCount != 0)
+            Destroy(transform.GetChild(0).gameObject); //맵 남아있으면 삭제
+
         killed = 0;
         ChangeHPMP();
-    }
+
+        mapNum = 2; //임시
+
+        realkilled = 0;
+
+        //맵 불러오기
+        map = Instantiate(maps[mapNum]); //맵을 생성한다
+        map.transform.SetParent(gameObject.transform); //게임매니저가 맵의 부모가 됨
+
+        making = true;
+        nowPhase = 0;
+        phaseTime = 0;
+
+    } //Start End
 
 
     void Update()
@@ -92,14 +123,35 @@ public class GameManager : MonoBehaviour //게임 총괄
         }
 
         //킬 수 표시
-        killText.text = killed.ToString() + " / " + enemies.ToString();
+        killText.text = killed.ToString();
 
         //if (killed == enemies) Debug.LogWarning("클리어");
 
         //빠른 재시작
         if (Input.GetKeyDown(KeyCode.Backspace)) SceneManager.LoadScene(0);
 
+
+
+
+
+        //적 불러오기
+        if (making)
+        {
+            MakeEnemy(nowPhase);
+            phaseTime += Time.deltaTime;
+
+            if (phaseTime > 0.5f && !appeared)
+            {
+                Transform set = map.transform.GetChild(nowPhase + 1);
+                for (int i = 0; i < set.childCount; i++)
+                    set.GetChild(i).gameObject.SetActive(true);
+                appeared = true;
+            }
+        }
+
+
     } //Update End
+
 
 
     public void ChangeHPMP() //hp, mp 구슬 최신화
@@ -111,6 +163,43 @@ public class GameManager : MonoBehaviour //게임 총괄
         }
     }
 
+
+    void MakeEnemy(int ph) //적 프리팹 활성화
+    {
+        //지금 페이즈에 해당하는 몬스터 집합은 몇 번?
+        int sum = 0;
+        for (int i = 0; i < mapNum; i++) sum += phases[i];
+
+        //전투 시작
+        if (ph == 0) EnemySet(sum);
+
+        //전투 종료
+        else if (ph >= phases[mapNum] && realkilled == enemies[mapNum, ph - 1])
+        {
+            for (int i = 0; i < phases[mapNum]; i++)
+            {
+                Transform set = map.transform.GetChild(i + 2);
+                Destroy(set.gameObject);
+            }
+            making = false;
+            player.ClearBG();
+        }
+
+        //다음 페이즈
+        else if (realkilled == enemies[mapNum, ph - 1]) EnemySet(sum + ph);
+    }
+
+    void EnemySet(int dex)
+    {
+        GameObject mon = Instantiate(mons[dex]);
+        mon.transform.SetParent(map.transform);
+        nowPhase++;
+        realkilled = 0;
+        phaseTime = 0;
+        appeared = false;
+    }
+
+
     public void GameContinuetimeScale() // 계속하기 - 온 클릭용 함수
     {
         Time.timeScale = 1f;
@@ -120,4 +209,5 @@ public class GameManager : MonoBehaviour //게임 총괄
     {
         Application.Quit();
     }
+
 } //GameManager End

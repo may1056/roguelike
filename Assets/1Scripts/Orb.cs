@@ -11,12 +11,13 @@ public class Orb : MonoBehaviour //구체
 
     private void Awake()
     {
-        tp = transform.position;
+        //tp = transform.position;
     }
 
     void Update()
     {
         Vector2 ptp = Player.player.transform.position;
+        tp = transform.position;
 
         dist = Vector2.Distance(tp, ptp);
 
