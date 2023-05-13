@@ -41,13 +41,16 @@ public class Player : MonoBehaviour //플레이어
 
     public int shield;
     public int maxshield;
+    bool protect;
 
 
     float hurtTime = 0; //피격 시 사용할 시간 변수
     public static bool hurted;
     int inEnemies = 0;
 
-    float notDamagedTime = 0;
+    public Image hurtImage;
+
+    float dontBehaveTime = 0;
 
 
     public float speed = 0; //달리기 속도
@@ -120,6 +123,8 @@ public class Player : MonoBehaviour //플레이어
 
 
 
+
+
     void Awake()
     {
         player = this; //이게 나다
@@ -148,14 +153,14 @@ public class Player : MonoBehaviour //플레이어
     } //Awake End
 
 
+
+
     void Update()
     {
         if (GameManager.mapouterror) transform.position = Vector2.zero;
 
         Vector2 tp = transform.position;
 
-
-        bg.transform.localPosition = -0.1f * tp; //배경 이동
 
 
         //ㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍ
@@ -236,9 +241,7 @@ public class Player : MonoBehaviour //플레이어
         if (!onceDashed && (Input.GetMouseButtonDown(1)
             || Input.GetKeyDown("k"))) //k는 임시 대쉬 키
         {
-            //isDashing = true;
             onceDashed = true;
-            //gameObject.layer = 12; //12PlayerDash
 
             transform.position = new Vector2(m, tp.y);
             tp = transform.position;
@@ -248,7 +251,8 @@ public class Player : MonoBehaviour //플레이어
                 new Vector2(tp.x - tpx * i * 0.1f, tp.y),
                 Quaternion.identity);
 
-        } //Dash
+            dontBehaveTime = 0;
+        }
 
         //대쉬 도달 위치 표시
         td.transform.position = new Vector2(m, tp.y);
@@ -274,7 +278,7 @@ public class Player : MonoBehaviour //플레이어
                 if (postime >= 1 && postime <= 10) SavePos();
             }
 
-            //빠르게 눌러 돌아가기 (혹은, 저장 위치가 없으면 저장하기)
+            //빠르게 눌러 돌아가기
             if (Input.GetMouseButtonUp(2) || Input.GetKeyUp("l"))
             {
                 if (posSaved && postime < 1)
@@ -284,6 +288,7 @@ public class Player : MonoBehaviour //플레이어
                     transform.position = pos;
                     posSaved = false;
                     posCool = 10;
+                    dontBehaveTime = 0;
                 }
                 postime = 0;
             }
@@ -324,6 +329,7 @@ public class Player : MonoBehaviour //플레이어
             float x = F ? -2 : 2;
             attackP = new Vector2(transform.position.x + x, transform.position.y);
             attacksr.color = new Color(1, 1, 1, 1);
+            dontBehaveTime = 0;
         }
         else attacksr.color = new Color(1, 1, 1, 0);
 
@@ -348,6 +354,7 @@ public class Player : MonoBehaviour //플레이어
             MakeEffect(skillP, skillSprite, -2);
             mp--;
             manager.ChangeHPMP();
+            dontBehaveTime = 0;
         }
         else skillP = new Vector2(9999, 9999); //저 멀리
 
@@ -368,6 +375,7 @@ public class Player : MonoBehaviour //플레이어
             wsCool = 20;
             mp -= 2;
             manager.ChangeHPMP();
+            dontBehaveTime = 0;
         }
 
         if (wsAvailable)
@@ -430,12 +438,20 @@ public class Player : MonoBehaviour //플레이어
         //공격당함
         if (hurted)
         {
-            if (shield >= 1) shield--;
-            else hp--;
+            if (shield >= 1)
+            {
+                shield--;
+                protect = true;
+            }
+            else
+            {
+                hp--;
+                protect = false;
+            }
             manager.ChangeHPMP();
             hurtTime = 1;
             hurted = false;
-            notDamagedTime = 0;
+            dontBehaveTime = 0;
         }
 
         if (inEnemies == 0) hurted = false;
@@ -451,11 +467,12 @@ public class Player : MonoBehaviour //플레이어
 
         //ㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷ
 
-        notDamagedTime += Time.deltaTime;
-        if (notDamagedTime > 3 && shield < maxshield)
+        //쉴드 재충전
+        dontBehaveTime += Time.deltaTime;
+        if (dontBehaveTime > 3 && shield < maxshield)
         {
             shield++;
-            notDamagedTime = 0;
+            dontBehaveTime = 0;
             manager.ChangeHPMP();
         }
 
@@ -480,6 +497,8 @@ public class Player : MonoBehaviour //플레이어
 
         //ㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱ
 
+        bg.transform.localPosition = -0.1f * tp; //배경 이동
+
         if (bgtime > 0)
         {
             //배경 흰색으로 갔다가 돌아온다 - 다른 배경에도 일반화하려고 복잡하게 썼음
@@ -489,6 +508,8 @@ public class Player : MonoBehaviour //플레이어
         }
 
     } //Update End
+
+
 
 
     void FixedUpdate()
@@ -537,6 +558,8 @@ public class Player : MonoBehaviour //플레이어
     }
 
 
+
+
     void SlideCheck() //isSliding 끄기
     {
         if (isSliding)
@@ -549,7 +572,10 @@ public class Player : MonoBehaviour //플레이어
 
     void Hurt() //잠깐 붉은색 되었다가 서서히 회복
     {
-        sr.color = new Color(1, 1 - hurtTime, 1 - hurtTime);
+        //sr.color = new Color(1, 1 - hurtTime, 1 - hurtTime);
+
+        int c = protect ? 0 : 1;
+        hurtImage.color = new Color(c, c, c, 0.5f * hurtTime);
         hurtTime -= 4 * Time.deltaTime;
     }
 

@@ -171,19 +171,22 @@ public class GameManager : MonoBehaviour //게임 총괄
     {
         for (int i = 0; i < player.maxhp + player.maxshield; i++)
         {
+            //HP
             if (i < player.hp)
             {
                 hps[i].color = Color.white;
                 hps[i].gameObject.SetActive(true);
             }
+            //SHIELD
             else if (i < player.hp + player.shield)
             {
-                hps[i].color = Color.gray;
+                hps[i].color = Color.black;
                 hps[i].gameObject.SetActive(true);
             }
             else hps[i].gameObject.SetActive(false);
         }
 
+        //MP
         for(int i = 0; i < player.maxmp; i++)
             mps[i].gameObject.SetActive(i < player.mp);
     }
