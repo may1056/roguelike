@@ -35,7 +35,18 @@ public class Bullet : MonoBehaviour //탄막
                     break;
             }
         }
-    }
+
+
+        //위치 저장에 의한 파괴
+        if (Mathf.Abs(Player.posP[0].y) < 100)
+        {
+            for (int i = 0; i < 2; i++)
+            {
+                if (Vector2.Distance(tp, Player.posP[i]) < 3) Destroy(gameObject);
+            }
+        }
+
+    } //Update End
 
 
     private void OnCollisionEnter2D(Collision2D collision)

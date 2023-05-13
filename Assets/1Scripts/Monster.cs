@@ -249,7 +249,19 @@ public class Monster : MonoBehaviour //잡몹
         }
 
 
-
+        //위치 저장 데미지 입음
+        if (Mathf.Abs(Player.posP[0].y) < 100)
+        {
+            for(int i = 0; i < 2; i++)
+            {
+                if (Vector2.Distance(tp, Player.posP[i]) < 3)
+                {
+                    hp--;
+                    sr.sprite = Hurt;
+                    ModifyHp();
+                }
+            }
+        }
 
 
 

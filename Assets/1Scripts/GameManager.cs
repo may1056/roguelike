@@ -128,7 +128,7 @@ public class GameManager : MonoBehaviour //게임 총괄
         //if (killed == enemies) Debug.LogWarning("클리어");
 
         //빠른 재시작
-        if (Input.GetKeyDown(KeyCode.Backspace)) SceneManager.LoadScene(0);
+        if (Input.GetKeyDown(KeyCode.Backspace)) SceneManager.LoadScene(1);
 
 
 

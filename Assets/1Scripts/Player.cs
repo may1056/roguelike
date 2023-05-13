@@ -67,8 +67,16 @@ public class Player : MonoBehaviour //플레이어
     public float dashDist; //가능한 대쉬 거리
     public LayerMask lg; //Ground
 
-    Vector2 pos = Vector2.zero; //위치 저장
+
+    //save position
+    public Text posText;
+    float posCool = 0;
+    Vector2 pos = Vector2.zero;
     bool posSaved = false;
+    public Sprite posSprite;
+    float postime = 0;
+    public static Vector2[] posP =
+        { new Vector2(9999, 9999) , new Vector2(9999, 9999) };
 
 
 
@@ -134,7 +142,10 @@ public class Player : MonoBehaviour //플레이어
 
     void Update()
     {
-        bg.transform.localPosition = -0.1f * transform.position; //배경 이동
+        Vector2 tp = transform.position;
+
+
+        bg.transform.localPosition = -0.1f * tp; //배경 이동
 
 
         //ㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍ
@@ -196,15 +207,15 @@ public class Player : MonoBehaviour //플레이어
 
         for (int i = -2; i <= 2; i++)
         {
-            Vector2 v = new(transform.position.x, transform.position.y + i * 0.4f);
+            Vector2 v = new(tp.x, tp.y + i * 0.4f);
             hit = Physics2D.Raycast(v, d, dashDist, lg); //레이 맞은 것 저장
 
             Debug.DrawRay(v, d * dashDist, Color.red, 0.1f); //시각화
 
-            gx[i + 2] = transform.position.x + (F ? -1 : 1)
+            gx[i + 2] = tp.x + (F ? -1 : 1)
                 * (hit.transform != null ? hit.distance : dashDist);
         }
-        float tpx = transform.position.x;
+        float tpx = tp.x;
 
         float m = F ?
                 Mathf.Max(gx[0], gx[1], gx[2], gx[3], gx[4]) + 0.7f :
@@ -219,17 +230,18 @@ public class Player : MonoBehaviour //플레이어
             onceDashed = true;
             //gameObject.layer = 12; //12PlayerDash
 
-            transform.position = new Vector2(m, transform.position.y);
+            transform.position = new Vector2(m, tp.y);
+            tp = transform.position;
 
-            tpx = transform.position.x - tpx;
+            tpx = tp.x - tpx;
             for (int i = 0; i < 10; i++) Instantiate(fadeEffect,
-                new Vector2(transform.position.x - tpx * i * 0.1f, transform.position.y),
+                new Vector2(tp.x - tpx * i * 0.1f, tp.y),
                 Quaternion.identity);
 
         } //Dash
 
         //대쉬 도달 위치 표시
-        td.transform.position = new Vector2(m, transform.position.y);
+        td.transform.position = new Vector2(m, tp.y);
 
 
 
@@ -239,22 +251,50 @@ public class Player : MonoBehaviour //플레이어
 
         //ㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊ
 
-        //위치 저장
-        if (Input.GetMouseButtonDown(2) || Input.GetKeyDown("l"))
+        if (posCool <= 0) //가능
         {
-            if (posSaved)
+            //저장 위치가 없으면 바로 저장하기
+            if ((Input.GetMouseButtonDown(2) || Input.GetKeyDown("l"))
+                && !posSaved) SavePos();
+
+            //위치가 이미 저장되어 있다면 길게 눌러 새로 저장
+            if (Input.GetMouseButton(2) || Input.GetKey("l"))
             {
-                transform.position = pos;
-                posSaved = false;
+                postime += Time.deltaTime;
+                if (postime >= 1 && postime <= 10) SavePos();
             }
-            else
+
+            //빠르게 눌러 돌아가기 (혹은, 저장 위치가 없으면 저장하기)
+            if (Input.GetMouseButtonUp(2) || Input.GetKeyUp("l"))
             {
-                pos = transform.position;
-                po.transform.position = pos;
-                posSaved = true;
+                if (posSaved && postime < 1)
+                {
+                    DamagePos(0, tp);
+                    DamagePos(1, pos);
+                    transform.position = pos;
+                    posSaved = false;
+                    posCool = 10;
+                }
+                postime = 0;
             }
+            else //발동 타이밍 제외 posP는 딴 데 가 있다
+            {
+                posP[0] = new Vector2(9999, 9999);
+                posP[1] = posP[0];
+            }
+
+            //POS 온오프
             po.gameObject.SetActive(posSaved);
         }
+        else //불가능
+        {
+            posCool -= Time.deltaTime;
+
+            posP[0] = new Vector2(9999, 9999);
+            posP[1] = posP[0];
+        }
+
+        posText.text = posCool.ToString("N1");
 
 
 
@@ -354,7 +394,7 @@ public class Player : MonoBehaviour //플레이어
         else sr.color = Color.white; //기본
 
         if (hp > maxhp) hp = maxhp;
-        if (hp <= 0) SceneManager.LoadScene(0); //쉐이망
+        if (hp <= 0) SceneManager.LoadScene(1); //쉐이망
 
 
 
@@ -364,12 +404,23 @@ public class Player : MonoBehaviour //플레이어
         //ㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹ
 
         //내려갈 수 있는가?
-        Debug.DrawRay(transform.position, -1 * transform.up, Color.blue, 0.1f);
-        RaycastHit2D B; //block
-        B = Physics2D.Raycast(transform.position, -1 * transform.up, 1, lb);
-        RaycastHit2D G; //ground
-        G = Physics2D.Raycast(transform.position, -1 * transform.up, 1, lg);
-        cs.gameObject.SetActive(B.transform != null && G.transform == null);
+        Debug.DrawRay(tp, -1 * transform.up, Color.blue, 0.1f);
+
+        RaycastHit2D B1, B2; //block
+        B1 = Physics2D.Raycast(
+            new Vector2(tp.x - 0.5f, tp.y), -1 * transform.up, 1, lb);
+        B2 = Physics2D.Raycast(
+            new Vector2(tp.x + 0.5f, tp.y), -1 * transform.up, 1, lb);
+
+        RaycastHit2D G1, G2; //ground
+        G1 = Physics2D.Raycast(
+            new Vector2(tp.x - 0.5f, tp.y), -1 * transform.up, 1, lg);
+        G2 = Physics2D.Raycast(
+            new Vector2(tp.x + 0.5f, tp.y), -1 * transform.up, 1, lg);
+
+        bool s = (B1.transform != null || B2.transform != null)
+            && G1.transform == null && G2.transform == null;
+        cs.gameObject.SetActive(s);
 
         //플랫폼 내려가기
         if (Input.GetKeyDown("s"))
@@ -504,6 +555,27 @@ public class Player : MonoBehaviour //플레이어
             WeaponSkill0();
         }
         else wsP = new Vector2(9999, 9999);
+    }
+
+
+    void SavePos()
+    {
+        pos = transform.position;
+        po.transform.position = pos;
+        posSaved = true;
+        postime = 99;
+        GameObject save = Instantiate(
+            fadeEffect, transform.position, Quaternion.identity);
+        save.transform.GetComponent<SpriteRenderer>().sprite = posSprite;
+        save.transform.localScale = 0.2f * Vector2.one;
+    }
+    void DamagePos(int i, Vector2 v)
+    {
+        posP[i] = v;
+        GameObject p = Instantiate(fadeEffect, v, Quaternion.identity);
+        SpriteRenderer psr = p.transform.GetComponent<SpriteRenderer>();
+        psr.sprite = posSprite;
+        psr.sortingOrder = 10;
     }
 
 

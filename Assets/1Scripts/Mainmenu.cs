@@ -15,6 +15,6 @@ public class Mainmenu : MonoBehaviour // 게임매니저 사용하려했는데 �
 
     public void GameStart() // 게임 시작 버튼
     {
-        SceneManager.LoadScene("SampleScene");
+        SceneManager.LoadScene(1);
     }
 }
