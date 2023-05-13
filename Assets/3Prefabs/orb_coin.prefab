@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: -4243002168257304155}
   - component: {fileID: 3593237259188166327}
   m_Layer: 4
-  m_Name: mpOrb
+  m_Name: orb_coin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c477e4e53886f244b672a3898d53239, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hp_mp: 0
+  kind: 2
 --- !u!212 &7408269115187275966
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -89,8 +89,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 6e5ae3fbb040be54aaa1c023466dfcf7, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Sprite: {fileID: -508144027, guid: 5e38e6b0e5266ec44ab65d691d41382f, type: 3}
+  m_Color: {r: 1, g: 0.80087996, b: 0.015686274, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0

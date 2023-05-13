@@ -35,12 +35,20 @@ public class Player : MonoBehaviour //플레이어
     //애니메이션 만들기 귀찮아서 임시방편으로 스프라이트 교체용
     //0: 평소 상태(멈춤), 1: 걷기(달리기), 2: 뛰기(점프)
 
+
     public int hp;
     public int maxhp;
+
+    public int shield;
+    public int maxshield;
+
 
     float hurtTime = 0; //피격 시 사용할 시간 변수
     public static bool hurted;
     int inEnemies = 0;
+
+    float notDamagedTime = 0;
+
 
     public float speed = 0; //달리기 속도
 
@@ -142,6 +150,8 @@ public class Player : MonoBehaviour //플레이어
 
     void Update()
     {
+        if (GameManager.mapouterror) transform.position = Vector2.zero;
+
         Vector2 tp = transform.position;
 
 
@@ -377,29 +387,6 @@ public class Player : MonoBehaviour //플레이어
 
 
 
-        //ㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍ
-
-        //공격당함
-        if (hurted)
-        {
-            hp--;
-            manager.ChangeHPMP();
-            hurtTime = 1;
-            hurted = false;
-        }
-
-        if (inEnemies == 0) hurted = false;
-
-        if (hurtTime >= 0) Hurt(); //아플 때
-        else sr.color = Color.white; //기본
-
-        if (hp > maxhp) hp = maxhp;
-        if (hp <= 0) SceneManager.LoadScene(1); //쉐이망
-
-
-
-
-
 
         //ㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹ
 
@@ -437,6 +424,45 @@ public class Player : MonoBehaviour //플레이어
 
 
 
+
+        //ㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍ
+
+        //공격당함
+        if (hurted)
+        {
+            if (shield >= 1) shield--;
+            else hp--;
+            manager.ChangeHPMP();
+            hurtTime = 1;
+            hurted = false;
+            notDamagedTime = 0;
+        }
+
+        if (inEnemies == 0) hurted = false;
+
+        if (hurtTime >= 0) Hurt(); //아플 때
+        else sr.color = Color.white; //기본
+
+        if (hp > maxhp) hp = maxhp;
+        if (hp <= 0) SceneManager.LoadScene(1); //쉐이망
+
+
+
+
+        //ㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷ
+
+        notDamagedTime += Time.deltaTime;
+        if (notDamagedTime > 3 && shield < maxshield)
+        {
+            shield++;
+            notDamagedTime = 0;
+            manager.ChangeHPMP();
+        }
+
+
+
+
+
         //ㅇㅂㅇㅂㅇㅂㅇㅂㅇㅂㅇㅂㅇㅂㅇㅂㅇㅂㅇㅂㅇㅂㅇㅂㅇㅂㅇㅂㅇㅂ
 
         if (getOrb)
@@ -444,6 +470,7 @@ public class Player : MonoBehaviour //플레이어
             manager.ChangeHPMP();
             getOrb = false;
         }
+
         if (mp > maxmp) mp = maxmp;
 
 

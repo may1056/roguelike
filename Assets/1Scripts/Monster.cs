@@ -44,6 +44,7 @@ public class Monster : MonoBehaviour //잡몹
 
     public GameObject hpOrb;
     public GameObject mpOrb;
+    public GameObject coinOrb;
 
     bool withPlayer = false;
     float withPlayerTime = 0;
@@ -149,6 +150,12 @@ public class Monster : MonoBehaviour //잡몹
 
     void Update()
     {
+        if (GameManager.mapouterror)
+        {
+            transform.position = firstP;
+            moving = false;
+        }
+
         Vector2 pp = Player.player.transform.position;
 
         //플레이어와 적 사이의 거리
@@ -274,6 +281,9 @@ public class Monster : MonoBehaviour //잡몹
             r = Random.Range(0, 10);
             if (r <= 1) Instantiate(mpOrb, tp, Quaternion.identity);
 
+            r = Random.Range(0, 10);
+            if (r <= 5) Instantiate(coinOrb, tp, Quaternion.identity);
+
             Destroy(this.gameObject);
         }
 
@@ -345,9 +355,16 @@ public class Monster : MonoBehaviour //잡몹
                 transform.Translate(3 * h * Time.deltaTime * Vector2.right);
 
                 Debug.DrawRay(tp, h * transform.right, Color.green, 0.1f);
-                RaycastHit2D hit =
-                    Physics2D.Raycast(tp, h * transform.right, 1, pf);
-                if (hit.transform != null) leejong = !leejong;
+
+                RaycastHit2D hit1 = Physics2D.Raycast(
+                    new Vector2(tp.x, tp.y - 0.4f), h * transform.right, 1, pf);
+                RaycastHit2D hit2 = Physics2D.Raycast(
+                    tp, h * transform.right, 1, pf);
+                RaycastHit2D hit3 = Physics2D.Raycast(
+                    new Vector2(tp.x, tp.y + 0.4f), h * transform.right, 1, pf);
+
+                if (hit1.transform != null || hit2.transform != null
+                    || hit3.transform != null) leejong = !leejong;
 
                 sr.flipX = leejong;
 

@@ -49,6 +49,7 @@ public class GameManager : MonoBehaviour //게임 총괄
 
 
     public static bool mapouterror; //맵뚫 오류가 발생한 것 같다!
+    float errortime;
 
 
 
@@ -58,7 +59,7 @@ public class GameManager : MonoBehaviour //게임 총괄
 
 
     public Player player;
-    public Image[] hps = new Image[6]; //hp 구슬들
+    public Image[] hps = new Image[8]; //hp 구슬들
     public Image[] mps = new Image[6]; //mp 구슬들
 
     public Text[] stat = new Text[5];
@@ -73,6 +74,10 @@ public class GameManager : MonoBehaviour //게임 총괄
     //public Text atkcoolText; //일반공격 쿨타임
 
 
+    public static int coins = 0;
+    public Text coinText;
+
+
 
 
     void Start()
@@ -83,7 +88,9 @@ public class GameManager : MonoBehaviour //게임 총괄
         killed = 0;
         ChangeHPMP();
 
-        mapNum = 2; //임시
+        coins = 0;
+
+        mapNum = 1; //임시
 
         realkilled = 0;
 
@@ -109,7 +116,8 @@ public class GameManager : MonoBehaviour //게임 총괄
         coolText.text = "쿨타임: " + player.cooltime.ToString("N0") + "초";
 
         //메뉴창 표시
-        if (Input.GetButtonDown("Cancel")) {
+        if (Input.GetButtonDown("Cancel"))
+        {
             if (menuSet.activeSelf)
             {
                 menuSet.SetActive(false);
@@ -122,10 +130,12 @@ public class GameManager : MonoBehaviour //게임 총괄
             }
         }
 
+
         //킬 수 표시
         killText.text = killed.ToString();
 
-        //if (killed == enemies) Debug.LogWarning("클리어");
+        //획득 동전 수 표시
+        coinText.text = coins.ToString();
 
         //빠른 재시작
         if (Input.GetKeyDown(KeyCode.Backspace)) SceneManager.LoadScene(1);
@@ -150,17 +160,32 @@ public class GameManager : MonoBehaviour //게임 총괄
         }
 
 
+        if (mapouterror && errortime > 0.02f) mapouterror = false;
+        else errortime += Time.deltaTime;
+
     } //Update End
 
 
 
     public void ChangeHPMP() //hp, mp 구슬 최신화
     {
-        for(int i = 0; i < 6; i++)
+        for (int i = 0; i < player.maxhp + player.maxshield; i++)
         {
-            hps[i].gameObject.SetActive(i < player.hp);
-            mps[i].gameObject.SetActive(i < player.mp);
+            if (i < player.hp)
+            {
+                hps[i].color = Color.white;
+                hps[i].gameObject.SetActive(true);
+            }
+            else if (i < player.hp + player.shield)
+            {
+                hps[i].color = Color.gray;
+                hps[i].gameObject.SetActive(true);
+            }
+            else hps[i].gameObject.SetActive(false);
         }
+
+        for(int i = 0; i < player.maxmp; i++)
+            mps[i].gameObject.SetActive(i < player.mp);
     }
 
 
@@ -205,9 +230,15 @@ public class GameManager : MonoBehaviour //게임 총괄
         Time.timeScale = 1f;
     }
 
+    public void SsipBug()
+    {
+        mapouterror = true;
+        errortime = 0;
+    }
+
     public void GameExit() // 게임 종료 버튼 - 에디터에선 실행안됨
     {
-        Application.Quit();
+        SceneManager.LoadScene(0);
     }
 
 } //GameManager End

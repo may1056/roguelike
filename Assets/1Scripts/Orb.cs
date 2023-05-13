@@ -7,7 +7,7 @@ public class Orb : MonoBehaviour //구체
     Rigidbody2D rigid;
 
     float dist;
-    public bool hp_mp;
+    public int kind; //0: hp오브, 1: mp오브, 2: 동전
 
     Vector2 tp;
 
@@ -46,11 +46,14 @@ public class Orb : MonoBehaviour //구체
         }
 
 
-        if (dist < 1)
+        if (dist < 0.5f)
         {
-            if (hp_mp) Player.player.hp++;
-            else Player.player.mp++;
-
+            switch (kind)
+            {
+                case 0: Player.player.hp++; break;
+                case 1: Player.player.mp++; break;
+                case 2: GameManager.coins++; break;
+            }
             Player.getOrb = true;
             Destroy(gameObject);
         }
