@@ -10,10 +10,17 @@ public class PlayerAttack : MonoBehaviour
 
     public static PlayerAttack playerAtk;
 
-
+    
     Transform atk; //공격 범위
 
     SpriteRenderer attacksr;
+
+    BoxCollider2D attackbc;
+
+    Animator attackani;
+
+    public GameObject playerbullet;
+
 
     public static float maxAttackCooltime = 0.2f; // 쿨타임 시간
     public static float curAttackCooltime = 0; // 현재 쿨타임
@@ -54,9 +61,14 @@ public class PlayerAttack : MonoBehaviour
 
         atk = transform.GetChild(1);
         attacksr = atk.GetComponent<SpriteRenderer>();
+        attackbc = atk.GetComponent<BoxCollider2D>();
+        attackani = atk.GetComponent<Animator>();
+
         attacksr.color = new Color(1, 1, 1, 0);
 
         wsP = new Vector2(9999, 9999);
+
+        GameManager.ismeleeWeapon = false; // 현재 무기가 채찍밖에 없어서 트루로 설정
     }
 
 
@@ -69,22 +81,35 @@ public class PlayerAttack : MonoBehaviour
 
         //ㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱ
 
-        //일반공격 쿨타임, 애니메이션
+
         if (curAttackCooltime <= maxAttackCooltime + 2)
             curAttackCooltime += Time.deltaTime;
 
         attackuse = (Input.GetMouseButton(0) || Input.GetKey("j"))
             && (curAttackCooltime >= maxAttackCooltime); //j는 임시 공격 키
 
-        if (attackuse)
+
+        // 근접공격 쿨타임, 애니메이션
+        if (attackuse && GameManager.ismeleeWeapon)
         {
             float x = player.F ? -2 : 2;
             attackP = new Vector2(transform.position.x + x, transform.position.y);
             attacksr.color = new Color(1, 1, 1, 1);
             player.dontBehaveTime = 0;
         }
-        else attacksr.color = new Color(1, 1, 1, 0);
+        else if(attackuse) //원거리 공격 쿨타임, 애니메이션?
+        {
+            float x = player.F ? -2 : 2;
+            attackP = new Vector2(transform.position.x + x, transform.position.y);
 
+            Instantiate(playerbullet, transform.position, transform.rotation);
+
+            attacksr.color = new Color(1, 1, 1, 1);
+
+            curAttackCooltime = 0;
+            player.dontBehaveTime = 0;
+        }
+        else attacksr.color = new Color(1, 1, 1, 0);
 
 
 
@@ -162,4 +187,28 @@ public class PlayerAttack : MonoBehaviour
         else wsP = new Vector2(9999, 9999);
     }
 
+    void WeaponChange()
+    {
+        //애니메이션 변경 자체는 애니메이터 파라미터에서 하는걸로 하고 여기서는 컨트롤러 값 수정
+        //animator SetInteger("컨트롤러 이름", 변경값) 이게 변경 함수니 기억하렴 종환아 + SetFloat,SetBool,SetTrigger
+
+        if (GameManager.ismeleeWeapon) //근접공격이면 콜라이더 활성화 아니면 비활성화
+        {
+            attackbc.enabled = true;
+
+            //무기별 공격 범위 지정 필요
+            //attackbc.size = new Vector2( x,y,);
+
+        }
+        else attackbc.enabled = false;
+
+    }
+
+    public void ismeleechange() // onclick
+    {
+        if (GameManager.ismeleeWeapon)
+            GameManager.ismeleeWeapon = false;
+        else
+            GameManager.ismeleeWeapon = true;
+    }
 } //PlayerAttack End

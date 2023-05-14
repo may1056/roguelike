@@ -19,14 +19,25 @@ public class GameManager : MonoBehaviour //게임 총괄
     readonly float[] commonItems_p = { 10, 10, 10, 10, 10, 10, 10, };
 
     //무기
-    readonly string[] weapon =
-        { "채찍", "검", "창", "활", "총지팡이",
+
+
+    readonly string[] meleeWeapon = // 근접 무기
+        { "채찍", "검", "창",
         "열라짱짱 쎈 킹왕짱 울트라 슈퍼 매지컬 치즈스틱 롱치즈 이거 ㄹㅇ실화냐...", "방패" };
+
+    readonly string[] rangedWeapon = // 원거리 무기
+        { "활", "총지팡이"};
+
     //무기별 확률
-    readonly float[] weapon_p = { 9.9f, 25, 20, 15, 15, 0.1f, 15 };
+    readonly float[] meleeWeapon_p = { 9.9f, 25, 20, 0.1f, 15 };
+    readonly float[] rangedWeapon_p = { 15, 15 };
 
+    // 현재 무기 코드
+    public static int meleeWeaponIndex;
 
+    public static int rangedWeaponIndex;
 
+    public static bool ismeleeWeapon; 
 
 
     public static int mapNum; //맵 번호
