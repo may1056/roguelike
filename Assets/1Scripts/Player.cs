@@ -21,7 +21,6 @@ public class Player : MonoBehaviour //플레이어
     //0채찍,
 
 
-    Transform atk; //공격 범위
     Transform bg; //배경
     Transform td; //대쉬 끝 위치
     public Transform po; //저장된 위치 표시 오브젝트
@@ -50,20 +49,10 @@ public class Player : MonoBehaviour //플레이어
 
     public Image hurtImage;
 
-    float dontBehaveTime = 0;
+    public float dontBehaveTime = 0;
 
 
     public float speed = 0; //달리기 속도
-
-    public static float maxAttackCooltime = 0.2f; // 쿨타임 시간
-    public static float curAttackCooltime = 0; // 현재 쿨타임
-    public float attackspeed = 0; // 공격 속도
-    public static Vector2 attackP;
-    public Sprite attackSprite;
-    bool attackuse = false;
-
-    SpriteRenderer attacksr;
-    //공격 오브젝트의 스프라이트렌더러, flipX 때문에 필요할 듯
 
 
     //bool isWalking = false;
@@ -91,36 +80,19 @@ public class Player : MonoBehaviour //플레이어
 
 
 
-    public int mp;
-    public int maxmp;
-    public float cooltime = 0;
-
-    bool skilluse; //스킬 시전하는지
-    public static Vector2 skillP; //스킬 원 위치
-    public Sprite skillSprite;
-
     bool isSliding; //플랫폼 내려가는 중인지
     Vector2 slideP;
     public LayerMask lb; //Block
 
-    public static bool getOrb;
-
-
-    //weapon skill
-    public Text wsText;
-    float wsCool = 0;
-    public static Vector2 wsP;
-    bool wsAvailable = false;
-    float wsgoing = 3;
-    int wscount = 0;
-    public Sprite ws0sprite;
-    //아 모르겠다 코드 막 짜야지.. 변수만 몇 개야
+    public static bool getOrb; //오브 먹었는지
 
 
     SpriteRenderer bgsr; //배경 스프라이트렌더러
     float bgtime = 0;
-    Color cloud = new Color(0.7f, 0.8f, 0.9f); //구름 약간 어두움
+    Color cloud = new(0.7f, 0.8f, 0.9f); //구름 약간 어두움
 
+
+    public bool F;
 
 
 
@@ -134,17 +106,12 @@ public class Player : MonoBehaviour //플레이어
         anim = GetComponent<Animator>();
 
         weaponNum = 0;
-        wsP = new Vector2(9999, 9999);
 
-        atk = transform.GetChild(1);
+
         bg = transform.GetChild(2);
         td = transform.GetChild(3);
         cs = transform.GetChild(4);
 
-        //플레이어의 0번째 자손인 Attack의 스프라이트렌더러를 끌고 온다.
-        //허접한 근접 공격을 만들기 위함.
-        attacksr = atk.GetComponent<SpriteRenderer>();
-        attacksr.color = new Color(1, 1, 1, 0);
 
         getOrb = false;
 
@@ -190,11 +157,9 @@ public class Player : MonoBehaviour //플레이어
         if (Input.GetButton("Horizontal"))
             sr.flipX = Input.GetAxisRaw("Horizontal") == -1;
 
-        bool F = sr.flipX; //하도 많이 써서 정의함
+        F = sr.flipX; //하도 많이 써서 정의함
 
-        //근?접 공격 오브젝트도 뒤집고 위치 변경. 이건 좀 많이 손봐야 한다.
-        attacksr.flipX = F;
-        atk.transform.localPosition = new Vector2(F ? -2f : 2f, 0);
+
 
 
         if (!isJumping) //점프 ㄴ
@@ -315,85 +280,6 @@ public class Player : MonoBehaviour //플레이어
 
 
 
-        //ㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱ
-
-        //일반공격 쿨타임, 애니메이션
-        if (curAttackCooltime <= maxAttackCooltime + 2)
-            curAttackCooltime += Time.deltaTime;
-
-        attackuse = (Input.GetMouseButton(0) || Input.GetKey("j"))
-            && (curAttackCooltime >= maxAttackCooltime); //j는 임시 공격 키
-
-        if (attackuse)
-        {
-            float x = F ? -2 : 2;
-            attackP = new Vector2(transform.position.x + x, transform.position.y);
-            attacksr.color = new Color(1, 1, 1, 1);
-            dontBehaveTime = 0;
-        }
-        else attacksr.color = new Color(1, 1, 1, 0);
-
-
-
-
-
-
-
-        //ㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋ
-
-        //기본 탑재 스킬
-        if (cooltime > 0) cooltime -= Time.deltaTime;
-
-        skilluse = cooltime <= 0 && Input.GetKeyDown("z") && mp >= 1;
-
-        if (skilluse) //약한 스킬
-        {
-            cooltime = 3;
-            float x = F ? -6 : 6;
-            skillP = new Vector2(transform.position.x + x, transform.position.y);
-            MakeEffect(skillP, skillSprite, -2);
-            mp--;
-            manager.ChangeHPMP();
-            dontBehaveTime = 0;
-        }
-        else skillP = new Vector2(9999, 9999); //저 멀리
-
-
-        //무기 파생 스킬
-        if (wsCool > 0)
-        {
-            wsCool -= Time.deltaTime;
-            wsText.text = wsCool.ToString("N1");
-        }
-        else wsText.text = "0";
-
-        if (wsCool <= 0 && Input.GetKeyDown("x") && mp >= 2)
-        {
-            wsAvailable = true;
-            wsgoing = 3;
-            wscount = 3;
-            wsCool = 20;
-            mp -= 2;
-            manager.ChangeHPMP();
-            dontBehaveTime = 0;
-        }
-
-        if (wsAvailable)
-        {
-            switch (weaponNum)
-            {
-                case 0:
-                    Wsgc(wscount);
-                    wsgoing -= 2 * Time.deltaTime;
-                break;
-            }
-
-            wsAvailable = wsgoing > 0;
-        }
-
-
-
-
 
 
         //ㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹ
@@ -488,7 +374,7 @@ public class Player : MonoBehaviour //플레이어
             getOrb = false;
         }
 
-        if (mp > maxmp) mp = maxmp;
+        //if (mp > maxmp) mp = maxmp;
 
 
 
@@ -580,35 +466,18 @@ public class Player : MonoBehaviour //플레이어
     }
 
 
-    //position, sprite, layer
-    void MakeEffect(Vector2 p, Sprite s, int l) //Fade 스크립트가 붙은 오브젝트 생성
+    //******position, sprite, layer, scale******
+    public void MakeEffect(Vector2 p, Sprite s, int l, float sc) //Fade 스크립트가 붙은 오브젝트 생성
     {
         GameObject effect = Instantiate(fadeEffect, p, Quaternion.identity);
+        effect.transform.localScale = sc * Vector2.one;
+
         SpriteRenderer esr = effect.transform.GetComponent<SpriteRenderer>();
         esr.sprite = s;
         esr.flipX = sr.flipX;
         esr.sortingOrder = l;
     }
 
-
-    void WeaponSkill0() //채찍 전용 스킬
-    {
-        GameObject ws0 = Instantiate(
-            fadeEffect, transform.position, Quaternion.identity);
-        SpriteRenderer wssr = ws0.transform.GetComponent<SpriteRenderer>();
-        wssr.sprite = ws0sprite;
-        wssr.sortingOrder = 10;
-    }
-    void Wsgc(int co) //채찍 전용 스킬 발현을 매개해주는 역할
-    {
-        if (wsgoing <= co)
-        {
-            wsP = transform.position;
-            wscount--;
-            WeaponSkill0();
-        }
-        else wsP = new Vector2(9999, 9999);
-    }
 
 
     void SavePos()
@@ -617,18 +486,12 @@ public class Player : MonoBehaviour //플레이어
         po.transform.position = pos;
         posSaved = true;
         postime = 99;
-        GameObject save = Instantiate(
-            fadeEffect, transform.position, Quaternion.identity);
-        save.transform.GetComponent<SpriteRenderer>().sprite = posSprite;
-        save.transform.localScale = 0.2f * Vector2.one;
+        MakeEffect(pos, posSprite, 8, 0.2f);
     }
     void DamagePos(int i, Vector2 v)
     {
         posP[i] = v;
-        GameObject p = Instantiate(fadeEffect, v, Quaternion.identity);
-        SpriteRenderer psr = p.transform.GetComponent<SpriteRenderer>();
-        psr.sprite = posSprite;
-        psr.sortingOrder = 10;
+        MakeEffect(v, posSprite, 10, 1);
     }
 
 

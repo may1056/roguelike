@@ -63,6 +63,7 @@ MonoBehaviour:
   hpOrb: {fileID: 6510405994357380013, guid: f298c78827c8618408d5e5c4b44641cc, type: 3}
   mpOrb: {fileID: 2026748482929784485, guid: dfc753a499df8d14bb6a7fc313dcaa13, type: 3}
   coinOrb: {fileID: 2026748482929784485, guid: 70d4039dbc797ac488ff53131785d764, type: 3}
+  deathEffect: {fileID: 21300000, guid: e6e20993f3fa5cb45a1a2df62c633aaa, type: 3}
   noticeDist: 0
   pf:
     serializedVersion: 2

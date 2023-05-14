@@ -1,0 +1,165 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class PlayerAttack : MonoBehaviour
+{
+    public Player player;
+    public GameManager manager;
+
+    public static PlayerAttack playerAtk;
+
+
+    Transform atk; //공격 범위
+
+    SpriteRenderer attacksr;
+
+    public static float maxAttackCooltime = 0.2f; // 쿨타임 시간
+    public static float curAttackCooltime = 0; // 현재 쿨타임
+    public float attackspeed = 0; // 공격 속도
+    public static Vector2 attackP;
+    public Sprite attackSprite;
+    bool attackuse = false;
+
+
+    public int mp;
+    public int maxmp;
+    public float cooltime = 0;
+
+    bool skilluse; //스킬 시전하는지
+    public static Vector2 skillP; //스킬 원 위치
+    public Sprite skillSprite;
+
+
+    //weapon skill
+    public Text wsText;
+    float wsCool = 0;
+    public static Vector2 wsP;
+    bool wsAvailable = false;
+    float wsgoing = 3;
+    int wscount = 0;
+    public Sprite ws0sprite;
+    //아 모르겠다 코드 막 짜야지.. 변수만 몇 개야
+
+
+
+
+
+
+    void Start()
+    {
+        playerAtk = this;
+
+
+        atk = transform.GetChild(1);
+        attacksr = atk.GetComponent<SpriteRenderer>();
+        attacksr.color = new Color(1, 1, 1, 0);
+
+        wsP = new Vector2(9999, 9999);
+    }
+
+
+
+    void Update()
+    {
+        attacksr.flipX = player.F;
+        atk.transform.localPosition = new Vector2(player.F ? -2f : 2f, 0);
+
+
+        //ㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱ
+
+        //일반공격 쿨타임, 애니메이션
+        if (curAttackCooltime <= maxAttackCooltime + 2)
+            curAttackCooltime += Time.deltaTime;
+
+        attackuse = (Input.GetMouseButton(0) || Input.GetKey("j"))
+            && (curAttackCooltime >= maxAttackCooltime); //j는 임시 공격 키
+
+        if (attackuse)
+        {
+            float x = player.F ? -2 : 2;
+            attackP = new Vector2(transform.position.x + x, transform.position.y);
+            attacksr.color = new Color(1, 1, 1, 1);
+            player.dontBehaveTime = 0;
+        }
+        else attacksr.color = new Color(1, 1, 1, 0);
+
+
+
+
+
+
+
+        //ㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋ
+
+        //기본 탑재 스킬
+        if (cooltime > 0) cooltime -= Time.deltaTime;
+
+        skilluse = cooltime <= 0 && Input.GetKeyDown("z") && mp >= 1;
+
+        if (skilluse) //약한 스킬
+        {
+            cooltime = 3;
+            float x = player.F ? -6 : 6;
+            skillP = new Vector2(transform.position.x + x, transform.position.y);
+            player.MakeEffect(skillP, skillSprite, -2, 1);
+            mp--;
+            manager.ChangeHPMP();
+            player.dontBehaveTime = 0;
+        }
+        else skillP = new Vector2(9999, 9999); //저 멀리
+
+
+        //무기 파생 스킬
+        if (wsCool > 0)
+        {
+            wsCool -= Time.deltaTime;
+            wsText.text = wsCool.ToString("N1");
+        }
+        else wsText.text = "0";
+
+        if (wsCool <= 0 && Input.GetKeyDown("x") && mp >= 2)
+        {
+            wsAvailable = true;
+            wsgoing = 3;
+            wscount = 3;
+            wsCool = 20;
+            mp -= 2;
+            manager.ChangeHPMP();
+            player.dontBehaveTime = 0;
+        }
+
+        if (wsAvailable)
+        {
+            switch (Player.weaponNum)
+            {
+                case 0:
+                    WeaponSkill0(wscount);
+                    wsgoing -= 2 * Time.deltaTime;
+                    break;
+            }
+
+            wsAvailable = wsgoing > 0;
+        }
+
+
+
+        if (mp > maxmp) mp = maxmp;
+
+    } //Update End
+
+
+
+    void WeaponSkill0(int co) //채찍 전용 스킬 발현을 매개해주는 역할 //이었는데 이젠 아님
+    {
+        if (wsgoing <= co)
+        {
+            wsP = transform.position;
+            wscount--;
+            player.MakeEffect(transform.position, ws0sprite, 10, 1);
+        }
+        else wsP = new Vector2(9999, 9999);
+    }
+
+} //PlayerAttack End

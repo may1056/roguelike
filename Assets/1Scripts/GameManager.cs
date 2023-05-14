@@ -59,6 +59,7 @@ public class GameManager : MonoBehaviour //게임 총괄
 
 
     public Player player;
+    public PlayerAttack playerAtk;
     public Image[] hps = new Image[8]; //hp 구슬들
     public Image[] mps = new Image[6]; //mp 구슬들
 
@@ -90,7 +91,7 @@ public class GameManager : MonoBehaviour //게임 총괄
 
         coins = 0;
 
-        mapNum = 1; //임시
+        mapNum = 2; //임시
 
         realkilled = 0;
 
@@ -108,12 +109,12 @@ public class GameManager : MonoBehaviour //게임 총괄
     void Update()
     {
         stat[0].text = "공격력: 공격력 변수 추가필요" /*+ Player.maxAttackCooltime.ToString()*/;
-        stat[1].text = "공격속도: " + Player.maxAttackCooltime.ToString();
+        stat[1].text = "공격속도: " + PlayerAttack.maxAttackCooltime.ToString();
         stat[2].text = "이동속도: " + Player.player.speed.ToString();
         stat[3].text = "점프력: " + Player.player.jumpPower.ToString();
 
 
-        coolText.text = "쿨타임: " + player.cooltime.ToString("N0") + "초";
+        coolText.text = "쿨타임: " + playerAtk.cooltime.ToString("N0") + "초";
 
         //메뉴창 표시
         if (Input.GetButtonDown("Cancel"))
@@ -187,8 +188,8 @@ public class GameManager : MonoBehaviour //게임 총괄
         }
 
         //MP
-        for(int i = 0; i < player.maxmp; i++)
-            mps[i].gameObject.SetActive(i < player.mp);
+        for(int i = 0; i < playerAtk.maxmp; i++)
+            mps[i].gameObject.SetActive(i < playerAtk.mp);
     }
 
 

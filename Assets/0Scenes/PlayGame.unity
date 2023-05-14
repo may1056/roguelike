@@ -265,6 +265,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   player: {fileID: 1511826926}
+  playerAtk: {fileID: 1511826931}
   hps:
   - {fileID: 610340858}
   - {fileID: 1281978600}
@@ -3660,6 +3661,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1511826927}
   - component: {fileID: 1511826926}
+  - component: {fileID: 1511826931}
   - component: {fileID: 1511826925}
   - component: {fileID: 1511826929}
   - component: {fileID: 1511826928}
@@ -3747,9 +3749,8 @@ MonoBehaviour:
   shield: 2
   maxshield: 2
   hurtImage: {fileID: 1638759842}
+  dontBehaveTime: 0
   speed: 4
-  attackspeed: 0
-  attackSprite: {fileID: 21300000, guid: fe450ee90c349de40a2e28cfa0ba7b7f, type: 3}
   jumpPower: 28.5
   dashSprite: {fileID: 21300000, guid: e4bf04b9512901b49a759ed7694a009b, type: 3}
   dashDist: 7
@@ -3758,15 +3759,10 @@ MonoBehaviour:
     m_Bits: 512
   posText: {fileID: 1523719854}
   posSprite: {fileID: 21300000, guid: ddcbfa00505df884394bb89ca99263d3, type: 3}
-  mp: 6
-  maxmp: 6
-  cooltime: 0
-  skillSprite: {fileID: 21300000, guid: 5ff1651192f581944a84673ed2bed55d, type: 3}
   lb:
     serializedVersion: 2
     m_Bits: 256
-  wsText: {fileID: 1548630686}
-  ws0sprite: {fileID: 21300000, guid: 1c5eac53e8051a74596cbb464d380d18, type: 3}
+  F: 0
 --- !u!4 &1511826927
 Transform:
   m_ObjectHideFlags: 0
@@ -3855,6 +3851,28 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1511826931
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1511826924}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e7ca328c050c314fbc34f9eb33249d3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 1511826926}
+  manager: {fileID: 25397025}
+  attackspeed: 0
+  attackSprite: {fileID: 21300000, guid: fe450ee90c349de40a2e28cfa0ba7b7f, type: 3}
+  mp: 6
+  maxmp: 6
+  cooltime: 0
+  skillSprite: {fileID: 21300000, guid: 5ff1651192f581944a84673ed2bed55d, type: 3}
+  wsText: {fileID: 1548630686}
+  ws0sprite: {fileID: 21300000, guid: 1c5eac53e8051a74596cbb464d380d18, type: 3}
 --- !u!1 &1523719853
 GameObject:
   m_ObjectHideFlags: 0

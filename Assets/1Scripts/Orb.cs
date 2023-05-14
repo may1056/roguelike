@@ -51,7 +51,7 @@ public class Orb : MonoBehaviour //구체
             switch (kind)
             {
                 case 0: Player.player.hp++; break;
-                case 1: Player.player.mp++; break;
+                case 1: PlayerAttack.playerAtk.mp++; break;
                 case 2: GameManager.coins++; break;
             }
             Player.getOrb = true;

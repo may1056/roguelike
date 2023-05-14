@@ -17,20 +17,23 @@ public class Bullet : MonoBehaviour //탄막
 
 
         //스킬 범위 내에 있음
-        if (Mathf.Abs(Player.skillP.y) < 100 &&
-            Vector2.Distance(tp, Player.skillP) < 5.5f) Destroy(gameObject);
+        if (Mathf.Abs(PlayerAttack.skillP.y) < 100 &&
+            Vector2.Distance(tp, PlayerAttack.skillP) < 5.5f) Destroy(gameObject);
+
 
 
         //무기 파생 스킬 범위 내에 있음
-        if (Mathf.Abs(Player.wsP.y) < 100)
+        Vector2 wsp = PlayerAttack.wsP;
+
+        if (Mathf.Abs(wsp.y) < 100)
         {
             switch (Player.weaponNum)
             {
                 case 0:
-                    bool inX = Mathf.Abs(Player.wsP.x - tp.x) < 7.5f
-                        && Mathf.Abs(Player.wsP.y - tp.y) < 1;
-                    bool inY = Mathf.Abs(Player.wsP.y - tp.y) < 7.5f
-                        && Mathf.Abs(Player.wsP.x - tp.x) < 1;
+                    bool inX = Mathf.Abs(wsp.x - tp.x) < 7.5f
+                        && Mathf.Abs(wsp.y - tp.y) < 1;
+                    bool inY = Mathf.Abs(wsp.y - tp.y) < 7.5f
+                        && Mathf.Abs(wsp.x - tp.x) < 1;
                     if (inX || inY) Destroy(gameObject);
                     break;
             }

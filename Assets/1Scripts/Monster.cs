@@ -51,6 +51,8 @@ public class Monster : MonoBehaviour //잡몹
 
     Vector2 firstP; //enemyerror에 대응해 처음 위치로 돌아감
 
+    public Sprite deathEffect;
+
 
     /// <summary>
     /// 플레이어 타겟팅형 몬스터 - 00, 02
@@ -98,34 +100,7 @@ public class Monster : MonoBehaviour //잡몹
         tp = transform.position;
         firstP = tp;
 
-        //스폰 효과
-        switch (monsterNum)
-        {
-            case 0: //거미
-                GameObject ap0 = Instantiate(fadeEffect,
-                    new Vector2(tp.x, tp.y - 0.4f), Quaternion.identity); //약간 아래에
-                ap0.transform.GetComponent<SpriteRenderer>().sprite = appear;
-                ap0.transform.localScale = 0.8f * Vector2.one; //약간 작게
-                break;
-
-            case 1: //팩맨
-                GameObject ap1 = Instantiate(fadeEffect, tp, Quaternion.identity);
-                ap1.transform.GetComponent<SpriteRenderer>().sprite = appear;
-                break;
-
-            case 2: //슬라임
-                GameObject ap2 = Instantiate(fadeEffect,
-                    new Vector2(tp.x, tp.y + 0.1f), Quaternion.identity); //약간 위에
-                ap2.transform.GetComponent<SpriteRenderer>().sprite = appear;
-                ap2.transform.localScale = 0.8f * Vector2.one; //약간 작게
-                break;
-
-            case 3: //???
-                GameObject ap3 = Instantiate(fadeEffect, tp, Quaternion.identity);
-                ap3.transform.GetComponent<SpriteRenderer>().sprite = appear;
-                ap3.transform.localScale = 0.8f * Vector2.one; //약간 작게
-                break;
-        }
+        MakeEffect(appear);
 
         gameObject.SetActive(false); //일단 감춤
 
@@ -166,8 +141,8 @@ public class Monster : MonoBehaviour //잡몹
         {
             case 0: //spider
                 //플레이어를 향해 이동 방향을 변경한다 (아프면 빨라짐)
-                if (tp.x > pp.x) H = hp == maxhp ? -1 : -2;
-                else H = hp == maxhp ? 1 : 2;
+                if (tp.x > pp.x) H = hp == maxhp ? -2 : -4;
+                else H = hp == maxhp ? 2 : 4;
 
                 Targeting();
             break;
@@ -176,7 +151,7 @@ public class Monster : MonoBehaviour //잡몹
 
             case 2:
                 //플레이어를 향해 이동 방향을 변경한다
-                H = tp.x > pp.x ? -1 : 1;
+                H = tp.x > pp.x ? -3 : 3;
 
                 Targeting();
 
@@ -212,11 +187,11 @@ public class Monster : MonoBehaviour //잡몹
         //피 닳는 시스템
         if (inAttackArea && (Input.GetMouseButtonDown(0)
             || Input.GetKeyDown("j")) && //내가 마우스가 없어서 임시로 설정한 키
-            Player.curAttackCooltime >= Player.maxAttackCooltime)
+            PlayerAttack.curAttackCooltime >= PlayerAttack.maxAttackCooltime)
         {
             hp--;
             sr.sprite = Hurt;
-            Player.curAttackCooltime = 0;
+            PlayerAttack.curAttackCooltime = 0;
             ModifyHp();
         }
 
@@ -226,8 +201,8 @@ public class Monster : MonoBehaviour //잡몹
 
 
         //스킬 범위 내에 있음
-        if (Mathf.Abs(Player.skillP.y) < 100 &&
-            Vector2.Distance(tp, Player.skillP) < 5.5f)
+        if (Mathf.Abs(PlayerAttack.skillP.y) < 100 &&
+            Vector2.Distance(tp, PlayerAttack.skillP) < 5.5f)
         {
             hp--;
             sr.sprite = Hurt;
@@ -236,15 +211,17 @@ public class Monster : MonoBehaviour //잡몹
 
 
         //무기 파생 스킬 범위 내에 있음
-        if (Mathf.Abs(Player.wsP.y) < 100)
+        Vector2 wsp = PlayerAttack.wsP;
+
+        if (Mathf.Abs(wsp.y) < 100)
         {
             switch (Player.weaponNum)
             {
                 case 0:
-                    bool inX = Mathf.Abs(Player.wsP.x - tp.x) < 7.5f
-                        && Mathf.Abs(Player.wsP.y - tp.y) < 1;
-                    bool inY = Mathf.Abs(Player.wsP.y - tp.y) < 7.5f
-                        && Mathf.Abs(Player.wsP.x - tp.x) < 1;
+                    bool inX = Mathf.Abs(wsp.x - tp.x) < 7.5f
+                        && Mathf.Abs(wsp.y - tp.y) < 1;
+                    bool inY = Mathf.Abs(wsp.y - tp.y) < 7.5f
+                        && Mathf.Abs(wsp.x - tp.x) < 1;
                     if (inX || inY)
                     {
                         hp -= 2;
@@ -284,6 +261,12 @@ public class Monster : MonoBehaviour //잡몹
             r = Random.Range(0, 10);
             if (r <= 5) Instantiate(coinOrb, tp, Quaternion.identity);
 
+            GameManager.killed++; //죽으면서 킬 수 올리고 감
+            if (monsterNum != 1) GameManager.realkilled++;
+            withPlayer = false;
+
+            MakeEffect(deathEffect);
+
             Destroy(this.gameObject);
         }
 
@@ -322,9 +305,6 @@ public class Monster : MonoBehaviour //잡몹
 
 
 
-
-
-
     void FixedUpdate()
     {
         tp = transform.position;
@@ -352,7 +332,7 @@ public class Monster : MonoBehaviour //잡몹
 
             case 1: //packman
                 float h = leejong ? 1 : -1;
-                transform.Translate(3 * h * Time.deltaTime * Vector2.right);
+                transform.Translate(5 * h * Time.deltaTime * Vector2.right);
 
                 Debug.DrawRay(tp, h * transform.right, Color.green, 0.1f);
 
@@ -387,11 +367,39 @@ public class Monster : MonoBehaviour //잡몹
     } //FixedUpdate End
 
 
-    private void OnDestroy()
+
+    //OnDestroy 함수가 맵 펑 할 때도 작동해서 아예 위로 보냄
+
+    void MakeEffect(Sprite s)
     {
-        GameManager.killed++; //죽으면서 킬 수 올리고 감
-        if (monsterNum != 1) GameManager.realkilled++;
-        withPlayer = false;
+        //사망 효과
+        switch (monsterNum)
+        {
+            case 0: //거미
+                GameObject e0 = Instantiate(fadeEffect,
+                    new Vector2(tp.x, tp.y - 0.4f), Quaternion.identity); //약간 아래에
+                e0.transform.GetComponent<SpriteRenderer>().sprite = s;
+                e0.transform.localScale = 0.8f * Vector2.one; //약간 작게
+                break;
+
+            case 1: //팩맨
+                GameObject e1 = Instantiate(fadeEffect, tp, Quaternion.identity);
+                e1.transform.GetComponent<SpriteRenderer>().sprite = s;
+                break;
+
+            case 2: //슬라임
+                GameObject e2 = Instantiate(fadeEffect,
+                    new Vector2(tp.x, tp.y + 0.1f), Quaternion.identity); //약간 위에
+                e2.transform.GetComponent<SpriteRenderer>().sprite = s;
+                e2.transform.localScale = 0.8f * Vector2.one; //약간 작게
+                break;
+
+            case 3: //???
+                GameObject e3 = Instantiate(fadeEffect, tp, Quaternion.identity);
+                e3.transform.GetComponent<SpriteRenderer>().sprite = s;
+                e3.transform.localScale = 0.8f * Vector2.one; //약간 작게
+                break;
+        }
     }
 
 
