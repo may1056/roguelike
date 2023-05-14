@@ -54,8 +54,11 @@ public class Bullet : MonoBehaviour //탄막
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Platform")) //플랫폼
+        if (collision.gameObject.tag == "Platform"|| collision.gameObject.tag == "Attack")
+        {
             Destroy(gameObject);
+        } //플랫폼
+            
     }
 
     //플랫폼 닿았는데 왜 안 없어짐????????
