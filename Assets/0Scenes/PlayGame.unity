@@ -232,6 +232,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de1f9023b53c0b845acce40ec1d339e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isMWText: {fileID: 697023679}
   maps:
   - {fileID: 1288616352244959304, guid: 76acfb5dcefe0b548b1e40ac306b2995, type: 3}
   - {fileID: 7573515225895658840, guid: f136e5fe6e909f54e86ca46bff6429d0, type: 3}
@@ -834,7 +835,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1511826931}
         m_TargetAssemblyTypeName: PlayerAttack, Assembly-CSharp
-        m_MethodName: ismeleechange
+        m_MethodName: Ismeleechange
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

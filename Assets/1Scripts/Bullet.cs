@@ -6,6 +6,9 @@ public class Bullet : MonoBehaviour //탄막
 {
     public float bulletSpeed;
 
+    public GameObject fadeEffect;
+    public Sprite doubleCircle;
+
 
     void Update()
     {
@@ -54,27 +57,40 @@ public class Bullet : MonoBehaviour //탄막
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.tag == "Platform"|| collision.gameObject.tag == "Attack")
+        if (collision.gameObject.layer == 9 || collision.gameObject.tag == "Attack")
         {
+            MakeEffect(Color.gray);
             Destroy(gameObject);
         } //플랫폼
-            
     }
 
-    //플랫폼 닿았는데 왜 안 없어짐????????
-    //그럼 어쩔 수 없이 땅 뚫어서 쏘게 놔둬야겠네~ 누군가는 깨겠지
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("Platform")) //플랫폼
+        if (other.gameObject.layer == 9) //플랫폼
+        {
+            MakeEffect(Color.gray);
             Destroy(gameObject);
+        }
 
         int l = other.gameObject.layer;
         if (l == 11 || l == 13) //플레이어
         {
             Player.hurted = true;
+            MakeEffect(Color.red);
             Destroy(gameObject);
         }
+    }
+
+
+    void MakeEffect(Color c)
+    {
+        GameObject eff =
+            Instantiate(fadeEffect, transform.position, Quaternion.identity);
+        SpriteRenderer effsr = eff.GetComponent<SpriteRenderer>();
+        effsr.sprite = doubleCircle;
+        effsr.color = c;
+        eff.transform.localScale = 0.5f * Vector2.one;
     }
 
 } //Bullet End

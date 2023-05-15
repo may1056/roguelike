@@ -37,7 +37,8 @@ public class GameManager : MonoBehaviour //게임 총괄
 
     public static int rangedWeaponIndex;
 
-    public static bool ismeleeWeapon; 
+    public static bool ismeleeWeapon;
+    public Text isMWText;
 
 
     public static int mapNum; //맵 번호
@@ -102,7 +103,7 @@ public class GameManager : MonoBehaviour //게임 총괄
 
         coins = 0;
 
-        mapNum = 2; //임시
+        mapNum = 1; //임시
 
         realkilled = 0;
 
@@ -152,6 +153,8 @@ public class GameManager : MonoBehaviour //게임 총괄
         //빠른 재시작
         if (Input.GetKeyDown(KeyCode.Backspace)) SceneManager.LoadScene(1);
 
+        if (ismeleeWeapon) isMWText.text = "원거리로 바꾸기";
+        else isMWText.text = "근거리로 바꾸기";
 
 
 

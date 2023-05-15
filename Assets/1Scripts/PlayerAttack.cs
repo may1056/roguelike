@@ -10,7 +10,7 @@ public class PlayerAttack : MonoBehaviour
 
     public static PlayerAttack playerAtk;
 
-    
+
     Transform atk; //공격 범위
 
     SpriteRenderer attacksr;
@@ -50,6 +50,10 @@ public class PlayerAttack : MonoBehaviour
     //아 모르겠다 코드 막 짜야지.. 변수만 몇 개야
 
 
+    readonly Color[] colors =
+        { new Color(1, 0.6f, 1), Color.red, new Color(1, 0.6f, 0), Color.yellow,
+        new Color(0, 0.7f, 1), Color.blue, new Color(0.6f, 0.3f, 1),};
+
 
 
 
@@ -81,6 +85,7 @@ public class PlayerAttack : MonoBehaviour
 
         //ㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱ
 
+        maxAttackCooltime = GameManager.ismeleeWeapon ? 0.2f : 0.5f;
 
         if (curAttackCooltime <= maxAttackCooltime + 2)
             curAttackCooltime += Time.deltaTime;
@@ -97,12 +102,13 @@ public class PlayerAttack : MonoBehaviour
             attacksr.color = new Color(1, 1, 1, 1);
             player.dontBehaveTime = 0;
         }
-        else if(attackuse) //원거리 공격 쿨타임, 애니메이션?
+        else if (attackuse) //원거리 공격 쿨타임, 애니메이션?
         {
             float x = player.F ? -2 : 2;
             attackP = new Vector2(transform.position.x + x, transform.position.y);
 
-            Instantiate(playerbullet, transform.position, transform.rotation);
+            Instantiate(playerbullet,
+                transform.position, Quaternion.Euler(0, 0, player.F ? 180 : 0));
 
             attacksr.color = new Color(1, 1, 1, 1);
 
@@ -163,11 +169,21 @@ public class PlayerAttack : MonoBehaviour
                     WeaponSkill0(wscount);
                     wsgoing -= 2 * Time.deltaTime;
                     break;
+
+                case 1:
+                    WeaponSkill1();
+                    wsAvailable = false;
+                    wsgoing = 0;
+                    wscount = 0;
+                    break;
             }
 
             wsAvailable = wsgoing > 0;
         }
 
+
+
+        if (Input.GetKeyDown("p")) Ismeleechange();
 
 
         if (mp > maxmp) mp = maxmp;
@@ -187,6 +203,19 @@ public class PlayerAttack : MonoBehaviour
         else wsP = new Vector2(9999, 9999);
     }
 
+
+    void WeaponSkill1()
+    {
+        for(int i = -3; i <= 3; i++)
+        {
+            GameObject ws1 = Instantiate(playerbullet,
+                transform.position, Quaternion.Euler(0, 0, 10 * i + (player.F ? 180 : 0)));
+            ws1.GetComponent<PlayerBullet>().severe = true;
+            ws1.GetComponent<SpriteRenderer>().color = Color.red; //colors[i+3];
+        }
+    }
+
+
     void WeaponChange()
     {
         //애니메이션 변경 자체는 애니메이터 파라미터에서 하는걸로 하고 여기서는 컨트롤러 값 수정
@@ -204,11 +233,11 @@ public class PlayerAttack : MonoBehaviour
 
     }
 
-    public void ismeleechange() // onclick
+    public void Ismeleechange() // onclick
     {
-        if (GameManager.ismeleeWeapon)
-            GameManager.ismeleeWeapon = false;
-        else
-            GameManager.ismeleeWeapon = true;
+        GameManager.ismeleeWeapon = !GameManager.ismeleeWeapon;
+
+        if (Player.weaponNum == 0) Player.weaponNum = 1;
+        else Player.weaponNum = 0;
     }
 } //PlayerAttack End

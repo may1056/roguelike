@@ -105,7 +105,7 @@ public class Player : MonoBehaviour //플레이어
         sr = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
 
-        weaponNum = 0;
+        weaponNum = 1; //임시
 
 
         bg = transform.GetChild(2);
@@ -229,7 +229,7 @@ public class Player : MonoBehaviour //플레이어
 
 
         //ㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊ
-
+        /*
         if (posCool <= 0) //가능
         {
             //저장 위치가 없으면 바로 저장하기
@@ -275,7 +275,7 @@ public class Player : MonoBehaviour //플레이어
         }
 
         posText.text = posCool.ToString("N1");
-
+        */
 
 
 

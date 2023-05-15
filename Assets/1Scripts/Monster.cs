@@ -25,11 +25,11 @@ public class Monster : MonoBehaviour //잡몹
 
     public GameObject fadeEffect;
 
-    public Sprite appear;
+    public Sprite doubleCircle;
 
     bool inAttackArea; //플레이어의 공격 범위 내에 있는지
 
-    int hp; //체력
+    public int hp; //체력
     public int maxhp; //최대 체력
 
     Transform C;
@@ -50,8 +50,6 @@ public class Monster : MonoBehaviour //잡몹
     float withPlayerTime = 0;
 
     Vector2 firstP; //enemyerror에 대응해 처음 위치로 돌아감
-
-    public Sprite deathEffect;
 
 
     /// <summary>
@@ -100,7 +98,7 @@ public class Monster : MonoBehaviour //잡몹
         tp = transform.position;
         firstP = tp;
 
-        MakeEffect(appear);
+        DecideEffect(Color.black);
 
         gameObject.SetActive(false); //일단 감춤
 
@@ -265,7 +263,7 @@ public class Monster : MonoBehaviour //잡몹
             if (monsterNum != 1) GameManager.realkilled++;
             withPlayer = false;
 
-            MakeEffect(deathEffect);
+            DecideEffect(Color.white);
 
             Destroy(this.gameObject);
         }
@@ -368,39 +366,37 @@ public class Monster : MonoBehaviour //잡몹
 
 
 
-    //OnDestroy 함수가 맵 펑 할 때도 작동해서 아예 위로 보냄
 
-    void MakeEffect(Sprite s)
+    void DecideEffect(Color c)
     {
-        //사망 효과
         switch (monsterNum)
         {
             case 0: //거미
-                GameObject e0 = Instantiate(fadeEffect,
-                    new Vector2(tp.x, tp.y - 0.4f), Quaternion.identity); //약간 아래에
-                e0.transform.GetComponent<SpriteRenderer>().sprite = s;
-                e0.transform.localScale = 0.8f * Vector2.one; //약간 작게
+                MakeEffect(new Vector2(tp.x, tp.y - 0.4f), c, 0.8f);
                 break;
 
             case 1: //팩맨
-                GameObject e1 = Instantiate(fadeEffect, tp, Quaternion.identity);
-                e1.transform.GetComponent<SpriteRenderer>().sprite = s;
+                MakeEffect(tp, c, 1);
                 break;
 
             case 2: //슬라임
-                GameObject e2 = Instantiate(fadeEffect,
-                    new Vector2(tp.x, tp.y + 0.1f), Quaternion.identity); //약간 위에
-                e2.transform.GetComponent<SpriteRenderer>().sprite = s;
-                e2.transform.localScale = 0.8f * Vector2.one; //약간 작게
+                MakeEffect(new Vector2(tp.x, tp.y + 0.1f), c, 0.8f);
                 break;
 
             case 3: //???
-                GameObject e3 = Instantiate(fadeEffect, tp, Quaternion.identity);
-                e3.transform.GetComponent<SpriteRenderer>().sprite = s;
-                e3.transform.localScale = 0.8f * Vector2.one; //약간 작게
+                MakeEffect(tp, c, 0.8f);
                 break;
         }
     }
+    void MakeEffect(Vector2 v, Color c, float sc)
+    {
+        GameObject eff = Instantiate(fadeEffect, v, Quaternion.identity);
+        SpriteRenderer effsr = eff.GetComponent<SpriteRenderer>();
+        effsr.sprite = doubleCircle;
+        effsr.color = c;
+        eff.transform.localScale = sc * Vector2.one;
+    }
+
 
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -434,7 +430,7 @@ public class Monster : MonoBehaviour //잡몹
     }
 
 
-    void ModifyHp() //hp circle 최신화
+    public void ModifyHp() //hp circle 최신화
     {
         if (hp > 0) C.transform.GetComponent<SpriteRenderer>().sprite = hc[hp - 1];
     }

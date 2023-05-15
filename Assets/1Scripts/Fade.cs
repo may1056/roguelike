@@ -16,6 +16,6 @@ public class Fade : MonoBehaviour //서서히 사라지는 효과
     {
         fadetimegoes += 3 * Time.deltaTime;
         if (fadetimegoes > 1) Destroy(gameObject);
-        sr.color = new Color(1, 1, 1, 1 - fadetimegoes);
+        sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, 1 - fadetimegoes);
     }
 }
