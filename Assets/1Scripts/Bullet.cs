@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour //탄막
 {
+    public int bulletType;
+    //0: 일반 딜, 1: 슬로우,
+
     public float bulletSpeed;
 
     public GameObject fadeEffect;
@@ -59,7 +62,11 @@ public class Bullet : MonoBehaviour //탄막
     {
         if (collision.gameObject.layer == 9 || collision.gameObject.tag == "Attack")
         {
-            MakeEffect(Color.gray);
+            switch (bulletType)
+            {
+                case 0: MakeEffect(Color.gray, 0.5f); break;
+                case 1: MakeEffect(new Color(0.56f, 0.71f, 0.84f), 1); break;
+            }
             Destroy(gameObject);
         } //플랫폼
     }
@@ -69,28 +76,45 @@ public class Bullet : MonoBehaviour //탄막
     {
         if (other.gameObject.layer == 9) //플랫폼
         {
-            MakeEffect(Color.gray);
+            switch (bulletType)
+            {
+                case 0: MakeEffect(Color.gray, 0.5f); break;
+                case 1: MakeEffect(new Color(0.56f, 0.71f, 0.84f), 1); break;
+            }
             Destroy(gameObject);
         }
 
         int l = other.gameObject.layer;
         if (l == 11 || l == 13) //플레이어
         {
-            Player.hurted = true;
-            MakeEffect(Color.red);
+            switch (bulletType)
+            {
+                case 0:
+                    Player.hurted = true;
+                    MakeEffect(Color.red, 0.5f);
+                    break;
+
+                case 1:
+                    Player pl = other.transform.GetComponent<Player>();
+                    pl.slowtime = 2;
+                    if (pl.slow > 0.9f) pl.slow = 1;
+                    else pl.slow += 0.1f;
+                    break;
+            }
             Destroy(gameObject);
         }
-    }
+
+    } //OnTriggerEnter2D End
 
 
-    void MakeEffect(Color c)
+    void MakeEffect(Color c, float sc)
     {
         GameObject eff =
             Instantiate(fadeEffect, transform.position, Quaternion.identity);
         SpriteRenderer effsr = eff.GetComponent<SpriteRenderer>();
         effsr.sprite = doubleCircle;
         effsr.color = c;
-        eff.transform.localScale = 0.5f * Vector2.one;
+        eff.transform.localScale = sc * Vector2.one;
     }
 
 } //Bullet End

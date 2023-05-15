@@ -46,8 +46,13 @@ public class Player : MonoBehaviour //플레이어
     float hurtTime = 0; //피격 시 사용할 시간 변수
     public static bool hurted;
     int inEnemies = 0;
-
     public Image hurtImage;
+
+
+    public float slow = 0;
+    public float slowtime = 0;
+    public Image frozenimage;
+
 
     public float dontBehaveTime = 0;
 
@@ -136,7 +141,7 @@ public class Player : MonoBehaviour //플레이어
         if ((Input.GetKeyDown("w") || Input.GetKeyDown(KeyCode.Space))
             && !isJumping)
         {
-            rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
+            rigid.AddForce(Vector2.up * jumpPower * (1 - slow), ForceMode2D.Impulse);
             isJumping = true;
             sr.sprite = players[2];
         }
@@ -188,12 +193,12 @@ public class Player : MonoBehaviour //플레이어
         for (int i = -2; i <= 2; i++)
         {
             Vector2 v = new(tp.x, tp.y + i * 0.4f);
-            hit = Physics2D.Raycast(v, d, dashDist, lg); //레이 맞은 것 저장
+            hit = Physics2D.Raycast(v, d, dashDist * (1 - slow), lg); //레이 맞은 것 저장
 
-            Debug.DrawRay(v, d * dashDist, Color.red, 0.1f); //시각화
+            Debug.DrawRay(v, d * dashDist * (1 - slow), Color.red, 0.1f); //시각화
 
             gx[i + 2] = tp.x + (F ? -1 : 1)
-                * (hit.transform != null ? hit.distance : dashDist);
+                * (hit.transform != null ? hit.distance : dashDist * (1 - slow));
         }
         float tpx = tp.x;
 
@@ -221,6 +226,9 @@ public class Player : MonoBehaviour //플레이어
 
         //대쉬 도달 위치 표시
         td.transform.position = new Vector2(m, tp.y);
+
+        td.transform.GetComponent<SpriteRenderer>().color
+            = new Color(1 - slow, 1 - slow, 1);
 
 
 
@@ -349,6 +357,27 @@ public class Player : MonoBehaviour //플레이어
         if (hp <= 0) SceneManager.LoadScene(1); //쉐이망
 
 
+        //느려짐
+        if (slowtime <= 0) slow = 0;
+        else if (slow < 1)
+        {
+            frozenimage.color = new Color(1, 1, 1, slow);
+            slow -= 0.1f * Time.deltaTime;
+            if (slow <= 0)
+            {
+                slow = 0;
+                slowtime = 0;
+            }
+        }
+        else
+        {
+            frozenimage.color = Color.blue;
+            slowtime -= Time.deltaTime;
+        }
+
+        frozenimage.gameObject.SetActive(slow > 0);
+
+
 
 
         //ㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷ
@@ -403,7 +432,8 @@ public class Player : MonoBehaviour //플레이어
         //좌우 이동 (등속, 손 떼면 바로 멈춤)
         float h = Input.GetAxisRaw("Horizontal");
         // 속도 기본 값 10 + speed
-        transform.Translate((10+speed) * Time.deltaTime * new Vector2(h, 0));
+        transform.Translate((10 + speed) * (1 - slow)
+            * Time.deltaTime * new Vector2(h, 0));
 
         //isWalking = h != 0;
 
@@ -411,6 +441,8 @@ public class Player : MonoBehaviour //플레이어
             //Instantiate(dashEffect, transform.position, Quaternion.identity);
 
     } //FixedUpdate End
+
+
 
 
     private void OnCollisionEnter2D(Collision2D collision)

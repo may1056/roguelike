@@ -10,9 +10,9 @@ public class Monster : MonoBehaviour //잡몹
 
 
     readonly float[,] limitX = //좌우 한계
-        { { -48, 48 }, { -55, 55 }, { -30, 30 }, };
+        { { -48, 48 }, { -55, 55 }, { -30, 30 }, { -4, 50 } };
     readonly float[,] limitY = //상하 한계
-        { { -4, 12 }, { -21, 49 }, { -3, 19 }, };
+        { { -4, 12 }, { -21, 49 }, { -3, 19 }, { -4, 30 } };
 
 
     /// <summary>
@@ -143,7 +143,7 @@ public class Monster : MonoBehaviour //잡몹
                 else H = hp == maxhp ? 2 : 4;
 
                 Targeting();
-            break;
+                break;
 
             //packman은 Update 없음
 
@@ -156,7 +156,7 @@ public class Monster : MonoBehaviour //잡몹
                 //점프를 위한 시간 변수 값 조정
                 if (moving && Mathf.Abs(rigid.velocity.y) < 0.1f)
                     lezong -= Time.deltaTime;
-            break;
+                break;
 
             case 3:
                 Targeting();
@@ -165,11 +165,26 @@ public class Monster : MonoBehaviour //잡몹
                 if (bulletTime <= 0 && moving)
                 {
                     bulletTime = 3;
-                    Instantiate(bullet, tp, Quaternion.Euler(
-                        0, 0, Mathf.Rad2Deg * Mathf.Atan2(pp.y - tp.y, pp.x - tp.x)));
+                    ShootBullet();
                 }
                 else bulletTime -= Time.deltaTime;
-            break;
+                break;
+
+            case 4:
+                H = tp.x > pp.x ? -1 : 1;
+                Targeting();
+
+                //탄막 발사
+                if (bulletTime <= 0 && moving)
+                {
+                    bulletTime = 5;
+                    for (int i = 0; i < 20; i++) Invoke(nameof(ShootBullet), i * 0.05f);
+                }
+                else if (moving)
+                {
+                    bulletTime -= Time.deltaTime;
+                }
+                break;
 
         } //switch
 
@@ -260,7 +275,7 @@ public class Monster : MonoBehaviour //잡몹
             if (r <= 5) Instantiate(coinOrb, tp, Quaternion.identity);
 
             GameManager.killed++; //죽으면서 킬 수 올리고 감
-            if (monsterNum != 1) GameManager.realkilled++;
+            GameManager.realkilled++;
             withPlayer = false;
 
             DecideEffect(Color.white);
@@ -278,7 +293,7 @@ public class Monster : MonoBehaviour //잡몹
         if (withPlayerTime > 0.29f)
         {
             withPlayerTime = -0.5f;
-            Player.hurted = true;
+            if (monsterNum < 3) Player.hurted = true;
         }
 
 
@@ -295,11 +310,20 @@ public class Monster : MonoBehaviour //잡몹
 
     void Targeting() //타겟팅형 몬스터를 위해
     {
-        sr.flipX = tp.x < Player.player.transform.position.x - 0.1f;
+        sr.flipX = tp.x < Player.player.transform.position.x - 0.3f;
 
         //가까우면 이동 시작
         if (dist < noticeDist) moving = true;
     }
+
+
+    void ShootBullet()
+    {
+        Instantiate(bullet, tp, Quaternion.Euler(0, 0, Mathf.Rad2Deg *
+            Mathf.Atan2(Player.player.transform.position.y - tp.y,
+            Player.player.transform.position.x - tp.x)));
+    }
+
 
 
 
@@ -361,7 +385,13 @@ public class Monster : MonoBehaviour //잡몹
             break;
 
             //??아무튼원거리는 FixedUpdate 없음
+
+            case 4: //??아무튼얼음빔
+                if (moving && bulletTime < 4 && bulletTime > 1)
+                    transform.Translate(H * Time.deltaTime * Vector2.right);
+                break;
         }
+
     } //FixedUpdate End
 
 
@@ -385,6 +415,10 @@ public class Monster : MonoBehaviour //잡몹
 
             case 3: //???
                 MakeEffect(tp, c, 0.8f);
+                break;
+
+            case 4: //???
+                MakeEffect(tp, c, 0.9f);
                 break;
         }
     }

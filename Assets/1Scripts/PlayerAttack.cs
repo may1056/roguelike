@@ -206,12 +206,12 @@ public class PlayerAttack : MonoBehaviour
 
     void WeaponSkill1()
     {
-        for(int i = -3; i <= 3; i++)
+        for(int i = -2; i <= 2; i++)
         {
             GameObject ws1 = Instantiate(playerbullet,
-                transform.position, Quaternion.Euler(0, 0, 10 * i + (player.F ? 180 : 0)));
+                transform.position, Quaternion.Euler(0, 0, 20 * i + (player.F ? 180 : 0)));
             ws1.GetComponent<PlayerBullet>().severe = true;
-            ws1.GetComponent<SpriteRenderer>().color = Color.red; //colors[i+3];
+            //ws1.GetComponent<SpriteRenderer>().color = colors[i+3];
         }
     }
 
