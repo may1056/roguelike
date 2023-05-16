@@ -72,7 +72,8 @@ public class PlayerAttack : MonoBehaviour
 
         wsP = new Vector2(9999, 9999);
 
-        GameManager.ismeleeWeapon = false; // 현재 무기가 채찍밖에 없어서 트루로 설정
+        GameManager.ismeleeWeapon = false;
+        attackani.SetBool("IsmeleeWeapon", GameManager.ismeleeWeapon); // IsmeleeWeapon 파라미터도 GameManager.ismeleeWeapon 값따라 변경
     }
 
 
@@ -219,7 +220,7 @@ public class PlayerAttack : MonoBehaviour
     void WeaponChange()
     {
         //애니메이션 변경 자체는 애니메이터 파라미터에서 하는걸로 하고 여기서는 컨트롤러 값 수정
-        //animator SetInteger("컨트롤러 이름", 변경값) 이게 변경 함수니 기억하렴 종환아 + SetFloat,SetBool,SetTrigger
+        //attackani.SetInteger("컨트롤러 이름", 변경값) 이게 변경 함수니 기억하렴 종환아 + SetFloat,SetBool,SetTrigger
 
         if (GameManager.ismeleeWeapon) //근접공격이면 콜라이더 활성화 아니면 비활성화
         {
@@ -236,6 +237,8 @@ public class PlayerAttack : MonoBehaviour
     public void Ismeleechange() // onclick
     {
         GameManager.ismeleeWeapon = !GameManager.ismeleeWeapon;
+        attackani.SetBool("IsmeleeWeapon", GameManager.ismeleeWeapon); // IsmeleeWeapon 파라미터도 GameManager.ismeleeWeapon 값따라 변경
+
 
         if (Player.weaponNum == 0) Player.weaponNum = 1;
         else Player.weaponNum = 0;
