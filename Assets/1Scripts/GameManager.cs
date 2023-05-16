@@ -48,10 +48,10 @@ public class GameManager : MonoBehaviour //게임 총괄
     public GameObject[] mons; //맵 내 몬스터 집합 프리팹
 
     //맵별 페이즈 수
-    readonly int[] phases = { 1, 1, 3, 1, };
+    readonly int[] phases = { 1, 1, 3, 3, };
 
     //페이즈별 잡아야 할 몬스터 수, -1: 안 잡아도 된다
-    readonly int[,] enemies = { { 23, 0, 0, }, { -1, 0, 0, }, { 14, 15, 25, }, { 22, 0, 0, } };
+    readonly int[,] enemies = { { 23, 0, 0, }, { -1, 0, 0, }, { 14, 15, 25, }, { 21, 25, 24, } };
 
     bool making; //진행 중인지
     int nowPhase; //현재 페이즈

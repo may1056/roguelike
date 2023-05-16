@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public class Monster : MonoBehaviour //잡몹
 {
     public int monsterNum;
-    //00spider 01packman 02slime 03??아무튼원거리
+    //00spider 01packman 02slime 03??아무튼원거리 04??아무튼얼음빔 05kingslime
 
 
     readonly float[,] limitX = //좌우 한계
@@ -52,6 +52,7 @@ public class Monster : MonoBehaviour //잡몹
     Vector2 firstP; //enemyerror에 대응해 처음 위치로 돌아감
 
 
+
     /// <summary>
     /// 플레이어 타겟팅형 몬스터 - 00, 02
     /// </summary>
@@ -80,6 +81,9 @@ public class Monster : MonoBehaviour //잡몹
     float lezong = 0.3f;//점프 시간 카운트
     public float lezonghan; //점프파워
 
+    bool k; //king
+    public GameObject littleslime;
+
 
 
     /// <summary>
@@ -89,6 +93,8 @@ public class Monster : MonoBehaviour //잡몹
     public GameObject bullet;
     float bulletTime = 0;
     public float bull_T; //탄막 생성 주기
+
+    Quaternion AngleSelected;
 
 
 
@@ -117,6 +123,8 @@ public class Monster : MonoBehaviour //잡몹
         sr = GetComponent<SpriteRenderer>();
 
         inAttackArea = false;
+
+        k = monsterNum == 5;
 
     } //Start End
 
@@ -147,9 +155,11 @@ public class Monster : MonoBehaviour //잡몹
 
             //packman은 Update 없음
 
-            case 2:
+            case 2: //slime
+            case 5: //kingslime
                 //플레이어를 향해 이동 방향을 변경한다
                 H = tp.x > pp.x ? -3 : 3;
+                if (k) H *= 2;
 
                 Targeting();
 
@@ -158,27 +168,33 @@ public class Monster : MonoBehaviour //잡몹
                     lezong -= Time.deltaTime;
                 break;
 
-            case 3:
+            case 3: //??amuteunweongeori
                 Targeting();
 
                 //탄막 발사
                 if (bulletTime <= 0 && moving)
                 {
                     bulletTime = 3;
+                    AngleSelected = Quaternion.Euler(0, 0, Mathf.Rad2Deg *
+                        Mathf.Atan2(Player.player.transform.position.y - tp.y,
+                        Player.player.transform.position.x - tp.x));
                     ShootBullet();
                 }
                 else bulletTime -= Time.deltaTime;
                 break;
 
-            case 4:
+            case 4: //??amuteuneoleumbeam
                 H = tp.x > pp.x ? -1 : 1;
                 Targeting();
 
                 //탄막 발사
                 if (bulletTime <= 0 && moving)
                 {
-                    bulletTime = 5;
-                    for (int i = 0; i < 20; i++) Invoke(nameof(ShootBullet), i * 0.05f);
+                    bulletTime = 6;
+                    AngleSelected = Quaternion.Euler(0, 0, Mathf.Rad2Deg *
+                        Mathf.Atan2(Player.player.transform.position.y - tp.y,
+                        Player.player.transform.position.x - tp.x));
+                    for (int i = 0; i < 40; i++) Invoke(nameof(ShootBullet), i * 0.025f);
                 }
                 else if (moving)
                 {
@@ -193,8 +209,8 @@ public class Monster : MonoBehaviour //잡몹
 
 
 
-        //가까우면 hp 표시
-        C.gameObject.SetActive(dist < 7);
+        //가깝거나 딜을 입으면 hp 표시
+        C.gameObject.SetActive(dist < 5 || hp < maxhp);
 
 
         //피 닳는 시스템
@@ -278,6 +294,16 @@ public class Monster : MonoBehaviour //잡몹
             GameManager.realkilled++;
             withPlayer = false;
 
+            if (k)
+            {
+                for (int i = -1; i <= 1; i += 2)
+                {
+                    GameObject s = Instantiate(littleslime,
+                        new Vector2(tp.x + i * 0.5f, tp.y), Quaternion.identity);
+                    s.SetActive(true);
+                }
+            }
+
             DecideEffect(Color.white);
 
             Destroy(this.gameObject);
@@ -293,7 +319,7 @@ public class Monster : MonoBehaviour //잡몹
         if (withPlayerTime > 0.29f)
         {
             withPlayerTime = -0.5f;
-            if (monsterNum < 3) Player.hurted = true;
+            if (monsterNum < 3 && Player.unbeatableTime <= 0) Player.hurted = true;
         }
 
 
@@ -313,15 +339,26 @@ public class Monster : MonoBehaviour //잡몹
         sr.flipX = tp.x < Player.player.transform.position.x - 0.3f;
 
         //가까우면 이동 시작
-        if (dist < noticeDist) moving = true;
+        if (dist < noticeDist)
+        {
+            moving = true;
+            if (transform.childCount == 2) //느낌표 보이기 (있으면)
+            {
+                transform.GetChild(1).gameObject.SetActive(true);
+                Invoke(nameof(Noticed), 2); //2초 뒤 부숴
+            }
+        }
+    }
+    void Noticed() //느낌표 파괴 (있으면)
+    {
+        if (transform.childCount == 2)
+            Destroy(transform.GetChild(1).gameObject);
     }
 
 
     void ShootBullet()
     {
-        Instantiate(bullet, tp, Quaternion.Euler(0, 0, Mathf.Rad2Deg *
-            Mathf.Atan2(Player.player.transform.position.y - tp.y,
-            Player.player.transform.position.x - tp.x)));
+        Instantiate(bullet, tp, AngleSelected);
     }
 
 
@@ -374,11 +411,19 @@ public class Monster : MonoBehaviour //잡몹
             break;
 
             case 2: //slime
+            case 5: //kingslime
                 //플레이어를 감지한 후에는 계속 이동
                 if (moving) transform.Translate(H * Time.deltaTime * Vector2.right);
 
                 if (lezong <= 0)
                 {
+                    if (monsterNum == 5 && Random.Range(0, 2) == 1)
+                    {
+                        //킹슬라임은 점프 때마다 확률적으로 작은 슬라임 생성
+                        GameManager.realkilled--;
+                        GameObject s = Instantiate(littleslime, tp, Quaternion.identity);
+                        s.SetActive(true);
+                    }
                     rigid.AddForce(Vector2.up * lezonghan, ForceMode2D.Impulse);
                     lezong = 0.3f;
                 }
@@ -387,7 +432,7 @@ public class Monster : MonoBehaviour //잡몹
             //??아무튼원거리는 FixedUpdate 없음
 
             case 4: //??아무튼얼음빔
-                if (moving && bulletTime < 4 && bulletTime > 1)
+                if (moving && bulletTime < 5 && bulletTime > 1)
                     transform.Translate(H * Time.deltaTime * Vector2.right);
                 break;
         }
@@ -419,6 +464,10 @@ public class Monster : MonoBehaviour //잡몹
 
             case 4: //???
                 MakeEffect(tp, c, 0.9f);
+                break;
+
+            case 5: //킹슬라임
+                MakeEffect(new Vector2(tp.x, tp.y + 0.1f), c, 1.5f);
                 break;
         }
     }
@@ -466,7 +515,17 @@ public class Monster : MonoBehaviour //잡몹
 
     public void ModifyHp() //hp circle 최신화
     {
-        if (hp > 0) C.transform.GetComponent<SpriteRenderer>().sprite = hc[hp - 1];
+        if (hp > 0 && hp <= 5)
+        {
+            C.transform.GetComponent<SpriteRenderer>().sprite = hc[hp - 1];
+            if (C.childCount == 1) Destroy(C.GetChild(0).gameObject);
+        }
+        else if (hp > 5 && hp <= 10)
+        {
+            C.transform.GetComponent<SpriteRenderer>().sprite = hc[hp - 6];
+            C.transform.GetChild(0).
+                transform.GetComponent<SpriteRenderer>().sprite = hc[4];
+        }
     }
 
 } //Enemy End

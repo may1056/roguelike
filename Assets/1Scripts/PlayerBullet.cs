@@ -69,7 +69,7 @@ public class PlayerBullet : MonoBehaviour
 
             if (t <= 0)
             {
-                MakeEffect(Color.gray);
+                MakeEffect(transform.position, Color.gray);
                 Destroy(gameObject);
             }
         }
@@ -98,8 +98,7 @@ public class PlayerBullet : MonoBehaviour
             collision.transform.GetComponent<Monster>().hp--;
             collision.transform.GetComponent<Monster>().ModifyHp();
 
-            MakeEffect(new Color(0.01f * Random.Range(0, 100),
-                0.01f * Random.Range(0, 100), 0.01f * Random.Range(0, 100)));
+            MakeEffect(collision.transform.position, Color.red);
         }
     }
 
@@ -108,7 +107,7 @@ public class PlayerBullet : MonoBehaviour
     {
         if (other.gameObject.layer == 9 && !severe) //플랫폼
         {
-            MakeEffect(Color.gray);
+            MakeEffect(transform.position, Color.gray);
             Destroy(gameObject);
         }
 
@@ -117,18 +116,16 @@ public class PlayerBullet : MonoBehaviour
             other.GetComponent<Monster>().hp--;
             other.GetComponent<Monster>().ModifyHp();
 
-            MakeEffect(severe ? new Color(0.01f * Random.Range(0, 100), 0.01f
-                * Random.Range(0, 100), 0.01f * Random.Range(0, 100)) : Color.red);
+            MakeEffect(transform.position, Color.red);
             Destroy(gameObject);
         }
     }
 
 
 
-    void MakeEffect(Color c)
+    void MakeEffect(Vector2 v, Color c)
     {
-        GameObject eff =
-            Instantiate(fadeEffect, transform.position, Quaternion.identity);
+        GameObject eff = Instantiate(fadeEffect, v, Quaternion.identity);
         SpriteRenderer effsr = eff.GetComponent<SpriteRenderer>();
         effsr.sprite = doubleCircle;
         effsr.color = c;

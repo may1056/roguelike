@@ -90,15 +90,18 @@ public class Bullet : MonoBehaviour //탄막
             switch (bulletType)
             {
                 case 0:
-                    Player.hurted = true;
+                    if (Player.unbeatableTime <= 0) Player.hurted = true;
                     MakeEffect(Color.red, 0.5f);
                     break;
 
                 case 1:
-                    Player pl = other.transform.GetComponent<Player>();
-                    pl.slowtime = 2;
-                    if (pl.slow > 0.9f) pl.slow = 1;
-                    else pl.slow += 0.1f;
+                    if (Player.unbeatableTime <= 0)
+                    {
+                        Player pl = other.transform.GetComponent<Player>();
+                        pl.slowtime = 2;
+                        if (pl.slow > 0.9f) pl.slow = 1;
+                        else pl.slow += 0.04f;
+                    }
                     break;
             }
             Destroy(gameObject);

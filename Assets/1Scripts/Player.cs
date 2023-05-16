@@ -43,6 +43,10 @@ public class Player : MonoBehaviour //플레이어
     bool protect;
 
 
+    public static float unbeatableTime; //무적 시간
+    public float maxunbeatableTime;
+
+
     float hurtTime = 0; //피격 시 사용할 시간 변수
     public static bool hurted;
     int inEnemies = 0;
@@ -117,6 +121,7 @@ public class Player : MonoBehaviour //플레이어
         td = transform.GetChild(3);
         cs = transform.GetChild(4);
 
+        unbeatableTime = 0;
 
         getOrb = false;
 
@@ -209,7 +214,7 @@ public class Player : MonoBehaviour //플레이어
 
         //마우스 우클릭 대쉬
         if (!onceDashed && (Input.GetMouseButtonDown(1)
-            || Input.GetKeyDown("k"))) //k는 임시 대쉬 키
+            || Input.GetKeyDown("k")) && slow < 1) //k는 임시 대쉬 키
         {
             onceDashed = true;
 
@@ -329,9 +334,12 @@ public class Player : MonoBehaviour //플레이어
 
         //ㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍ
 
+        unbeatableTime -= Time.deltaTime;
+
         //공격당함
         if (hurted)
         {
+            unbeatableTime = maxunbeatableTime;
             if (shield >= 1)
             {
                 shield--;
@@ -372,7 +380,7 @@ public class Player : MonoBehaviour //플레이어
         else
         {
             frozenimage.color = Color.blue;
-            slowtime -= Time.deltaTime;
+            slowtime -= 2 * Time.deltaTime;
         }
 
         frozenimage.gameObject.SetActive(slow > 0);
