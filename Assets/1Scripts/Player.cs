@@ -104,6 +104,10 @@ public class Player : MonoBehaviour //플레이어
     public bool F;
 
 
+    bool canRevive;
+    public Image reviveImage;
+
+
 
 
     void Awake()
@@ -127,8 +131,23 @@ public class Player : MonoBehaviour //플레이어
 
         bgsr = bg.GetComponent<SpriteRenderer>();
 
+        canRevive = false;
+
     } //Awake End
 
+
+
+    void Start()
+    {
+        itemNum = 1; //임시
+
+        switch (itemNum)
+        {
+            case 0: canRevive = true; break;
+            case 1: transform.GetChild(5).gameObject.SetActive(true); break;
+        }
+
+    } //Start End
 
 
 
@@ -334,6 +353,7 @@ public class Player : MonoBehaviour //플레이어
 
         //ㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍ
 
+        //무적 시간: 안 아픔
         unbeatableTime -= Time.deltaTime;
 
         //공격당함
@@ -362,15 +382,40 @@ public class Player : MonoBehaviour //플레이어
         else sr.color = Color.white; //기본
 
         if (hp > maxhp) hp = maxhp;
-        if (hp <= 0) SceneManager.LoadScene(1); //쉐이망
 
 
-        //느려짐
+
+
+        if (hp <= 0) //쉐이망
+        {
+            if (canRevive) //부활 아이템
+            {
+                hp = 6;
+                shield = 2;
+                unbeatableTime = 2;
+                canRevive = false;
+                GameObject rev = Instantiate(fadeEffect, tp, Quaternion.identity);
+                rev.GetComponent<SpriteRenderer>().sprite = posSprite;
+                reviveImage.gameObject.SetActive(true);
+                Invoke(nameof(AfterRevive), 2);
+            }
+            else SceneManager.LoadScene(1);
+        }
+
+        reviveImage.color = new Color(1, 1, 1, unbeatableTime * 0.5f);
+
+
+
+
+
+        //ㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹ
+
+        //슬로우
         if (slowtime <= 0) slow = 0;
         else if (slow < 1)
         {
             frozenimage.color = new Color(1, 1, 1, slow);
-            slow -= 0.1f * Time.deltaTime;
+            slow -= 0.2f * Time.deltaTime;
             if (slow <= 0)
             {
                 slow = 0;
@@ -384,6 +429,8 @@ public class Player : MonoBehaviour //플레이어
         }
 
         frozenimage.gameObject.SetActive(slow > 0);
+
+
 
 
 
@@ -532,6 +579,12 @@ public class Player : MonoBehaviour //플레이어
     {
         posP[i] = v;
         MakeEffect(v, posSprite, 10, 1);
+    }
+
+
+    void AfterRevive()
+    {
+        reviveImage.gameObject.SetActive(false);
     }
 
 

@@ -52,6 +52,12 @@ public class Monster : MonoBehaviour //잡몹
     Vector2 firstP; //enemyerror에 대응해 처음 위치로 돌아감
 
 
+    public float pollution = 0; //오염 정도
+    public bool polluted = false; //오염되었는지
+
+
+
+
 
     /// <summary>
     /// 플레이어 타겟팅형 몬스터 - 00, 02
@@ -277,6 +283,21 @@ public class Monster : MonoBehaviour //잡몹
         }
 
 
+        //자동 공격 오염
+        polluted = pollution == 1;
+
+        if (polluted)
+        {
+            sr.sprite = Hurt;
+            ModifyHp();
+            Invoke(nameof(RemovePollution), 1);
+        }
+        else if (pollution > 0 && !polluted) pollution -= 0.3f * Time.deltaTime;
+
+        transform.GetChild(1).GetComponent<SpriteRenderer>().color
+            = new Color(0.6f, 0.4f, 1, pollution);
+
+
 
         //쉐이망 - hp, mp 오브 확률적으로 내놓기
         if (hp <= 0)
@@ -342,17 +363,17 @@ public class Monster : MonoBehaviour //잡몹
         if (dist < noticeDist)
         {
             moving = true;
-            if (transform.childCount == 2) //느낌표 보이기 (있으면)
+            if (transform.childCount == 3) //느낌표 보이기 (있으면)
             {
-                transform.GetChild(1).gameObject.SetActive(true);
+                transform.GetChild(2).gameObject.SetActive(true);
                 Invoke(nameof(Noticed), 2); //2초 뒤 부숴
             }
         }
     }
     void Noticed() //느낌표 파괴 (있으면)
     {
-        if (transform.childCount == 2)
-            Destroy(transform.GetChild(1).gameObject);
+        if (transform.childCount == 3)
+            Destroy(transform.GetChild(2).gameObject);
     }
 
 
@@ -361,6 +382,12 @@ public class Monster : MonoBehaviour //잡몹
         Instantiate(bullet, tp, AngleSelected);
     }
 
+
+    void RemovePollution() //오염 제거
+    {
+        if (polluted) pollution = 0;
+        CancelInvoke(nameof(RemovePollution));
+    }
 
 
 
@@ -373,16 +400,18 @@ public class Monster : MonoBehaviour //잡몹
             case 0: //spider
                 if (moving)
                 {
-                    transform.Translate(H * Time.deltaTime * Vector2.right);
+                    transform.Translate(H * (1 - pollution) *
+                        Time.deltaTime * Vector2.right);
 
                     //벽에 막혀 안 움직이면 점프
                     if (Mathf.Abs(tp.x - nowPosition.x) < 0.01f)
                     {
-                        rigid.AddForce(0.3f * Vector2.up, ForceMode2D.Impulse);
+                        rigid.AddForce(
+                            0.3f * (1 - pollution) * Vector2.up, ForceMode2D.Impulse);
 
                         if (Mathf.Abs(tp.y - nowPosition.y) < 0.01f)
-                            rigid.AddForce((sr.flipX ? 0.1f : -0.1f) * Vector2.right,
-                                ForceMode2D.Impulse);
+                            rigid.AddForce((sr.flipX ? 0.1f : -0.1f) * (1 - pollution) *
+                                Vector2.right, ForceMode2D.Impulse);
                     }
 
                     nowPosition = tp;
@@ -391,7 +420,8 @@ public class Monster : MonoBehaviour //잡몹
 
             case 1: //packman
                 float h = leejong ? 1 : -1;
-                transform.Translate(5 * h * Time.deltaTime * Vector2.right);
+                transform.Translate(5 * h * (1 - pollution) *
+                    Time.deltaTime * Vector2.right);
 
                 Debug.DrawRay(tp, h * transform.right, Color.green, 0.1f);
 
@@ -413,7 +443,8 @@ public class Monster : MonoBehaviour //잡몹
             case 2: //slime
             case 5: //kingslime
                 //플레이어를 감지한 후에는 계속 이동
-                if (moving) transform.Translate(H * Time.deltaTime * Vector2.right);
+                if (moving) transform.Translate(H * (1 - pollution) *
+                    Time.deltaTime * Vector2.right);
 
                 if (lezong <= 0)
                 {
@@ -422,9 +453,11 @@ public class Monster : MonoBehaviour //잡몹
                         //킹슬라임은 점프 때마다 확률적으로 작은 슬라임 생성
                         GameManager.realkilled--;
                         GameObject s = Instantiate(littleslime, tp, Quaternion.identity);
+                        s.transform.SetParent(transform.parent);
                         s.SetActive(true);
                     }
-                    rigid.AddForce(Vector2.up * lezonghan, ForceMode2D.Impulse);
+                    rigid.AddForce(Vector2.up * (1 - pollution) * lezonghan,
+                        ForceMode2D.Impulse);
                     lezong = 0.3f;
                 }
             break;

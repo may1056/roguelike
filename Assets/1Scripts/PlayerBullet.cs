@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class PlayerBullet : MonoBehaviour
 {
-    public bool severe; //심각한지
+    public int pbType; //player bullet type
+    //0: 총지팡이 일반 탄알, 1: 총지팡이 심각한 탄알, 2: 자동 공격 탄알
 
     public float bulletSpeed;
 
@@ -22,22 +23,30 @@ public class PlayerBullet : MonoBehaviour
 
         t = 1;
 
-        if (severe) //심각한 탄알일 경우
+        switch (pbType)
         {
-            GetComponent<CircleCollider2D>().isTrigger = false;
-            //GetComponent<Rigidbody2D>().gravityScale = 0.5f;
-            transform.localScale = 2f * Vector2.one;
-        }
+            case 0: GrayRandom(); break;
 
-        float rand = 0.1f * Random.Range(0, 10);
-        sr.color = new Color(rand, rand, rand); //무채색 랜덤
+            case 1:
+                GrayRandom();
+                GetComponent<CircleCollider2D>().isTrigger = false;
+                transform.localScale = 2f * Vector2.one;
+                break;
+        }
 
     } //Start End
 
 
+    void GrayRandom() //무채색 랜덤
+    {
+        float rand = 0.1f * Random.Range(0, 10);
+        sr.color = new Color(rand, rand, rand);
+    }
+
+
     void Update()
     {
-        if (severe) //심각한 탄알일 경우
+        if (pbType == 1) //심각한 탄알일 경우
         {
             t -= 0.5f * Time.deltaTime;
 
@@ -55,9 +64,8 @@ public class PlayerBullet : MonoBehaviour
                     GameObject pb = Instantiate(this.gameObject,
                         transform.position, Quaternion.Euler(0, 0, 45 * i));
                     pb.transform.localScale = Vector2.one;
-                    pb.GetComponent<PlayerBullet>().severe = false;
+                    pb.GetComponent<PlayerBullet>().pbType = 0;
                     pb.GetComponent<CircleCollider2D>().isTrigger = true;
-                    //pb.GetComponent<Rigidbody2D>().gravityScale = 0;
                     pb.transform.GetChild(0).gameObject.SetActive(false);
                 }
                 Destroy(gameObject);
@@ -69,7 +77,7 @@ public class PlayerBullet : MonoBehaviour
 
             if (t <= 0)
             {
-                MakeEffect(transform.position, Color.gray);
+                MakeEffect(transform.position, Color.gray, pbType == 0 ? 1 : 0.4f);
                 Destroy(gameObject);
             }
         }
@@ -87,48 +95,62 @@ public class PlayerBullet : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.layer == 9) //플랫폼
-        {
-            //MakeEffect(Color.gray);
-            //Destroy(gameObject);
-        }
-
-        if (collision.gameObject.CompareTag("Enemy") && severe) //적
+        if (collision.gameObject.CompareTag("Enemy") && pbType == 1) //적
         {
             collision.transform.GetComponent<Monster>().hp--;
             collision.transform.GetComponent<Monster>().ModifyHp();
 
-            MakeEffect(collision.transform.position, Color.red);
+            MakeEffect(collision.transform.position, Color.red, 1);
         }
     }
 
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.layer == 9 && !severe) //플랫폼
+        if (other.gameObject.layer == 9 && pbType != 1) //플랫폼
         {
-            MakeEffect(transform.position, Color.gray);
+            MakeEffect(transform.position, Color.gray, 1);
             Destroy(gameObject);
         }
 
         if (other.gameObject.CompareTag("Enemy")) //적
         {
-            other.GetComponent<Monster>().hp--;
-            other.GetComponent<Monster>().ModifyHp();
+            Monster m = other.GetComponent<Monster>();
 
-            MakeEffect(transform.position, Color.red);
+            switch (pbType)
+            {
+                case 0:
+                    m.hp--;
+                    m.ModifyHp();
+                    MakeEffect(transform.position, Color.red, 1);
+                    break;
+
+                case 2:
+                    if (m.pollution > 0.5f) m.pollution = 1;
+                    else m.pollution += 0.5f;
+                    if (m.polluted)
+                    {
+                        m.hp--;
+                        m.ModifyHp();
+                        m.pollution = 0.5f;
+                        MakeEffect(transform.position, new Color(0.6f, 0.4f, 1), 0.7f);
+                    }
+                    break;
+            }
             Destroy(gameObject);
         }
-    }
+
+    } //OnTriggerEnter2D End
 
 
 
-    void MakeEffect(Vector2 v, Color c)
+    void MakeEffect(Vector2 v, Color c, float sc)
     {
         GameObject eff = Instantiate(fadeEffect, v, Quaternion.identity);
         SpriteRenderer effsr = eff.GetComponent<SpriteRenderer>();
         effsr.sprite = doubleCircle;
         effsr.color = c;
+        eff.transform.localScale = sc * Vector2.one;
     }
 
 } //PlayerBullet End

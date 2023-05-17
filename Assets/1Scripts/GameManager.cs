@@ -53,7 +53,7 @@ public class GameManager : MonoBehaviour //게임 총괄
     //페이즈별 잡아야 할 몬스터 수, -1: 안 잡아도 된다
     readonly int[,] enemies = { { 23, 0, 0, }, { -1, 0, 0, }, { 14, 15, 25, }, { 21, 25, 24, } };
 
-    bool making; //진행 중인지
+    public bool making; //진행 중인지
     int nowPhase; //현재 페이즈
     float phaseTime; //페이즈 진행 시간
     bool appeared; //적들 등장했는지
@@ -175,8 +175,13 @@ public class GameManager : MonoBehaviour //게임 총괄
         }
 
 
+        //맵 아웃 에러
         if (mapouterror && errortime > 0.02f) mapouterror = false;
         else errortime += Time.deltaTime;
+
+
+
+
 
     } //Update End
 

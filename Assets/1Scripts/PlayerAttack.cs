@@ -211,7 +211,7 @@ public class PlayerAttack : MonoBehaviour
         {
             GameObject ws1 = Instantiate(playerbullet,
                 transform.position, Quaternion.Euler(0, 0, 20 * i + (player.F ? 180 : 0)));
-            ws1.GetComponent<PlayerBullet>().severe = true;
+            ws1.GetComponent<PlayerBullet>().pbType = 1;
             //ws1.GetComponent<SpriteRenderer>().color = colors[i+3];
         }
     }
