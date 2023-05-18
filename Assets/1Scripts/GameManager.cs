@@ -68,6 +68,19 @@ public class GameManager : MonoBehaviour //게임 총괄
 
 
 
+    public GameObject Portal1; //쉬움, 보통
+    public GameObject Portal2; //어려움, 기믹
+
+    readonly Vector2[,] portal_position //맵별 포탈 위치
+        = { { new Vector2(0, 0), new Vector2(999, 999) }, { new Vector2(0, 5), new Vector2(999, 999) }, { new Vector2(-2, 0), new Vector2(2, 0) }, { new Vector2(20, 1), new Vector2(26, 1) } };
+
+    readonly int[,] portal_mapNum //포탈별 다음 맵 번호, -1은 포탈 X
+        = { { 0, -1 }, { 2, -1 }, { 3, 1 }, { 2, 1 } };
+
+
+
+
+
 
 
     public Player player;
@@ -102,7 +115,7 @@ public class GameManager : MonoBehaviour //게임 총괄
 
         coins = 0;
 
-        mapNum = 1; //임시
+        mapNum = 3; //임시
 
         realkilled = 0;
 

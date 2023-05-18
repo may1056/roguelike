@@ -16,7 +16,7 @@ public class Player : MonoBehaviour //플레이어
     Animator anim;
 
 
-    public static int itemNum;
+    public static (int, int) itemNum; //????이게 되네
     public static int weaponNum;
     //0채찍,
 
@@ -142,13 +142,16 @@ public class Player : MonoBehaviour //플레이어
 
     void Start()
     {
-        itemNum = 2; //임시
+        itemNum = (0, -1); //임시
+
+        Debug.Log(itemNum.Item1);
+        Debug.Log(itemNum.Item2);
 
         switch (itemNum)
         {
-            case 0: canRevive = true; break;
-            case 1: transform.GetChild(5).gameObject.SetActive(true); break;
-            case 2: maxhp = 1; hp = 1; selfinjury = true; break;
+            case (0, -1): canRevive = true; break;
+            case (1, -1): transform.GetChild(5).gameObject.SetActive(true); break;
+            case (2, -1): maxhp = 1; hp = 1; selfinjury = true; break;
         }
 
         manager.ChangeHPMP();
