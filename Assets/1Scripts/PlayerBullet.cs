@@ -134,6 +134,7 @@ public class PlayerBullet : MonoBehaviour
                         m.ModifyHp();
                         m.pollution = 0.5f;
                         MakeEffect(transform.position, new Color(0.6f, 0.4f, 1), 0.7f);
+                        CancelInvoke(nameof(m.RemovePollution));
                     }
                     break;
             }

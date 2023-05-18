@@ -54,6 +54,7 @@ public class Monster : MonoBehaviour //잡몹
 
     public float pollution = 0; //오염 정도
     public bool polluted = false; //오염되었는지
+    Transform pol;
 
 
 
@@ -131,6 +132,29 @@ public class Monster : MonoBehaviour //잡몹
         inAttackArea = false;
 
         k = monsterNum == 5;
+
+        pol = transform.GetChild(1);
+        switch (monsterNum)
+        {
+            case 0:
+                pol.localPosition = new Vector2(0, -0.3f);
+                pol.localScale = new Vector2(0.2f, 0.2f); break;
+            case 1:
+                pol.localPosition = Vector2.zero;
+                pol.localScale = new Vector2(0.3f, 0.3f); break;
+            case 2:
+                pol.localPosition = Vector2.zero;
+                pol.localScale = new Vector2(0.2f, 0.2f); break;
+            case 3:
+                pol.localPosition = Vector2.zero;
+                pol.localScale = new Vector2(0.25f, 0.25f); break;
+            case 4:
+                pol.localPosition = Vector2.zero;
+                pol.localScale = new Vector2(0.3f, 0.3f); break;
+            case 5:
+                pol.localPosition = Vector2.zero;
+                pol.localScale = new Vector2(0.2f, 0.2f); break;
+        }
 
     } //Start End
 
@@ -383,7 +407,7 @@ public class Monster : MonoBehaviour //잡몹
     }
 
 
-    void RemovePollution() //오염 제거
+    public void RemovePollution() //오염 제거
     {
         if (polluted) pollution = 0;
         CancelInvoke(nameof(RemovePollution));

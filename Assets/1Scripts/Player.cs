@@ -104,8 +104,11 @@ public class Player : MonoBehaviour //플레이어
     public bool F;
 
 
-    bool canRevive;
+    bool canRevive; //부활
     public Image reviveImage;
+
+
+    public bool selfinjury = false; //자해
 
 
 
@@ -139,13 +142,16 @@ public class Player : MonoBehaviour //플레이어
 
     void Start()
     {
-        itemNum = 1; //임시
+        itemNum = 2; //임시
 
         switch (itemNum)
         {
             case 0: canRevive = true; break;
             case 1: transform.GetChild(5).gameObject.SetActive(true); break;
+            case 2: maxhp = 1; hp = 1; selfinjury = true; break;
         }
+
+        manager.ChangeHPMP();
 
     } //Start End
 
@@ -439,7 +445,7 @@ public class Player : MonoBehaviour //플레이어
 
         //쉴드 재충전
         dontBehaveTime += Time.deltaTime;
-        if (dontBehaveTime > 3 && shield < maxshield)
+        if (dontBehaveTime > (selfinjury ? 6 : 3) && shield < maxshield)
         {
             shield++;
             dontBehaveTime = 0;

@@ -236,7 +236,7 @@ MonoBehaviour:
   coinOrb: {fileID: 2026748482929784485, guid: 70d4039dbc797ac488ff53131785d764, type: 3}
   pollution: 0
   polluted: 0
-  noticeDist: 8
+  noticeDist: 12
   pf:
     serializedVersion: 2
     m_Bits: 0

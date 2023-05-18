@@ -87,6 +87,7 @@ public class PlayerAttack : MonoBehaviour
         //ㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱ
 
         maxAttackCooltime = GameManager.ismeleeWeapon ? 0.2f : 0.5f;
+        if (player.selfinjury) maxAttackCooltime *= 0.2f; //자해 시 공격 빠름
 
         if (curAttackCooltime <= maxAttackCooltime + 2)
             curAttackCooltime += Time.deltaTime;
@@ -132,12 +133,16 @@ public class PlayerAttack : MonoBehaviour
 
         if (skilluse) //약한 스킬
         {
-            cooltime = 3;
+            if (player.selfinjury) cooltime = 0.6f;
+            else
+            {
+                cooltime = 3;
+                mp--;
+                manager.ChangeHPMP();
+            }
             float x = player.F ? -6 : 6;
             skillP = new Vector2(transform.position.x + x, transform.position.y);
             player.MakeEffect(skillP, skillSprite, -2, 1);
-            mp--;
-            manager.ChangeHPMP();
             player.dontBehaveTime = 0;
         }
         else skillP = new Vector2(9999, 9999); //저 멀리
@@ -156,9 +161,13 @@ public class PlayerAttack : MonoBehaviour
             wsAvailable = true;
             wsgoing = 3;
             wscount = 3;
-            wsCool = 20;
-            mp -= 2;
-            manager.ChangeHPMP();
+            if (player.selfinjury) wsCool = 4; //자해 시 빠른 스킬
+            else
+            {
+                wsCool = 20;
+                mp -= 2;
+                manager.ChangeHPMP();
+            }
             player.dontBehaveTime = 0;
         }
 

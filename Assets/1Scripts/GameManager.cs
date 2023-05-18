@@ -99,11 +99,10 @@ public class GameManager : MonoBehaviour //게임 총괄
             Destroy(transform.GetChild(0).gameObject); //맵 남아있으면 삭제
 
         killed = 0;
-        ChangeHPMP();
 
         coins = 0;
 
-        mapNum = 3; //임시
+        mapNum = 1; //임시
 
         realkilled = 0;
 
@@ -189,7 +188,7 @@ public class GameManager : MonoBehaviour //게임 총괄
 
     public void ChangeHPMP() //hp, mp 구슬 최신화
     {
-        for (int i = 0; i < player.maxhp + player.maxshield; i++)
+        for (int i = 0; i < 8; i++)
         {
             //HP
             if (i < player.hp)

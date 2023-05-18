@@ -16,7 +16,7 @@ public class AutoAttack : MonoBehaviour
 
     void Start()
     {
-        InvokeRepeating(nameof(ShootBullet), 1, 0.3f);
+        InvokeRepeating(nameof(ShootBullet), 0, 0.5f);
     }
 
 
@@ -45,9 +45,9 @@ public class AutoAttack : MonoBehaviour
             }
         }
 
-        target = nowtarget;
+        if (nowdist < 5) target = nowtarget;
 
-        if (!manager.making) CancelInvoke();
+        if (!manager.making) CancelInvoke(nameof(ShootBullet));
 
     } //Update End
 
