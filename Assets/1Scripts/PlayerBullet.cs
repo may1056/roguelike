@@ -97,8 +97,10 @@ public class PlayerBullet : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Enemy") && pbType == 1) //적
         {
-            collision.transform.GetComponent<Monster>().hp--;
-            collision.transform.GetComponent<Monster>().ModifyHp();
+            Monster m = collision.transform.GetComponent<Monster>();
+            if (Player.player.berserker && Player.player.hp < 3) m.hp -= 4;
+            else m.hp--;
+            m.ModifyHp();
 
             MakeEffect(collision.transform.position, Color.red, 1);
         }
@@ -120,7 +122,8 @@ public class PlayerBullet : MonoBehaviour
             switch (pbType)
             {
                 case 0:
-                    m.hp--;
+                    if (Player.player.berserker && Player.player.hp < 3) m.hp -= 4;
+                    else m.hp--;
                     m.ModifyHp();
                     MakeEffect(transform.position, Color.red, 1);
                     break;
@@ -130,7 +133,7 @@ public class PlayerBullet : MonoBehaviour
                     else m.pollution += 0.5f;
                     if (m.polluted)
                     {
-                        m.hp--;
+                        m.hp--; //자동 공격은 버서커 딜증 대상 아님
                         m.ModifyHp();
                         m.pollution = 0.5f;
                         MakeEffect(transform.position, new Color(0.6f, 0.4f, 1), 0.7f);

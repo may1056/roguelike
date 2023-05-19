@@ -104,11 +104,23 @@ public class Player : MonoBehaviour //플레이어
     public bool F;
 
 
+    public int stamina; //대쉬 제한을 위해 스태미나 필요할 듯
+    public int maxstamina;
+    public Sprite[] St = new Sprite[6];
+
+
+
+    //아이템 관련
+    //0.
     bool canRevive; //부활
     public Image reviveImage;
-
-
-    public bool selfinjury = false; //자해
+    //2.
+    public bool selfinjury; //자해
+    //4.
+    public bool berserker;
+    //5.
+    public bool dashdeal;
+    public Sprite dashdealEff, dashupgradeEff;
 
 
 
@@ -142,21 +154,47 @@ public class Player : MonoBehaviour //플레이어
 
     void Start()
     {
-        itemNum = (0, -1); //임시
-
-        Debug.Log(itemNum.Item1);
-        Debug.Log(itemNum.Item2);
-
-        switch (itemNum)
-        {
-            case (0, -1): canRevive = true; break;
-            case (1, -1): transform.GetChild(5).gameObject.SetActive(true); break;
-            case (2, -1): maxhp = 1; hp = 1; selfinjury = true; break;
-        }
+        GetNewItem();
 
         manager.ChangeHPMP();
 
     } //Start End
+
+
+
+    void GetNewItem() //랜덤 아이템 얻기 - 임시
+    {
+        itemNum = (Random.Range(0, 6), Random.Range(0, 6));
+        if (itemNum.Item1 == itemNum.Item2) itemNum.Item2 = -1; //겹치면 그냥 없앰
+
+        manager.ItemInfo();
+
+        ItemDefault();
+        ItemActive(itemNum.Item1);
+        ItemActive(itemNum.Item2);
+    }
+    void ItemDefault() //아이템 설정 기본값으로 되돌리기
+    {
+        canRevive = false; //0
+        transform.GetChild(6).gameObject.SetActive(false); //1
+        maxhp = 6; selfinjury = false; //2
+        maxshield = 0; shield = 0; //3
+        berserker = false; //4
+        dashdeal = false; dashDist = 8; maxstamina = 3; //5
+    }
+    void ItemActive(int i) //아이템 설정 최신화
+    {
+        switch (i)
+        {
+            case 0: canRevive = true; break;
+            case 1: transform.GetChild(6).gameObject.SetActive(true); break;
+            case 2: maxhp = 1; hp = 1; selfinjury = true; break;
+            case 3: maxshield = 2; shield = 2; break;
+            case 4: berserker = true; break;
+            case 5: dashdeal = true; dashDist = 12; maxstamina = 5; stamina = 5; break;
+        }
+    }
+
 
 
 
@@ -228,7 +266,7 @@ public class Player : MonoBehaviour //플레이어
             Vector2 v = new(tp.x, tp.y + i * 0.4f);
             hit = Physics2D.Raycast(v, d, dashDist * (1 - slow), lg); //레이 맞은 것 저장
 
-            Debug.DrawRay(v, d * dashDist * (1 - slow), Color.red, 0.1f); //시각화
+            Debug.DrawRay(v, (1 - slow) * dashDist * d, Color.red, 0.1f); //시각화
 
             gx[i + 2] = tp.x + (F ? -1 : 1)
                 * (hit.transform != null ? hit.distance : dashDist * (1 - slow));
@@ -242,7 +280,7 @@ public class Player : MonoBehaviour //플레이어
 
         //마우스 우클릭 대쉬
         if (!onceDashed && (Input.GetMouseButtonDown(1)
-            || Input.GetKeyDown("k")) && slow < 1) //k는 임시 대쉬 키
+            || Input.GetKeyDown("k")) && slow < 1 && stamina > 0) //k는 임시 대쉬 키
         {
             onceDashed = true;
 
@@ -250,11 +288,22 @@ public class Player : MonoBehaviour //플레이어
             tp = transform.position;
 
             tpx = tp.x - tpx;
-            for (int i = 0; i < 10; i++) Instantiate(fadeEffect,
-                new Vector2(tp.x - tpx * i * 0.1f, tp.y),
-                Quaternion.identity);
+            for (int i = 0; i < 10; i++)
+            {
+                GameObject dash = Instantiate(fadeEffect,
+                    new Vector2(tp.x - tpx * i * 0.1f, tp.y), Quaternion.identity);
+                if (dashdeal) //대쉬 이펙트
+                    dash.GetComponent<SpriteRenderer>().sprite = dashupgradeEff;
+            }
+
+            if (dashdeal) DashDamage(tp.x, tp.x - tpx, tp.y);
 
             dontBehaveTime = 0;
+
+            CancelInvoke(nameof(RecoverSt));
+            stamina--;
+            ChangeSt();
+            Invoke(nameof(RecoverSt), dashdeal ? 2 : 3); //스태미나 충전
         }
 
         //대쉬 도달 위치 표시
@@ -262,7 +311,6 @@ public class Player : MonoBehaviour //플레이어
 
         td.transform.GetComponent<SpriteRenderer>().color
             = new Color(1 - slow, 1 - slow, 1);
-
 
 
 
@@ -399,10 +447,13 @@ public class Player : MonoBehaviour //플레이어
         {
             if (canRevive) //부활 아이템
             {
-                hp = 6;
-                shield = 2;
+                hp = maxhp;
+                shield = maxshield;
                 unbeatableTime = 2;
                 canRevive = false;
+                if (itemNum.Item1 == 0) itemNum.Item1 = -1;
+                else itemNum.Item2 = -1;
+                manager.ItemInfo();
                 GameObject rev = Instantiate(fadeEffect, tp, Quaternion.identity);
                 rev.GetComponent<SpriteRenderer>().sprite = posSprite;
                 reviveImage.gameObject.SetActive(true);
@@ -591,10 +642,66 @@ public class Player : MonoBehaviour //플레이어
     }
 
 
-    void AfterRevive()
+    void RecoverSt()
+    {
+        CancelInvoke(nameof(RecoverSt));
+        if (stamina < maxstamina) stamina++;
+        ChangeSt();
+        Invoke(nameof(RecoverSt), dashdeal ? 2 : 3);
+    }
+    void ChangeSt()
+    {
+        transform.GetChild(5).GetComponent<SpriteRenderer>().sprite = St[stamina];
+    }
+
+
+
+    //아이템 관련 함수들
+
+    void AfterRevive() //0.
     {
         reviveImage.gameObject.SetActive(false);
+        manager.ChangeHPMP();
     }
+
+    void DashDamage(float X1, float X2, float Y) //5.
+    {
+        if (manager.transform.childCount == 1)
+        {
+            Transform c0 = manager.transform.GetChild(0);
+
+            if (c0.childCount > 2)
+            {
+                for (int i = 2; i < c0.childCount; i++)
+                {
+                    Transform c0i = c0.GetChild(i);
+
+                    for (int j = 0; j < c0i.childCount; j++)
+                    {
+                        Transform c0ij = c0i.GetChild(j);
+
+                        Vector2 mv = c0ij.position;
+
+                        if (((mv.x > X1 && mv.x < X2) || (mv.x < X1 && mv.x > X2))
+                            && mv.y > Y - 2 && mv.y < Y + 2)
+                        {
+                            Monster c0ijm = c0ij.GetComponent<Monster>();
+                            c0ijm.hp--;
+                            c0ijm.ModifyHp();
+                            GameObject dd = Instantiate(fadeEffect, mv, Quaternion.identity);
+                            SpriteRenderer ddsr = dd.GetComponent<SpriteRenderer>();
+                            ddsr.sprite = dashdealEff;
+                            ddsr.sortingOrder = 8;
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+
+
+
 
 
     public void ClearBG() //클리어 시 배경 색상 변동

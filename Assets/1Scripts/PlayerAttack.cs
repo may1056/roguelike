@@ -109,8 +109,14 @@ public class PlayerAttack : MonoBehaviour
             float x = player.F ? -2 : 2;
             attackP = new Vector2(transform.position.x + x, transform.position.y);
 
-            Instantiate(playerbullet,
+            GameObject pb = Instantiate(playerbullet,
                 transform.position, Quaternion.Euler(0, 0, player.F ? 180 : 0));
+            if (player.selfinjury)
+            {
+                pb.GetComponent<PlayerBullet>().bulletSpeed = 40;
+                pb.transform.rotation = Quaternion.Euler(
+                    0, 0, (player.F ? 180 : 0) + Random.Range(-30, 31)); //각도 분산
+            }
 
             attacksr.color = new Color(1, 1, 1, 1);
 
@@ -133,7 +139,7 @@ public class PlayerAttack : MonoBehaviour
 
         if (skilluse) //약한 스킬
         {
-            if (player.selfinjury) cooltime = 0.6f;
+            if (player.selfinjury) cooltime = 1;
             else
             {
                 cooltime = 3;
@@ -161,7 +167,7 @@ public class PlayerAttack : MonoBehaviour
             wsAvailable = true;
             wsgoing = 3;
             wscount = 3;
-            if (player.selfinjury) wsCool = 4; //자해 시 빠른 스킬
+            if (player.selfinjury) wsCool = 2; //자해 시 빠른 스킬
             else
             {
                 wsCool = 20;
@@ -252,4 +258,5 @@ public class PlayerAttack : MonoBehaviour
         if (Player.weaponNum == 0) Player.weaponNum = 1;
         else Player.weaponNum = 0;
     }
+
 } //PlayerAttack End

@@ -248,7 +248,8 @@ public class Monster : MonoBehaviour //잡몹
             || Input.GetKeyDown("j")) && //내가 마우스가 없어서 임시로 설정한 키
             PlayerAttack.curAttackCooltime >= PlayerAttack.maxAttackCooltime)
         {
-            hp--;
+            if (Player.player.berserker && Player.player.hp < 3) hp -= 4;
+            else hp--;
             sr.sprite = Hurt;
             PlayerAttack.curAttackCooltime = 0;
             ModifyHp();
@@ -263,7 +264,8 @@ public class Monster : MonoBehaviour //잡몹
         if (Mathf.Abs(PlayerAttack.skillP.y) < 100 &&
             Vector2.Distance(tp, PlayerAttack.skillP) < 5.5f)
         {
-            hp--;
+            if (Player.player.berserker && Player.player.hp < 3) hp -= 4;
+            else hp--;
             sr.sprite = Hurt;
             ModifyHp();
         }
@@ -283,7 +285,8 @@ public class Monster : MonoBehaviour //잡몹
                         && Mathf.Abs(wsp.x - tp.x) < 1;
                     if (inX || inY)
                     {
-                        hp -= 2;
+                        if (Player.player.berserker && Player.player.hp < 3) hp -= 8;
+                        else hp -= 2;
                         sr.sprite = Hurt;
                         ModifyHp();
                     }
@@ -291,7 +294,7 @@ public class Monster : MonoBehaviour //잡몹
             }
         }
 
-
+        /*
         //위치 저장 데미지 입음
         if (Mathf.Abs(Player.posP[0].y) < 100)
         {
@@ -299,13 +302,14 @@ public class Monster : MonoBehaviour //잡몹
             {
                 if (Vector2.Distance(tp, Player.posP[i]) < 3)
                 {
-                    hp--;
+                    if (Player.player.berserker && Player.player.hp <= 2) hp -= 2;
+                    else hp--;
                     sr.sprite = Hurt;
                     ModifyHp();
                 }
             }
         }
-
+        */
 
         //자동 공격 오염
         polluted = pollution == 1;
@@ -327,13 +331,13 @@ public class Monster : MonoBehaviour //잡몹
         if (hp <= 0)
         {
             int r = Random.Range(0, 10);
-            if (r <= 1) Instantiate(hpOrb, tp, Quaternion.identity);
+            if (r < 1) Instantiate(hpOrb, tp, Quaternion.identity);
 
             r = Random.Range(0, 10);
-            if (r <= 1) Instantiate(mpOrb, tp, Quaternion.identity);
+            if (r < 2) Instantiate(mpOrb, tp, Quaternion.identity);
 
             r = Random.Range(0, 10);
-            if (r <= 5) Instantiate(coinOrb, tp, Quaternion.identity);
+            if (r < 4) Instantiate(coinOrb, tp, Quaternion.identity);
 
             GameManager.killed++; //죽으면서 킬 수 올리고 감
             GameManager.realkilled++;
@@ -345,6 +349,7 @@ public class Monster : MonoBehaviour //잡몹
                 {
                     GameObject s = Instantiate(littleslime,
                         new Vector2(tp.x + i * 0.5f, tp.y), Quaternion.identity);
+                    s.transform.SetParent(transform.parent);
                     s.SetActive(true);
                 }
             }

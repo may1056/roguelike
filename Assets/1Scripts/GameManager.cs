@@ -9,14 +9,19 @@ public class GameManager : MonoBehaviour //게임 총괄
     //아이템
     readonly string[] legendItems = { "알파 수정" };
     readonly string[] rareItems =
-        { "부활 아이템", "자동 공격", "자해", "버서커", "강한 대쉬", "극진공수도 비급",};
+        { "부활 아이템", "자동 공격", "자해", "쉴드", "버서커", "강한 대쉬", "극진공수도 비급",};
     readonly string[] commonItems =
         { "붉은 수정", "hp색 수정", "초록 수정", "노란 수정", "푸른 수정", "주황 수정", "독" };
 
     //아이템별 확률
     readonly float[] legendItems_p = { 0.1f };
-    readonly float[] rareItems_p = { 3, 3, 3, 3, 3, 3 };
+    readonly float[] rareItems_p = { 3, 3, 3, 3, 3, 3, 3 };
     readonly float[] commonItems_p = { 10, 10, 10, 10, 10, 10, 10, };
+
+
+    public Text itemText;
+
+
 
     //무기
 
@@ -41,7 +46,7 @@ public class GameManager : MonoBehaviour //게임 총괄
     public Text isMWText;
 
 
-    public static int mapNum; //맵 번호
+    public static int mapNum = 3; //맵 번호
     GameObject map; //맵이 들어가는 공간
 
     public GameObject[] maps; //맵 프리팹
@@ -72,7 +77,7 @@ public class GameManager : MonoBehaviour //게임 총괄
     public GameObject Portal2; //어려움, 기믹
 
     readonly Vector2[,] portal_position //맵별 포탈 위치
-        = { { new Vector2(0, 0), new Vector2(999, 999) }, { new Vector2(0, 5), new Vector2(999, 999) }, { new Vector2(-2, 0), new Vector2(2, 0) }, { new Vector2(20, 1), new Vector2(26, 1) } };
+        = { { new Vector2(0, 0), new Vector2(999, 999) }, { new Vector2(0, 5), new Vector2(999, 999) }, { new Vector2(-2, 1), new Vector2(2, 1) }, { new Vector2(20, 1), new Vector2(26, 1) } };
 
     readonly int[,] portal_mapNum //포탈별 다음 맵 번호, -1은 포탈 X
         = { { 0, -1 }, { 2, -1 }, { 3, 1 }, { 2, 1 } };
@@ -114,8 +119,6 @@ public class GameManager : MonoBehaviour //게임 총괄
         killed = 0;
 
         coins = 0;
-
-        mapNum = 3; //임시
 
         realkilled = 0;
 
@@ -195,6 +198,48 @@ public class GameManager : MonoBehaviour //게임 총괄
 
 
 
+        //전투가 끝났거나 다 잡을 필요 없으면 포탈들 정위치 후 보이기
+        if (!making || enemies[mapNum, 0] == -1)
+        {
+            Portal1.transform.position = portal_position[mapNum, 0];
+            Portal1.SetActive(true);
+            Portal2.transform.position = portal_position[mapNum, 1];
+            Portal2.SetActive(true);
+        }
+
+        GameObject P1S = Portal1.transform.GetChild(0).gameObject; //포탈1 S 텍스트
+        GameObject P2S = Portal2.transform.GetChild(0).gameObject; //포탈2 S 텍스트
+
+        //포탈1과 가까우면
+        if (Vector2.Distance(player.transform.position, Portal1.transform.position) < 2)
+        {
+            P1S.SetActive(true);
+            P2S.SetActive(false);
+            if (Input.GetKeyDown("s")) //포탈 타기
+            {
+                mapNum = portal_mapNum[mapNum, 0];
+                SceneManager.LoadScene(1);
+            }
+        }
+        //포탈2와 가까우면
+        else if (Vector2.Distance(player.transform.position, Portal2.transform.position) < 2)
+        {
+            P1S.SetActive(false);
+            P2S.SetActive(true);
+            if (Input.GetKeyDown("s")) //포탈 타기
+            {
+                mapNum = portal_mapNum[mapNum, 1];
+                SceneManager.LoadScene(1);
+            }
+        }
+        else //멀리 있다면
+        {
+            P1S.SetActive(false);
+            P2S.SetActive(false);
+        }
+
+
+
     } //Update End
 
 
@@ -270,6 +315,18 @@ public class GameManager : MonoBehaviour //게임 총괄
         mapouterror = true;
         errortime = 0;
     }
+
+
+
+    public void ItemInfo()
+    {
+        int i1 = Player.itemNum.Item1, i2 = Player.itemNum.Item2;
+
+        itemText.text = "1. " + (i1 == -1 ? "없음" : rareItems[i1]) +
+            " 2. " + (i2 == -1 ? "없음" : rareItems[i2]);
+    }
+
+
 
     public void GameExit() // 게임 종료 버튼 - 에디터에선 실행안됨
     {
