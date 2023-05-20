@@ -25,10 +25,7 @@ public class PlayerBullet : MonoBehaviour
 
         switch (pbType)
         {
-            case 0: GrayRandom(); break;
-
             case 1:
-                GrayRandom();
                 GetComponent<CircleCollider2D>().isTrigger = false;
                 transform.localScale = 2f * Vector2.one;
                 break;
@@ -36,12 +33,6 @@ public class PlayerBullet : MonoBehaviour
 
     } //Start End
 
-
-    void GrayRandom() //무채색 랜덤
-    {
-        float rand = 0.1f * Random.Range(0, 10);
-        sr.color = new Color(rand, rand, rand);
-    }
 
 
     void Update()
