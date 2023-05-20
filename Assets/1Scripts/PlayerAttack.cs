@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEngine.GraphicsBuffer;
 
 public class PlayerAttack : MonoBehaviour
 {
@@ -28,6 +29,8 @@ public class PlayerAttack : MonoBehaviour
     public static Vector2 attackP;
     public Sprite attackSprite;
     bool attackuse = false;
+    Vector2 mousePosition;
+    float weaponangle;
 
 
     public int mp;
@@ -68,7 +71,7 @@ public class PlayerAttack : MonoBehaviour
         attackbc = atk.GetComponent<BoxCollider2D>();
         attackani = atk.GetComponent<Animator>();
 
-        attacksr.color = new Color(1, 1, 1, 0);
+        //attacksr.color = new Color(1, 1, 1, 0);
 
         wsP = new Vector2(9999, 9999);
 
@@ -80,8 +83,10 @@ public class PlayerAttack : MonoBehaviour
 
     void Update()
     {
+        WeaponAnimation();
+
         attacksr.flipX = player.F;
-        atk.transform.localPosition = new Vector2(player.F ? -2f : 2f, 0);
+        //atk.transform.localPosition = new Vector2(player.F ? -2f : 2f, 0);
 
 
         //ㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱ
@@ -100,14 +105,14 @@ public class PlayerAttack : MonoBehaviour
         if (attackuse && GameManager.ismeleeWeapon)
         {
             float x = player.F ? -2 : 2;
-            attackP = new Vector2(transform.position.x + x, transform.position.y);
-            attacksr.color = new Color(1, 1, 1, 1);
+            //attackP = new Vector2(transform.position.x + x, transform.position.y);
+            //attacksr.color = new Color(1, 1, 1, 1);
             player.dontBehaveTime = 0;
         }
         else if (attackuse) //원거리 공격 쿨타임, 애니메이션?
         {
             float x = player.F ? -2 : 2;
-            attackP = new Vector2(transform.position.x + x, transform.position.y);
+            //attackP = new Vector2(transform.position.x + x, transform.position.y);
 
             GameObject pb = Instantiate(playerbullet,
                 transform.position, Quaternion.Euler(0, 0, player.F ? 180 : 0));
@@ -118,12 +123,12 @@ public class PlayerAttack : MonoBehaviour
                     0, 0, (player.F ? 180 : 0) + Random.Range(-30, 31)); //각도 분산
             }
 
-            attacksr.color = new Color(1, 1, 1, 1);
+            //attacksr.color = new Color(1, 1, 1, 1);
 
             curAttackCooltime = 0;
             player.dontBehaveTime = 0;
         }
-        else attacksr.color = new Color(1, 1, 1, 0);
+        //else attacksr.color = new Color(1, 1, 1, 0);
 
 
 
@@ -207,6 +212,15 @@ public class PlayerAttack : MonoBehaviour
     } //Update End
 
 
+    void WeaponAnimation() // 무기 위치 고정, 마우스에 따른 회전
+    {
+        atk.transform.localPosition = new Vector2(0, 0);
+        mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        weaponangle = Mathf.Atan2(mousePosition.y - atk.position.y, mousePosition.x - atk.position.x) * Mathf.Rad2Deg;
+        atk.transform.rotation = Quaternion.AngleAxis(weaponangle - 90, Vector3.forward); ;
+
+        if (attackuse) attackani.SetTrigger("attacked");
+    }
 
     void WeaponSkill0(int co) //채찍 전용 스킬 발현을 매개해주는 역할 //이었는데 이젠 아님
     {
