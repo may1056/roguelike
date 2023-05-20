@@ -220,6 +220,9 @@ public class PlayerAttack : MonoBehaviour
         atk.transform.rotation = Quaternion.AngleAxis(weaponangle - 90, Vector3.forward); ;
 
         if (attackuse) attackani.SetTrigger("attacked");
+
+        if (GameManager.ismeleeWeapon) attacksr.color = new Color(1, 1, 1, 1);
+        else attacksr.color = new Color(1, 1, 1, 0);
     }
 
     void WeaponSkill0(int co) //채찍 전용 스킬 발현을 매개해주는 역할 //이었는데 이젠 아님
