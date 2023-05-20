@@ -390,7 +390,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   monsterNum: 5
   fadeEffect: {fileID: 8326106217213998104, guid: c32a19154cf10874f974978490ab09ef, type: 3}
-  doubleCircle: {fileID: 21300000, guid: e6e20993f3fa5cb45a1a2df62c633aaa, type: 3}
+  doubleCircle: {fileID: 21300000, guid: bc8cdb377d76208459a0ccc268b24045, type: 3}
   hp: 0
   maxhp: 10
   hc:
