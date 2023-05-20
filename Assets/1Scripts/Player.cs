@@ -210,7 +210,7 @@ public class Player : MonoBehaviour //플레이어
 
         //점프
         if ((Input.GetKeyDown("w") || Input.GetKeyDown(KeyCode.Space))
-            && !isJumping)
+            && !isJumping && GameManager.prgEnd)
         {
             rigid.AddForce(Vector2.up * jumpPower * (1 - slow), ForceMode2D.Impulse);
             isJumping = true;
@@ -230,7 +230,7 @@ public class Player : MonoBehaviour //플레이어
         //ㅂㅎㅂㅎㅂㅎㅂㅎㅂㅎㅂㅎㅂㅎㅂㅎㅂㅎㅂㅎㅂㅎㅂㅎㅂㅎㅂㅎ
 
         //방향 전환
-        if (Input.GetButton("Horizontal"))
+        if (Input.GetButton("Horizontal") && GameManager.prgEnd)
             sr.flipX = Input.GetAxisRaw("Horizontal") == -1;
 
         F = sr.flipX; //하도 많이 써서 정의함
@@ -280,7 +280,8 @@ public class Player : MonoBehaviour //플레이어
 
         //마우스 우클릭 대쉬
         if (!onceDashed && (Input.GetMouseButtonDown(1)
-            || Input.GetKeyDown("k")) && slow < 1 && stamina > 0) //k는 임시 대쉬 키
+            || Input.GetKeyDown("k")) && slow < 1 && stamina > 0 //k는 임시 대쉬 키
+             && GameManager.prgEnd)
         {
             onceDashed = true;
 
@@ -393,7 +394,7 @@ public class Player : MonoBehaviour //플레이어
         cs.gameObject.SetActive(s);
 
         //플랫폼 내려가기
-        if (Input.GetKeyDown("s"))
+        if (Input.GetKeyDown("s") && GameManager.prgEnd)
         {
             isSliding = true;
             this.gameObject.layer = 13; //13PlayerSlide

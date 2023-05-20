@@ -140,7 +140,8 @@ public class PlayerAttack : MonoBehaviour
         //기본 탑재 스킬
         if (cooltime > 0) cooltime -= Time.deltaTime;
 
-        skilluse = cooltime <= 0 && Input.GetKeyDown("z") && mp >= 1;
+        skilluse = cooltime <= 0 && Input.GetKeyDown("z") && mp >= 1
+            && GameManager.prgEnd;
 
         if (skilluse) //약한 스킬
         {
@@ -167,7 +168,8 @@ public class PlayerAttack : MonoBehaviour
         }
         else wsText.text = "0";
 
-        if (wsCool <= 0 && Input.GetKeyDown("x") && mp >= 2)
+        if (wsCool <= 0 && Input.GetKeyDown("x") && mp >= 2
+            && GameManager.prgEnd)
         {
             wsAvailable = true;
             wsgoing = 3;
@@ -204,7 +206,7 @@ public class PlayerAttack : MonoBehaviour
 
 
 
-        if (Input.GetKeyDown("p")) Ismeleechange();
+        if (Input.GetKeyDown("p") && GameManager.prgEnd) Ismeleechange();
 
 
         if (mp > maxmp) mp = maxmp;

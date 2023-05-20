@@ -245,8 +245,9 @@ public class Monster : MonoBehaviour //잡몹
 
         //피 닳는 시스템
         if (inAttackArea && (Input.GetMouseButtonDown(0)
-            || Input.GetKeyDown("j")) && //내가 마우스가 없어서 임시로 설정한 키
-            PlayerAttack.curAttackCooltime >= PlayerAttack.maxAttackCooltime)
+            || Input.GetKeyDown("j") ) && //내가 마우스가 없어서 임시로 설정한 키
+            PlayerAttack.curAttackCooltime >= PlayerAttack.maxAttackCooltime
+             && GameManager.prgEnd)
         {
             if (Player.player.berserker && Player.player.hp < 3) hp -= 4;
             else hp--;

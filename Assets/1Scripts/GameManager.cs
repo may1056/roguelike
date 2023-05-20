@@ -3,9 +3,27 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class GameManager : MonoBehaviour //게임 총괄
 {
+    public Image Progress; //처음에 게임 진행 상황 알리기 위해
+    float progressTime = 0; //4초까지 보여줄 거야
+    public static bool prgEnd; //알려주는 거 끝났는지
+
+    static int floor = 2; //몇 층
+    static int stage = 1; //몇 스테이지
+
+    Transform p_l; //point_line
+    int dot; //반짝거릴 점 번호
+
+
+    //ㅋㅋㅋㅋㅋㅋㅋㅋ
+    static float 게임실행시간 = 0;
+    public Text 게임실행시간텍스트;
+
+
+
     //아이템
     readonly string[] legendItems = { "알파 수정" };
     readonly string[] rareItems =
@@ -110,6 +128,44 @@ public class GameManager : MonoBehaviour //게임 총괄
 
 
 
+    void Awake()
+    {
+        //아래는 Canvas의 PROGRESS 오브젝트 관련
+
+        prgEnd = false; //안 끝났어
+        Time.timeScale = 0; //멈춰
+        Progress.gameObject.SetActive(true); //나타내
+
+        //floor-stage는 텍스트메쉬프로를 사용해볼 것임. 예쁘기 때문
+        Progress.rectTransform.GetChild(0).GetComponent<TextMeshProUGUI>().text
+            = floor.ToString() + " - " + stage.ToString(); //층 - 스테이지
+
+        //point_line은 점과 선 집합이며, 각 점에는 같은 번호에 해당하는 선이 종속되어 있다.
+        p_l = Progress.rectTransform.GetChild(1);
+
+        dot = 0; //초기화
+
+        for (int f = 1; f <= 3; f++) //floor
+        {
+            for (int s = 1; s <= (f == 1 ? 2 : 4); s++) //stage
+            {
+                //하하 각주 대체 뭐라 써야 되지. 아무튼 f와 s 가지고 0123456789 만들어낸다
+                int n = f * (f - 1) - 1 + s;
+
+                //진행 상황에 맞는 건 살리고, 아닌 건 죽인다
+                if (f < floor || (f == floor && s <= stage))
+                {
+                    p_l.GetChild(n).gameObject.SetActive(true);
+                    dot = n; //반응할 점 번호
+                }
+                else p_l.GetChild(n).gameObject.SetActive(false);
+
+            }
+        }
+
+    } //Awake End
+
+
 
     void Start()
     {
@@ -133,8 +189,28 @@ public class GameManager : MonoBehaviour //게임 총괄
     } //Start End
 
 
+
+
+
+    void EndProgress() //진행 화면 이제 그만 띄워라
+    {
+        prgEnd = true;
+        Time.timeScale = 1;
+        Progress.gameObject.SetActive(false);
+    }
+
+
     void Update()
     {
+        if (progressTime > 4 && !prgEnd) EndProgress();
+        else progressTime += Time.unscaledDeltaTime; //TimeScale에 구애받지 않음
+
+
+        게임실행시간 += Time.deltaTime;
+        게임실행시간텍스트.text = 게임실행시간.ToString();
+
+
+
         stat[0].text = "공격력: 공격력 변수 추가필요" /*+ Player.maxAttackCooltime.ToString()*/;
         stat[1].text = "공격속도: " + PlayerAttack.maxAttackCooltime.ToString();
         stat[2].text = "이동속도: " + Player.player.speed.ToString();
@@ -144,7 +220,7 @@ public class GameManager : MonoBehaviour //게임 총괄
         coolText.text = "쿨타임: " + playerAtk.cooltime.ToString("N0") + "초";
 
         //메뉴창 표시
-        if (Input.GetButtonDown("Cancel"))
+        if (Input.GetButtonDown("Cancel") && progressTime > 4)
         {
             if (menuSet.activeSelf)
             {
@@ -166,7 +242,7 @@ public class GameManager : MonoBehaviour //게임 총괄
         coinText.text = coins.ToString();
 
         //빠른 재시작
-        if (Input.GetKeyDown(KeyCode.Backspace)) SceneManager.LoadScene(1);
+        if (Input.GetKeyDown(KeyCode.Backspace) && progressTime > 4) SceneManager.LoadScene(1);
 
         if (ismeleeWeapon) isMWText.text = "원거리로 바꾸기";
         else isMWText.text = "근거리로 바꾸기";
@@ -175,7 +251,7 @@ public class GameManager : MonoBehaviour //게임 총괄
 
 
         //적 불러오기
-        if (making)
+        if (making && progressTime > 4)
         {
             MakeEnemy(nowPhase);
             phaseTime += Time.deltaTime;
@@ -218,7 +294,7 @@ public class GameManager : MonoBehaviour //게임 총괄
             if (Input.GetKeyDown("s")) //포탈 타기
             {
                 mapNum = portal_mapNum[mapNum, 0];
-                SceneManager.LoadScene(1);
+                NextStage();
             }
         }
         //포탈2와 가까우면
@@ -229,7 +305,7 @@ public class GameManager : MonoBehaviour //게임 총괄
             if (Input.GetKeyDown("s")) //포탈 타기
             {
                 mapNum = portal_mapNum[mapNum, 1];
-                SceneManager.LoadScene(1);
+                NextStage();
             }
         }
         else //멀리 있다면
@@ -243,6 +319,29 @@ public class GameManager : MonoBehaviour //게임 총괄
     } //Update End
 
 
+    void NextStage()
+    {
+        stage++;
+
+        if (floor == 1 && stage == 3) //1-3은 없으니 2-1로 가라
+        {
+            floor = 2;
+            stage = 1;
+        }
+        else if (floor == 2 && stage == 5) //2-5는 없으니 3-1로 가라
+        {
+            floor = 3;
+            stage = 1;
+        }
+        else if (floor == 3 && stage == 5) //3-5는 없... 막보를 죽였군! 잘했다
+        {
+            //끝
+        }
+
+        SceneManager.LoadScene(1); //PlayGame 재시작
+    }
+
+
 
     public void ChangeHPMP() //hp, mp 구슬 최신화
     {
@@ -251,13 +350,13 @@ public class GameManager : MonoBehaviour //게임 총괄
             //HP
             if (i < player.hp)
             {
-                hps[i].color = Color.white;
+                hps[i].color = new Color(1, 0.7f, 0.9f);
                 hps[i].gameObject.SetActive(true);
             }
             //SHIELD
             else if (i < player.hp + player.shield)
             {
-                hps[i].color = Color.black;
+                hps[i].color = Color.gray;
                 hps[i].gameObject.SetActive(true);
             }
             else hps[i].gameObject.SetActive(false);
@@ -265,7 +364,11 @@ public class GameManager : MonoBehaviour //게임 총괄
 
         //MP
         for(int i = 0; i < playerAtk.maxmp; i++)
+        {
+            mps[i].color = Player.itemNum.Item1 == 2 || Player.itemNum.Item2 == 2 ?
+                Color.black : new Color(0.3f, 0.3f, 0.8f); //자해 - 검정, 기본 - 마나 색
             mps[i].gameObject.SetActive(i < playerAtk.mp);
+        }
     }
 
 
