@@ -218,9 +218,9 @@ public class Player : MonoBehaviour //플레이어
         }
 
         //연직 방향 속력이 거의 0인 상태가 0.1초 이상이면 점프 중단
-        if (Mathf.Abs(rigid.velocity.y) < 0.01f) notJumpTime += Time.deltaTime;
-        else notJumpTime = 0;
-        isJumping = notJumpTime < 0.1f;
+        //if (Mathf.Abs(rigid.velocity.y) < 0.01f) notJumpTime += Time.deltaTime;
+        //else notJumpTime = 0;
+        //isJumping = notJumpTime < 0.1f;
 
 
 
