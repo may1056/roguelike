@@ -246,7 +246,7 @@ MonoBehaviour:
   bull_T: 0
   Down: {fileID: 0}
   Up: {fileID: 0}
-  Eye: {fileID: 0}
+  Charge: {fileID: 0}
   HurtDown: {fileID: 0}
   HurtUp: {fileID: 0}
 --- !u!212 &7937911736823455429
@@ -318,7 +318,7 @@ Rigidbody2D:
   m_AngularDrag: 0.05
   m_GravityScale: 1
   m_Material: {fileID: 0}
-  m_Interpolate: 0
+  m_Interpolate: 2
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
