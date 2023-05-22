@@ -99,8 +99,8 @@ public class Bullet : MonoBehaviour //탄막
                     {
                         Player pl = other.transform.GetComponent<Player>();
                         pl.slowtime = 2;
-                        if (pl.slow > 0.9f) pl.slow = 1;
-                        else pl.slow += 0.04f;
+                        if (pl.slow > 0.965f) pl.slow = 1;
+                        else pl.slow += 0.035f;
                     }
                     break;
             }

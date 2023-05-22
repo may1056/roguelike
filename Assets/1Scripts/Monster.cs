@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public class Monster : MonoBehaviour //잡몹
 {
     public int monsterNum;
-    //00spider 01packman 02slime 03??아무튼원거리 04??아무튼얼음빔 05kingslime
+    //00spider 01packman 02slime 03turret 04ice 05kingslime 06fire 07ghost
 
 
     readonly float[,] limitX = //좌우 한계
@@ -82,19 +82,19 @@ public class Monster : MonoBehaviour //잡몹
 
 
     /// <summary>
-    /// 점프형 몬스터 - 02
+    /// 점프형 몬스터 - 02, 05
     /// </summary>
 
     float lezong = 0.3f;//점프 시간 카운트
     public float lezonghan; //점프파워
 
-    bool k; //king
+    bool K; //king
     public GameObject littleslime;
 
 
 
     /// <summary>
-    /// 원거리 공격형 몬스터 - 03
+    /// 원거리 공격형 몬스터 - 03, 04, 06
     /// </summary>
 
     public GameObject bullet;
@@ -102,6 +102,14 @@ public class Monster : MonoBehaviour //잡몹
     public float bull_T; //탄막 생성 주기
 
     Quaternion AngleSelected;
+
+    bool repeated = false;
+    public Sprite Down, Up, Charge, HurtDown, HurtUp; //내려, 올려, 장전, 아파, 아파
+    GameObject shooter;
+    SpriteRenderer shsr = null;
+    bool D_U;
+
+
 
 
 
@@ -131,10 +139,10 @@ public class Monster : MonoBehaviour //잡몹
 
         inAttackArea = false;
 
-        k = monsterNum == 5;
+        K = monsterNum == 5;
 
         pol = transform.GetChild(1);
-        switch (monsterNum)
+        /*switch (monsterNum)
         {
             case 0:
                 pol.localPosition = new Vector2(0, -0.3f);
@@ -149,14 +157,20 @@ public class Monster : MonoBehaviour //잡몹
                 pol.localPosition = Vector2.zero;
                 pol.localScale = new Vector2(0.25f, 0.25f); break;
             case 4:
+            case 6:
                 pol.localPosition = Vector2.zero;
-                pol.localScale = new Vector2(0.3f, 0.3f); break;
+                pol.localScale = new Vector2(0.3f, 0.3f);
+                break;
             case 5:
                 pol.localPosition = Vector2.zero;
                 pol.localScale = new Vector2(0.2f, 0.2f); break;
-        }
+        }*/
 
     } //Start End
+
+
+
+
 
 
     void Update()
@@ -189,7 +203,7 @@ public class Monster : MonoBehaviour //잡몹
             case 5: //kingslime
                 //플레이어를 향해 이동 방향을 변경한다
                 H = tp.x > pp.x ? -3 : 3;
-                if (k) H *= 2;
+                if (K) H *= 2;
 
                 Targeting();
 
@@ -198,7 +212,7 @@ public class Monster : MonoBehaviour //잡몹
                     lezong -= Time.deltaTime;
                 break;
 
-            case 3: //??amuteunweongeori
+            case 3: //turret
                 Targeting();
 
                 //탄막 발사
@@ -213,22 +227,21 @@ public class Monster : MonoBehaviour //잡몹
                 else bulletTime -= Time.deltaTime;
                 break;
 
-            case 4: //??amuteuneoleumbeam
-                H = tp.x > pp.x ? -1 : 1;
+            case 4: //ice
+            case 6: //fire
+                H = tp.x > pp.x ? -2 : 2;
                 Targeting();
 
-                //탄막 발사
-                if (bulletTime <= 0 && moving)
+                if (shsr != null) shsr.flipX = sr.flipX;
+
+                if (moving && !repeated)
                 {
-                    bulletTime = 6;
-                    AngleSelected = Quaternion.Euler(0, 0, Mathf.Rad2Deg *
-                        Mathf.Atan2(Player.player.transform.position.y - tp.y,
-                        Player.player.transform.position.x - tp.x));
-                    for (int i = 0; i < 40; i++) Invoke(nameof(ShootBullet), i * 0.025f);
-                }
-                else if (moving)
-                {
-                    bulletTime -= Time.deltaTime;
+                    repeated = true;
+                    InvokeRepeating(nameof(FrontJump), 1, 7); //앞으로 점프
+                    InvokeRepeating(nameof(JumpStop), 2, 7); //점프 끝
+                    InvokeRepeating(nameof(OnShoot), 5, 7); //장전
+                    InvokeRepeating(nameof(OffShoot), 6, 7); //발사
+                    InvokeRepeating(nameof(ReturnDown), 7, 7); //원상복귀
                 }
                 break;
 
@@ -243,17 +256,19 @@ public class Monster : MonoBehaviour //잡몹
         C.gameObject.SetActive(dist < 5 || hp < maxhp);
 
 
+        ModifyHp();
+
         //피 닳는 시스템
         if (inAttackArea && (Input.GetMouseButtonDown(0)
             || Input.GetKeyDown("j") ) && //내가 마우스가 없어서 임시로 설정한 키
             PlayerAttack.curAttackCooltime >= PlayerAttack.maxAttackCooltime
              && GameManager.prgEnd)
         {
+            Apa();
             if (Player.player.berserker && Player.player.hp < 3) hp -= 4;
             else hp--;
-            sr.sprite = Hurt;
+
             PlayerAttack.curAttackCooltime = 0;
-            ModifyHp();
         }
 
 
@@ -265,10 +280,9 @@ public class Monster : MonoBehaviour //잡몹
         if (Mathf.Abs(PlayerAttack.skillP.y) < 100 &&
             Vector2.Distance(tp, PlayerAttack.skillP) < 5.5f)
         {
+            Apa();
             if (Player.player.berserker && Player.player.hp < 3) hp -= 4;
             else hp--;
-            sr.sprite = Hurt;
-            ModifyHp();
         }
 
 
@@ -286,10 +300,9 @@ public class Monster : MonoBehaviour //잡몹
                         && Mathf.Abs(wsp.x - tp.x) < 1;
                     if (inX || inY)
                     {
+                        Apa();
                         if (Player.player.berserker && Player.player.hp < 3) hp -= 8;
                         else hp -= 2;
-                        sr.sprite = Hurt;
-                        ModifyHp();
                     }
                 break;
             }
@@ -315,23 +328,20 @@ public class Monster : MonoBehaviour //잡몹
         //자동 공격 오염
         polluted = pollution == 1;
 
-        if (polluted)
-        {
-            sr.sprite = Hurt;
-            ModifyHp();
-            Invoke(nameof(RemovePollution), 1);
-        }
+        if (polluted) Invoke(nameof(RemovePollution), 1);
         else if (pollution > 0 && !polluted) pollution -= 0.3f * Time.deltaTime;
 
         transform.GetChild(1).GetComponent<SpriteRenderer>().color
-            = new Color(0.6f, 0.4f, 1, pollution);
+            = new Color(1, 1, 1, pollution);
+
+        transform.GetChild(1).gameObject.SetActive(pollution > 0);
 
 
 
         //쉐이망 - hp, mp 오브 확률적으로 내놓기
         if (hp <= 0)
         {
-            int r = Random.Range(0, 10);
+            int r = Random.Range(0, 30);
             if (r < 1) Instantiate(hpOrb, tp, Quaternion.identity);
 
             r = Random.Range(0, 10);
@@ -344,7 +354,7 @@ public class Monster : MonoBehaviour //잡몹
             GameManager.realkilled++;
             withPlayer = false;
 
-            if (k)
+            if (K)
             {
                 for (int i = -1; i <= 1; i += 2)
                 {
@@ -409,8 +419,62 @@ public class Monster : MonoBehaviour //잡몹
 
     void ShootBullet()
     {
-        Instantiate(bullet, tp, AngleSelected);
+        GameObject b = Instantiate(bullet, tp, AngleSelected);
+        b.GetComponent<SpriteRenderer>().sortingOrder = 6;
     }
+
+
+
+
+    //아래 함수 덩어리는 모두 04ice와 06fire의 Invoke 반복을 위해 존재
+
+    void FrontJump()
+    {
+        rigid.AddForce((1 - pollution) * lezonghan * Vector2.up,
+            ForceMode2D.Impulse);
+        rigid.AddForce((1 - pollution) * H * Vector2.right,
+            ForceMode2D.Impulse);
+        sr.sprite = Up;
+    }
+    void JumpStop()
+    {
+        rigid.velocity = new Vector2(0, rigid.velocity.y);
+        ReturnDown();
+    }
+    void OnShoot() //ice, fire 장전
+    {
+        shooter = Instantiate(fadeEffect, transform.position, Quaternion.identity);
+        shsr = shooter.GetComponent<SpriteRenderer>();
+        shsr.sprite = Charge;
+        shsr.sortingOrder = 5;
+
+        Fade fade = shooter.GetComponent<Fade>();
+        fade.up_down = true;
+        fade.k = 1;
+    }
+    void OffShoot() //ice, fire 해제
+    {
+        shooter = Instantiate(fadeEffect, transform.position, Quaternion.identity);
+        shsr = shooter.GetComponent<SpriteRenderer>();
+        shsr.sprite = Charge;
+        shsr.sortingOrder = 5;
+
+        shooter.GetComponent<Fade>().k = 1;
+
+        AngleSelected = Quaternion.Euler(0, 0, Mathf.Rad2Deg *
+            Mathf.Atan2(Player.player.transform.position.y - tp.y,
+            Player.player.transform.position.x - tp.x)); //어느 각도로 쏠 거냐
+
+        sr.sprite = Up; //손 올림
+        for (int i = 0; i < 40; i++) Invoke(nameof(ShootBullet), i * 0.025f);
+        Invoke(nameof(ReturnDown), 1); //1초 뒤 손 내림
+    }
+    void ReturnDown() //ice, fire 스프라이트 Down으로
+    {
+        sr.sprite = Down;
+    }
+
+
 
 
     public void RemovePollution() //오염 제거
@@ -418,6 +482,10 @@ public class Monster : MonoBehaviour //잡몹
         if (polluted) pollution = 0;
         CancelInvoke(nameof(RemovePollution));
     }
+
+
+
+
 
 
 
@@ -486,18 +554,13 @@ public class Monster : MonoBehaviour //잡몹
                         s.transform.SetParent(transform.parent);
                         s.SetActive(true);
                     }
-                    rigid.AddForce(Vector2.up * (1 - pollution) * lezonghan,
+                    rigid.AddForce((1 - pollution) * lezonghan * Vector2.up,
                         ForceMode2D.Impulse);
                     lezong = 0.3f;
                 }
             break;
 
-            //??아무튼원거리는 FixedUpdate 없음
-
-            case 4: //??아무튼얼음빔
-                if (moving && bulletTime < 5 && bulletTime > 1)
-                    transform.Translate(H * Time.deltaTime * Vector2.right);
-                break;
+            //turret, ice, fire는 FixedUpdate 없음
         }
 
     } //FixedUpdate End
@@ -576,7 +639,25 @@ public class Monster : MonoBehaviour //잡몹
     }
 
 
-    public void ModifyHp() //hp circle 최신화
+
+
+    public void Apa()
+    {
+        GameObject hurt = Instantiate(fadeEffect, transform.position,
+            Quaternion.identity);
+
+        SpriteRenderer hsr = hurt.GetComponent<SpriteRenderer>();
+        hsr.flipX = sr.flipX;
+        hsr.sortingOrder = 5;
+
+        if (monsterNum == 4 || monsterNum == 6)
+            hsr.sprite = D_U ? HurtDown : HurtUp;
+        else hsr.sprite = Hurt;
+
+        hurt.GetComponent<Fade>().k = 5;
+    }
+
+    void ModifyHp() //hp circle 최신화
     {
         if (hp > 0 && hp <= 5)
         {

@@ -230,7 +230,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  Hurt: {fileID: 21300000, guid: b6c3170a0dfd6e344ae859561f48c71b, type: 3}
+  Hurt: {fileID: 21300000, guid: b0c50f855ca082348a155ab7ccb32ae5, type: 3}
   hpOrb: {fileID: 6510405994357380013, guid: f298c78827c8618408d5e5c4b44641cc, type: 3}
   mpOrb: {fileID: 2026748482929784485, guid: dfc753a499df8d14bb6a7fc313dcaa13, type: 3}
   coinOrb: {fileID: 2026748482929784485, guid: 70d4039dbc797ac488ff53131785d764, type: 3}
@@ -244,6 +244,11 @@ MonoBehaviour:
   littleslime: {fileID: 0}
   bullet: {fileID: 0}
   bull_T: 0
+  Down: {fileID: 0}
+  Up: {fileID: 0}
+  Eye: {fileID: 0}
+  HurtDown: {fileID: 0}
+  HurtUp: {fileID: 0}
 --- !u!212 &3711459579996582488
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -380,7 +385,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &966298866134723023
 Transform:
   m_ObjectHideFlags: 0
@@ -437,8 +442,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 6
-  m_Sprite: {fileID: 21300000, guid: ddcbfa00505df884394bb89ca99263d3, type: 3}
-  m_Color: {r: 0.6, g: 0.4, b: 1, a: 1}
+  m_Sprite: {fileID: 21300000, guid: c60b5ca576837c7488458339cb25d914, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
