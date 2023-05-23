@@ -7,6 +7,7 @@ using TMPro;
 
 public class GameManager : MonoBehaviour //게임 총괄
 {
+    public GameObject ShopSet;//상점 열고 닫/
     public Image Progress; //처음에 게임 진행 상황 알리기 위해
     float progressTime = 0; //4초까지 보여줄 거야
     public static bool prgEnd; //알려주는 거 끝났는지
@@ -204,7 +205,16 @@ public class GameManager : MonoBehaviour //게임 총괄
 
 
     void Update()
-    {
+    {   
+    if (Input.GetButtonDown("Cancel")) {
+            if (ShopSet.activeSelf)
+                ShopSet.SetActive(false);
+              else  
+                ShopSet.SetActive(true);
+        }
+            //상점 열고닫기
+
+
         if (progressTime > 4 && !prgEnd) EndProgress();
         else progressTime += Time.unscaledDeltaTime; //TimeScale에 구애받지 않음
 
