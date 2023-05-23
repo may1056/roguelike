@@ -43,6 +43,9 @@ public class Player : MonoBehaviour //플레이어
     bool protect;
 
 
+    public int atkPower;
+
+
     public static float unbeatableTime; //무적 시간
     public float maxunbeatableTime;
 
@@ -111,16 +114,20 @@ public class Player : MonoBehaviour //플레이어
 
 
     //아이템 관련
-    //0.
-    bool canRevive; //부활
+    //1. 부활
+    bool canRevive;
     public Image reviveImage;
-    //2.
-    public bool selfinjury; //자해
-    //4.
+    //3. 자해
+    public bool selfinjury;
+    //5. 버서커
     public bool berserker;
-    //5.
+    //6. 강한 대쉬
     public bool dashdeal;
     public Sprite dashdealEff, dashupgradeEff;
+    //7. ~ 12. 빨핑파초노주 수정
+    public bool red, pink, blue, green, yellow, orange;
+    //13. 독
+    public bool poison;
 
 
 
@@ -164,7 +171,7 @@ public class Player : MonoBehaviour //플레이어
 
     void GetNewItem() //랜덤 아이템 얻기 - 임시
     {
-        itemNum = (Random.Range(0, 6), Random.Range(0, 6));
+        itemNum = (Random.Range(1, 8), 7);
         if (itemNum.Item1 == itemNum.Item2) itemNum.Item2 = -1; //겹치면 그냥 없앰
 
         manager.ItemInfo();
@@ -175,23 +182,39 @@ public class Player : MonoBehaviour //플레이어
     }
     void ItemDefault() //아이템 설정 기본값으로 되돌리기
     {
-        canRevive = false; //0
-        transform.GetChild(6).gameObject.SetActive(false); //1
-        maxhp = 6; selfinjury = false; //2
-        maxshield = 0; shield = 0; //3
-        berserker = false; //4
-        dashdeal = false; dashDist = 8; maxstamina = 3; //5
+        canRevive = false; //1
+        transform.GetChild(6).gameObject.SetActive(false); //2
+        maxhp = 6; selfinjury = false; //3
+        maxshield = 0; shield = 0; //4
+        berserker = false; //5
+        dashdeal = false; dashDist = 8; maxstamina = 3; //6
+
+        red = false; pink = false; blue = false; green = false; yellow = false; orange = false;
+        poison = false;
     }
     void ItemActive(int i) //아이템 설정 최신화
     {
         switch (i)
         {
-            case 0: canRevive = true; break;
-            case 1: transform.GetChild(6).gameObject.SetActive(true); break;
-            case 2: maxhp = 1; hp = 1; selfinjury = true; break;
-            case 3: maxshield = 2; shield = 2; break;
-            case 4: berserker = true; break;
-            case 5: dashdeal = true; dashDist = 12; maxstamina = 5; stamina = 5; break;
+            //legend
+            case 0: break; //알파 수정
+
+            //rare
+            case 1: canRevive = true; break;
+            case 2: transform.GetChild(6).gameObject.SetActive(true); break;
+            case 3: maxhp = 1; hp = 1; selfinjury = true; break;
+            case 4: maxshield = 2; shield = 2; break;
+            case 5: berserker = true; break;
+            case 6: dashdeal = true; dashDist = 12; maxstamina = 5; stamina = 5; break;
+
+            //common
+            case 7: red = true; break; //밸런스를 위해 붉은 수정 딜증 대상은 무기(일반공격, 무기파생스킬)로 한정
+            case 8: pink = true; break;
+            case 9: blue = true; break;
+            case 10: green = true; break;
+            case 11: yellow = true; break;
+            case 12: orange= true; break;
+            case 13: poison = true; break;
         }
     }
 
@@ -205,6 +228,12 @@ public class Player : MonoBehaviour //플레이어
         Vector2 tp = transform.position;
 
 
+        if (berserker && hp < 3) atkPower = red ? 3 : 2;
+        else atkPower = red ? 2 : 1;
+
+
+
+
 
         //ㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍ
 
@@ -212,7 +241,7 @@ public class Player : MonoBehaviour //플레이어
         if ((Input.GetKeyDown("w") || Input.GetKeyDown(KeyCode.Space))
             && !isJumping && GameManager.prgEnd)
         {
-            rigid.AddForce(Vector2.up * jumpPower * (1 - slow), ForceMode2D.Impulse);
+            rigid.AddForce((1 - slow) * jumpPower * Vector2.up, ForceMode2D.Impulse);
             isJumping = true;
             sr.sprite = players[2];
         }
@@ -452,11 +481,12 @@ public class Player : MonoBehaviour //플레이어
                 shield = maxshield;
                 unbeatableTime = 2;
                 canRevive = false;
-                if (itemNum.Item1 == 0) itemNum.Item1 = -1;
+                if (itemNum.Item1 == 1) itemNum.Item1 = -1;
                 else itemNum.Item2 = -1;
                 manager.ItemInfo();
                 GameObject rev = Instantiate(fadeEffect, tp, Quaternion.identity);
                 rev.GetComponent<SpriteRenderer>().sprite = posSprite;
+                rev.GetComponent<Fade>().k = 0.5f;
                 reviveImage.gameObject.SetActive(true);
                 Invoke(nameof(AfterRevive), 2);
             }
@@ -500,7 +530,7 @@ public class Player : MonoBehaviour //플레이어
 
         //쉴드 재충전
         dontBehaveTime += Time.deltaTime;
-        if (dontBehaveTime > (selfinjury ? 6 : 3) && shield < maxshield)
+        if (dontBehaveTime > (selfinjury ? 10 : 3) && shield < maxshield)
         {
             shield++;
             dontBehaveTime = 0;
@@ -648,7 +678,8 @@ public class Player : MonoBehaviour //플레이어
         CancelInvoke(nameof(RecoverSt));
         if (stamina < maxstamina) stamina++;
         ChangeSt();
-        Invoke(nameof(RecoverSt), dashdeal ? 2 : 3);
+
+        Invoke(nameof(RecoverSt), selfinjury ? (dashdeal ? 4.5f : 9) : (dashdeal ? 1.5f : 3));
     }
     void ChangeSt()
     {
@@ -659,13 +690,13 @@ public class Player : MonoBehaviour //플레이어
 
     //아이템 관련 함수들
 
-    void AfterRevive() //0.
+    void AfterRevive() //1. 부활
     {
         reviveImage.gameObject.SetActive(false);
         manager.ChangeHPMP();
     }
 
-    void DashDamage(float X1, float X2, float Y) //5.
+    void DashDamage(float X1, float X2, float Y) //6. 강한 대쉬
     {
         if (manager.transform.childCount == 1)
         {
@@ -687,8 +718,10 @@ public class Player : MonoBehaviour //플레이어
                             && mv.y > Y - 2 && mv.y < Y + 2)
                         {
                             Monster c0ijm = c0ij.GetComponent<Monster>();
-                            c0ijm.hp--;
                             c0ijm.Apa();
+                            c0ijm.hp--;
+                            if (poison) Invoke(nameof(c0ijm.AfterDamage), Random.Range(1, 30));
+
                             GameObject dd = Instantiate(fadeEffect, mv, Quaternion.identity);
                             SpriteRenderer ddsr = dd.GetComponent<SpriteRenderer>();
                             ddsr.sprite = dashdealEff;

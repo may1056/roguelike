@@ -10,9 +10,9 @@ public class Monster : MonoBehaviour //잡몹
 
 
     readonly float[,] limitX = //좌우 한계
-        { { -48, 48 }, { -55, 55 }, { -30, 30 }, { -4, 50 } };
+        { { -48, 48 }, { -55, 55 }, { -30, 30 }, { -4, 50 } ,{ -100,100} };
     readonly float[,] limitY = //상하 한계
-        { { -4, 12 }, { -21, 49 }, { -3, 19 }, { -4, 30 } };
+        { { -4, 12 }, { -21, 49 }, { -3, 19 }, { -4, 30 },{ -100,100}  };
 
 
     /// <summary>
@@ -56,6 +56,8 @@ public class Monster : MonoBehaviour //잡몹
     public bool polluted = false; //오염되었는지
     Transform pol;
 
+
+    public Sprite NoticeSprite;
 
 
 
@@ -265,8 +267,7 @@ public class Monster : MonoBehaviour //잡몹
              && GameManager.prgEnd)
         {
             Apa();
-            if (Player.player.berserker && Player.player.hp < 3) hp -= 4;
-            else hp--;
+            hp -= Player.player.atkPower;
 
             PlayerAttack.curAttackCooltime = 0;
         }
@@ -281,8 +282,7 @@ public class Monster : MonoBehaviour //잡몹
             Vector2.Distance(tp, PlayerAttack.skillP) < 5.5f)
         {
             Apa();
-            if (Player.player.berserker && Player.player.hp < 3) hp -= 4;
-            else hp--;
+            hp--;
         }
 
 
@@ -301,8 +301,10 @@ public class Monster : MonoBehaviour //잡몹
                     if (inX || inY)
                     {
                         Apa();
-                        if (Player.player.berserker && Player.player.hp < 3) hp -= 8;
-                        else hp -= 2;
+                        hp -= 2 * Player.player.atkPower;
+
+                        if (Player.player.poison)
+                            Invoke(nameof(AfterDamage), Random.Range(1, 30));
                     }
                 break;
             }
@@ -341,8 +343,13 @@ public class Monster : MonoBehaviour //잡몹
         //쉐이망 - hp, mp 오브 확률적으로 내놓기
         if (hp <= 0)
         {
-            int r = Random.Range(0, 30);
-            if (r < 1) Instantiate(hpOrb, tp, Quaternion.identity);
+            int r;
+
+            if (!Player.player.selfinjury && !Player.player.berserker)
+            {
+                r = Random.Range(0, 30);
+                if (r < 1) Instantiate(hpOrb, tp, Quaternion.identity);
+            }
 
             r = Random.Range(0, 10);
             if (r < 2) Instantiate(mpOrb, tp, Quaternion.identity);
@@ -365,7 +372,7 @@ public class Monster : MonoBehaviour //잡몹
                 }
             }
 
-            DecideEffect(Color.white);
+            //DecideEffect(Color.white);
 
             Destroy(this.gameObject);
         }
@@ -402,18 +409,23 @@ public class Monster : MonoBehaviour //잡몹
         //가까우면 이동 시작
         if (dist < noticeDist)
         {
-            moving = true;
-            if (transform.childCount == 3) //느낌표 보이기 (있으면)
+            if (!moving)
             {
-                transform.GetChild(2).gameObject.SetActive(true);
-                Invoke(nameof(Noticed), 2); //2초 뒤 부숴
+                float y = 0;
+                switch (monsterNum)
+                {
+                    case 0: y = 0.6f; break; case 1: y = 1.3f; break;
+                    case 2: y = 1; break; case 3: y = 1.1f; break;
+                    case 4: y = 1.5f; break; case 5: y = 0.85f; break;
+                }
+                GameObject no = Instantiate(fadeEffect,
+                    new Vector2(tp.x,tp.y+y), Quaternion.identity);
+                no.transform.SetParent(gameObject.transform);
+                no.GetComponent<SpriteRenderer>().sprite = NoticeSprite;
+                no.GetComponent<Fade>().k = 0.5f;
             }
+            moving = true;
         }
-    }
-    void Noticed() //느낌표 파괴 (있으면)
-    {
-        if (transform.childCount == 3)
-            Destroy(transform.GetChild(2).gameObject);
     }
 
 
@@ -426,7 +438,7 @@ public class Monster : MonoBehaviour //잡몹
 
 
 
-    //아래 함수 덩어리는 모두 04ice와 06fire의 Invoke 반복을 위해 존재
+    //아래 함수 덩어리는 모두 용용이들의 Invoke 반복을 위해 존재
 
     void FrontJump()
     {
@@ -435,6 +447,7 @@ public class Monster : MonoBehaviour //잡몹
         rigid.AddForce((1 - pollution) * H * Vector2.right,
             ForceMode2D.Impulse);
         sr.sprite = Up;
+        D_U = false;
     }
     void JumpStop()
     {
@@ -444,6 +457,7 @@ public class Monster : MonoBehaviour //잡몹
     void OnShoot() //ice, fire 장전
     {
         shooter = Instantiate(fadeEffect, transform.position, Quaternion.identity);
+        shooter.transform.SetParent(gameObject.transform);
         shsr = shooter.GetComponent<SpriteRenderer>();
         shsr.sprite = Charge;
         shsr.sortingOrder = 5;
@@ -455,6 +469,7 @@ public class Monster : MonoBehaviour //잡몹
     void OffShoot() //ice, fire 해제
     {
         shooter = Instantiate(fadeEffect, transform.position, Quaternion.identity);
+        shooter.transform.SetParent(gameObject.transform);
         shsr = shooter.GetComponent<SpriteRenderer>();
         shsr.sprite = Charge;
         shsr.sortingOrder = 5;
@@ -466,12 +481,14 @@ public class Monster : MonoBehaviour //잡몹
             Player.player.transform.position.x - tp.x)); //어느 각도로 쏠 거냐
 
         sr.sprite = Up; //손 올림
+        D_U = false;
         for (int i = 0; i < 40; i++) Invoke(nameof(ShootBullet), i * 0.025f);
         Invoke(nameof(ReturnDown), 1); //1초 뒤 손 내림
     }
     void ReturnDown() //ice, fire 스프라이트 Down으로
     {
         sr.sprite = Down;
+        D_U = true;
     }
 
 
@@ -670,6 +687,12 @@ public class Monster : MonoBehaviour //잡몹
             C.transform.GetChild(0).
                 transform.GetComponent<SpriteRenderer>().sprite = hc[4];
         }
+    }
+
+    public void AfterDamage() //Invoke용
+    {
+        Apa();
+        hp--;
     }
 
 } //Enemy End

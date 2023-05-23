@@ -92,7 +92,7 @@ public class PlayerAttack : MonoBehaviour
         //ㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱ
 
         maxAttackCooltime = GameManager.ismeleeWeapon ? 0.2f : 0.5f;
-        if (player.selfinjury) maxAttackCooltime *= 0.2f; //자해 시 공격 빠름
+        if (player.selfinjury) maxAttackCooltime *= 0.4f; //자해 시 공격 빠름
 
         if (curAttackCooltime <= maxAttackCooltime + 2)
             curAttackCooltime += Time.deltaTime;
@@ -118,7 +118,7 @@ public class PlayerAttack : MonoBehaviour
                 transform.position, Quaternion.Euler(0, 0, player.F ? 180 : 0));
             if (player.selfinjury)
             {
-                pb.GetComponent<PlayerBullet>().bulletSpeed = 40;
+                pb.GetComponent<PlayerBullet>().bulletSpeed = 30;
                 pb.transform.rotation = Quaternion.Euler(
                     0, 0, (player.F ? 180 : 0) + Random.Range(-30, 31)); //각도 분산
             }
@@ -145,7 +145,7 @@ public class PlayerAttack : MonoBehaviour
 
         if (skilluse) //약한 스킬
         {
-            if (player.selfinjury) cooltime = 1;
+            if (player.selfinjury) cooltime = 1.5f;
             else
             {
                 cooltime = 3;
@@ -174,7 +174,7 @@ public class PlayerAttack : MonoBehaviour
             wsAvailable = true;
             wsgoing = 3;
             wscount = 3;
-            if (player.selfinjury) wsCool = 2; //자해 시 빠른 스킬
+            if (player.selfinjury) wsCool = 10; //자해 시 빠른 스킬
             else
             {
                 wsCool = 20;

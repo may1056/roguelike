@@ -14550,6 +14550,7 @@ GameObject:
   - component: {fileID: 6944593747741723258}
   - component: {fileID: 6944593747741723257}
   - component: {fileID: 6944593747741723256}
+  - component: {fileID: 4995936985072540328}
   m_Layer: 8
   m_Name: block
   m_TagString: Platform
@@ -15408,6 +15409,25 @@ CompositeCollider2D:
       - {x: 13, y: 0}
   m_VertexDistance: 0.0005
   m_OffsetDistance: 0
+--- !u!251 &4995936985072540328
+PlatformEffector2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6944593747741723254}
+  m_Enabled: 1
+  m_UseColliderMask: 1
+  m_ColliderMask:
+    serializedVersion: 2
+    m_Bits: 2048
+  m_RotationalOffset: 0
+  m_UseOneWay: 1
+  m_UseOneWayGrouping: 0
+  m_SurfaceArc: 180
+  m_UseSideFriction: 0
+  m_UseSideBounce: 0
+  m_SideArc: 1
 --- !u!1 &6944593748636267091
 GameObject:
   m_ObjectHideFlags: 0

@@ -25,19 +25,22 @@ public class GameManager : MonoBehaviour //게임 총괄
 
 
     //아이템
-    readonly string[] legendItems = { "알파 수정" };
-    readonly string[] rareItems =
-        { "부활 아이템", "자동 공격", "자해", "쉴드", "버서커", "강한 대쉬", "극진공수도 비급",};
-    readonly string[] commonItems =
-        { "붉은 수정", "hp색 수정", "초록 수정", "노란 수정", "푸른 수정", "주황 수정", "독" };
+    readonly string[] Items = { "알파 수정",
+        "부활", "자동 공격", "자해", "쉴드", "버서커", "강한 대쉬",
+        "붉은 수정", "분홍 수정", "푸른 수정", "초록 수정", "노란 수정", "주황 수정", "독", };
+
+    readonly int[] Items_legendary = { 2,
+        1, 1, 1, 1, 1, 1,
+        0, 0, 0, 0, 0, 0, 0, }; //2: legend, 1: rare, 0: common
 
     //아이템별 확률
-    readonly float[] legendItems_p = { 0.1f };
-    readonly float[] rareItems_p = { 3, 3, 3, 3, 3, 3, 3 };
-    readonly float[] commonItems_p = { 10, 10, 10, 10, 10, 10, 10, };
+    //readonly float[] Items_p = { };
+
+    //Items_legendary에 상수 곱해서 확률 만들기로 정해짐!!! 기억할 것
 
 
     public Text itemText;
+
 
 
 
@@ -71,10 +74,10 @@ public class GameManager : MonoBehaviour //게임 총괄
     public GameObject[] mons; //맵 내 몬스터 집합 프리팹
 
     //맵별 페이즈 수
-    readonly int[] phases = { 1, 1, 3, 3, };
+    readonly int[] phases = { 1, 1, 3, 3, 1, };
 
     //페이즈별 잡아야 할 몬스터 수, -1: 안 잡아도 된다
-    readonly int[,] enemies = { { 23, 0, 0, }, { -1, 0, 0, }, { 14, 15, 25, }, { 21, 25, 24, } };
+    readonly int[,] enemies = { { 23, 0, 0, }, { -1, 0, 0, }, { 14, 15, 25, }, { 21, 25, 24, }, { 12, 0, 0, } };
 
     public bool making; //진행 중인지
     int nowPhase; //현재 페이즈
@@ -208,7 +211,6 @@ public class GameManager : MonoBehaviour //게임 총괄
 
         게임실행시간 += Time.deltaTime;
         게임실행시간텍스트.text = 게임실행시간.ToString();
-
 
 
         stat[0].text = "공격력: 공격력 변수 추가필요" /*+ Player.maxAttackCooltime.ToString()*/;
@@ -425,8 +427,8 @@ public class GameManager : MonoBehaviour //게임 총괄
     {
         int i1 = Player.itemNum.Item1, i2 = Player.itemNum.Item2;
 
-        itemText.text = "1. " + (i1 == -1 ? "없음" : rareItems[i1]) +
-            " 2. " + (i2 == -1 ? "없음" : rareItems[i2]);
+        itemText.text = "1. " + (i1 == -1 ? "없음" : Items[i1]) +
+            " 2. " + (i2 == -1 ? "없음" : Items[i2]);
     }
 
 

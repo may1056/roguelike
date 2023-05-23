@@ -58,6 +58,9 @@ public class PlayerBullet : MonoBehaviour
                     pb.GetComponent<PlayerBullet>().pbType = 0;
                     pb.GetComponent<CircleCollider2D>().isTrigger = true;
                     pb.transform.GetChild(0).gameObject.SetActive(false);
+                    float rand = 0.1f * Random.Range(0, 10);
+                    pb.GetComponent<SpriteRenderer>().color
+                        = new Color(rand, rand, rand); //무채색 랜덤
                 }
                 Destroy(gameObject);
             }
@@ -90,8 +93,9 @@ public class PlayerBullet : MonoBehaviour
         {
             Monster m = collision.transform.GetComponent<Monster>();
             m.Apa();
-            if (Player.player.berserker && Player.player.hp < 3) m.hp -= 4;
-            else m.hp--;
+            m.hp -= Player.player.atkPower;
+            if (Player.player.poison)
+                Invoke(nameof(m.AfterDamage), Random.Range(1, 30));
 
             MakeEffect(collision.transform.position, Color.red, 1);
         }
@@ -113,9 +117,10 @@ public class PlayerBullet : MonoBehaviour
             switch (pbType)
             {
                 case 0:
-                    if (Player.player.berserker && Player.player.hp < 3) m.hp -= 4;
-                    else m.hp--;
                     m.Apa();
+                    m.hp -= Player.player.atkPower;
+                    if (Player.player.poison)
+                        Invoke(nameof(m.AfterDamage), Random.Range(1, 30));
                     MakeEffect(transform.position, Color.red, 1);
                     break;
 
@@ -124,9 +129,11 @@ public class PlayerBullet : MonoBehaviour
                     else m.pollution += 0.5f;
                     if (m.polluted)
                     {
-                        m.hp--; //자동 공격은 버서커 딜증 대상 아님
-                        m.Apa();
                         m.pollution = 0.5f;
+                        m.Apa();
+                        m.hp--; //자동 공격은 버서커 딜증 대상 아님
+                        if (Player.player.poison)
+                            Invoke(nameof(m.AfterDamage), Random.Range(1, 30));
                         MakeEffect(transform.position, new Color(0.6f, 0.4f, 1), 0.7f);
                         CancelInvoke(nameof(m.RemovePollution));
                     }

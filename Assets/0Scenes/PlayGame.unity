@@ -241,7 +241,7 @@ MonoBehaviour:
   - {fileID: 7573515225895658840, guid: f136e5fe6e909f54e86ca46bff6429d0, type: 3}
   - {fileID: 636279154282950998, guid: b067fdf39ef7fb3499c86b2ac25ac44b, type: 3}
   - {fileID: 6944593748636267091, guid: 8f17113d85149b24986d25f69342b265, type: 3}
-  - {fileID: 0}
+  - {fileID: 7985396889005880093, guid: 13e6d60d361f5aa4fabc74e25b9e562b, type: 3}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
@@ -256,7 +256,7 @@ MonoBehaviour:
   - {fileID: 2879444807771030990, guid: 0a3ec8683e40114438a1a59130b6e21a, type: 3}
   - {fileID: 9132411178814953950, guid: 7d90f5e0ae304b44dbc9bad66452ac66, type: 3}
   - {fileID: 2846695248211069266, guid: ad49a891b58193047a0902e232b36085, type: 3}
-  - {fileID: 0}
+  - {fileID: 957078474417799112, guid: ec96f5fd662d00c42a5de16082c8ab48, type: 3}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
@@ -15316,6 +15316,7 @@ MonoBehaviour:
   maxhp: 6
   shield: 0
   maxshield: 0
+  atkPower: 0
   maxunbeatableTime: 0.4
   hurtImage: {fileID: 1638759842}
   slow: 0
@@ -15323,14 +15324,14 @@ MonoBehaviour:
   frozenimage: {fileID: 1666737800}
   dontBehaveTime: 0
   speed: 1.5
-  jumpPower: 28.5
+  jumpPower: 15
   dashSprite: {fileID: 21300000, guid: e4bf04b9512901b49a759ed7694a009b, type: 3}
   dashDist: 8
   lg:
     serializedVersion: 2
     m_Bits: 512
   posText: {fileID: 1523719854}
-  posSprite: {fileID: 21300000, guid: 5ab389adbd940e5438c05d4d48039979, type: 3}
+  posSprite: {fileID: 21300000, guid: 93cd007d41e8965419468c3defac5a64, type: 3}
   lb:
     serializedVersion: 2
     m_Bits: 256
@@ -15350,6 +15351,13 @@ MonoBehaviour:
   dashdeal: 0
   dashdealEff: {fileID: 21300000, guid: 9f182a0768e950f45b6633dc9e2ceedc, type: 3}
   dashupgradeEff: {fileID: 21300000, guid: e4bf04b9512901b49a759ed7694a009b, type: 3}
+  red: 0
+  pink: 0
+  blue: 0
+  green: 0
+  yellow: 0
+  orange: 0
+  poison: 0
 --- !u!4 &1511826927
 Transform:
   m_ObjectHideFlags: 0
@@ -15410,7 +15418,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 2
+  m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 3
