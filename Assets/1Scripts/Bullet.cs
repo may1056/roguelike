@@ -5,7 +5,7 @@ using UnityEngine;
 public class Bullet : MonoBehaviour //탄막
 {
     public int bulletType;
-    //0: 일반 딜, 1: 슬로우,
+    //0: 일반 딜, 1: 슬로우, 2: 지속 딜
 
     public float bulletSpeed;
 
@@ -101,6 +101,20 @@ public class Bullet : MonoBehaviour //탄막
                         pl.slowtime = 2;
                         if (pl.slow > 0.965f) pl.slow = 1;
                         else pl.slow += 0.035f;
+                    }
+                    break;
+
+                case 2:
+                    if (Player.unbeatableTime <= 0)
+                    {
+                        Player pl = other.transform.GetComponent<Player>();
+                        pl.burntime = 1;
+                        if (pl.burn > 0.965f && pl.burn < 1)
+                        {
+                            pl.burn = 1;
+                            pl.RepeatEx();
+                        }
+                        else pl.burn += 0.035f;
                     }
                     break;
             }

@@ -89,10 +89,11 @@ public class PlayerBullet : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Enemy") && pbType == 1) //적
+        if (collision.gameObject.CompareTag("Enemy") &&
+            collision.gameObject.layer == 7 && pbType == 1) //적
         {
             Monster m = collision.transform.GetComponent<Monster>();
-            m.Apa();
+            m.Apa(Color.red);
             m.hp -= Player.player.atkPower;
             if (Player.player.poison)
                 Invoke(nameof(m.AfterDamage), Random.Range(1, 30));
@@ -117,7 +118,7 @@ public class PlayerBullet : MonoBehaviour
             switch (pbType)
             {
                 case 0:
-                    m.Apa();
+                    m.Apa(Color.red);
                     m.hp -= Player.player.atkPower;
                     if (Player.player.poison)
                         Invoke(nameof(m.AfterDamage), Random.Range(1, 30));
@@ -130,7 +131,7 @@ public class PlayerBullet : MonoBehaviour
                     if (m.polluted)
                     {
                         m.pollution = 0.5f;
-                        m.Apa();
+                        m.Apa(Color.red);
                         m.hp--; //자동 공격은 버서커 딜증 대상 아님
                         if (Player.player.poison)
                             Invoke(nameof(m.AfterDamage), Random.Range(1, 30));

@@ -40,7 +40,7 @@ public class Monster : MonoBehaviour //잡몹
     Color mol_lu = new(0.1f, 0.1f, 0.1f); //03
 
     SpriteRenderer sr;
-    public Sprite Hurt;
+    public Sprite Empty; //Hurt, Poisoned는 여기에 색 덧입힌다
 
     public GameObject hpOrb;
     public GameObject mpOrb;
@@ -106,10 +106,18 @@ public class Monster : MonoBehaviour //잡몹
     Quaternion AngleSelected;
 
     bool repeated = false;
-    public Sprite Down, Up, Charge, HurtDown, HurtUp; //내려, 올려, 장전, 아파, 아파
+    public Sprite Down, Up, Charge, EmptyD, EmptyU; //내려, 올려, 장전, 아파, 아파
     GameObject shooter;
     SpriteRenderer shsr = null;
     bool D_U;
+
+
+
+    /// <summary>
+    /// 자폭형 몬스터 - 07
+    /// </summary>
+
+    public Sprite explosion;
 
 
 
@@ -247,6 +255,12 @@ public class Monster : MonoBehaviour //잡몹
                 }
                 break;
 
+            case 7: //ghost
+                H = 10.0f / dist;
+                Targeting();
+                if (dist < 1.5f) Pokbal();
+                break;
+
         } //switch
 
 
@@ -266,7 +280,7 @@ public class Monster : MonoBehaviour //잡몹
             PlayerAttack.curAttackCooltime >= PlayerAttack.maxAttackCooltime
              && GameManager.prgEnd)
         {
-            Apa();
+            Apa(Color.red);
             hp -= Player.player.atkPower;
 
             PlayerAttack.curAttackCooltime = 0;
@@ -281,7 +295,7 @@ public class Monster : MonoBehaviour //잡몹
         if (Mathf.Abs(PlayerAttack.skillP.y) < 100 &&
             Vector2.Distance(tp, PlayerAttack.skillP) < 5.5f)
         {
-            Apa();
+            Apa(Color.red);
             hp--;
         }
 
@@ -300,7 +314,7 @@ public class Monster : MonoBehaviour //잡몹
                         && Mathf.Abs(wsp.x - tp.x) < 1;
                     if (inX || inY)
                     {
-                        Apa();
+                        Apa(Color.red);
                         hp -= 2 * Player.player.atkPower;
 
                         if (Player.player.poison)
@@ -411,12 +425,13 @@ public class Monster : MonoBehaviour //잡몹
         {
             if (!moving)
             {
-                float y = 0;
+                float y = 0; //몬스터별 느낌표 위치 오프셋 (y축 방향)
                 switch (monsterNum)
                 {
                     case 0: y = 0.6f; break; case 1: y = 1.3f; break;
                     case 2: y = 1; break; case 3: y = 1.1f; break;
                     case 4: y = 1.5f; break; case 5: y = 0.85f; break;
+                    case 6: y = 1.5f; break; case 7: y = 1.4f; break;
                 }
                 GameObject no = Instantiate(fadeEffect,
                     new Vector2(tp.x,tp.y+y), Quaternion.identity);
@@ -493,6 +508,30 @@ public class Monster : MonoBehaviour //잡몹
 
 
 
+    void Pokbal() //유령 펑
+    {
+        Player pl = Player.player;
+        pl.burn = 1;
+        pl.burntime = 1;
+        pl.RepeatEx();
+
+        for (int i = 0; i < 2; i++)
+        {
+            GameObject pok = Instantiate(fadeEffect, tp,
+                Quaternion.Euler(0, 0, Random.Range(0, 360)));
+            SpriteRenderer poksr = pok.GetComponent<SpriteRenderer>();
+            poksr.sprite = explosion;
+            poksr.sortingOrder = 8;
+        }
+
+        GameManager.killed++; //죽으면서 킬 수 올리고 감
+        GameManager.realkilled++;
+        withPlayer = false;
+
+        Destroy(gameObject);
+    }
+
+
 
     public void RemovePollution() //오염 제거
     {
@@ -509,6 +548,7 @@ public class Monster : MonoBehaviour //잡몹
     void FixedUpdate()
     {
         tp = transform.position;
+        Vector2 pp = Player.player.transform.position;
 
         switch (monsterNum)
         {
@@ -578,6 +618,12 @@ public class Monster : MonoBehaviour //잡몹
             break;
 
             //turret, ice, fire는 FixedUpdate 없음
+
+            case 7: //ghost
+                //플레이어를 감지한 후에는 계속 이동
+                if (moving) transform.Translate(H * (1 - pollution) * Time.deltaTime
+                    * new Vector2(pp.x - tp.x, pp.y - tp.y).normalized);
+                break;
         }
 
     } //FixedUpdate End
@@ -601,11 +647,12 @@ public class Monster : MonoBehaviour //잡몹
                 MakeEffect(new Vector2(tp.x, tp.y + 0.1f), c, 0.8f);
                 break;
 
-            case 3: //???
+            case 3: //터렛
                 MakeEffect(tp, c, 0.8f);
                 break;
 
-            case 4: //???
+            case 4: //얼음용용이
+            case 6: //불용용이
                 MakeEffect(tp, c, 0.9f);
                 break;
 
@@ -658,7 +705,7 @@ public class Monster : MonoBehaviour //잡몹
 
 
 
-    public void Apa()
+    public void Apa(Color c)
     {
         GameObject hurt = Instantiate(fadeEffect, transform.position,
             Quaternion.identity);
@@ -668,8 +715,10 @@ public class Monster : MonoBehaviour //잡몹
         hsr.sortingOrder = 5;
 
         if (monsterNum == 4 || monsterNum == 6)
-            hsr.sprite = D_U ? HurtDown : HurtUp;
-        else hsr.sprite = Hurt;
+            hsr.sprite = D_U ? EmptyD : EmptyU;
+        else hsr.sprite = Empty;
+
+        hsr.color = c;
 
         hurt.GetComponent<Fade>().k = 5;
     }
@@ -689,9 +738,9 @@ public class Monster : MonoBehaviour //잡몹
         }
     }
 
-    public void AfterDamage() //Invoke용
+    public void AfterDamage() //poison 아이템 - Invoke용
     {
-        Apa();
+        Apa(Color.green);
         hp--;
     }
 
