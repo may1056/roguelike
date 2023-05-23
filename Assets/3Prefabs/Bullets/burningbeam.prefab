@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 4108525850984056869}
   - component: {fileID: 7138139936117677783}
   m_Layer: 0
-  m_Name: frozenbeam
+  m_Name: burningbeam
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef23cdae6964bcd42ba4c91add421aa1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bulletType: 1
+  bulletType: 2
   bulletSpeed: 10
   fadeEffect: {fileID: 8326106217213998104, guid: c32a19154cf10874f974978490ab09ef, type: 3}
   doubleCircle: {fileID: 21300000, guid: bc8cdb377d76208459a0ccc268b24045, type: 3}
@@ -92,7 +92,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 3
-  m_Sprite: {fileID: 21300000, guid: 0234670743943a84f8eb8907c56e3bca, type: 3}
+  m_Sprite: {fileID: 21300000, guid: e9659ac273a779745bcdaff8a334e9bc, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

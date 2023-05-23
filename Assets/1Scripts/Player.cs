@@ -58,7 +58,12 @@ public class Player : MonoBehaviour //플레이어
 
     public float slow = 0;
     public float slowtime = 0;
-    public Image frozenimage;
+    public Image frozenImage;
+
+    public float burn = 0;
+    public float burntime = 0;
+    public Image explosiveImage;
+
 
 
     public float dontBehaveTime = 0;
@@ -499,13 +504,12 @@ public class Player : MonoBehaviour //플레이어
 
 
 
-        //ㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹ
+        //ㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹ
 
-        //슬로우
         if (slowtime <= 0) slow = 0;
         else if (slow < 1)
         {
-            frozenimage.color = new Color(1, 1, 1, slow);
+            frozenImage.color = new Color(1, 1, 1, slow);
             slow -= 0.2f * Time.deltaTime;
             if (slow <= 0)
             {
@@ -515,11 +519,37 @@ public class Player : MonoBehaviour //플레이어
         }
         else
         {
-            frozenimage.color = Color.blue;
+            frozenImage.color = Color.blue;
             slowtime -= 2 * Time.deltaTime;
         }
 
-        frozenimage.gameObject.SetActive(slow > 0);
+        frozenImage.gameObject.SetActive(slow > 0);
+
+
+        //ㅍㅂㅍㅂㅍㅂㅍㅂㅍㅂㅍㅂㅍㅂㅍㅂㅍㅂㅍㅂㅍㅂㅍㅂㅍㅂㅍㅂㅍㅂ
+
+        if (burntime <= 0)
+        {
+            burn = 0;
+            CancelInvoke(nameof(Explode));
+        }
+        else if (burn < 1)
+        {
+            explosiveImage.color = new Color(1, 1, 1, burn);
+            burn -= 0.2f * Time.deltaTime;
+            if (burn <= 0)
+            {
+                burn = 0;
+                burntime = 0;
+            }
+        }
+        else
+        {
+            explosiveImage.color = Color.yellow; //주황색으로 바꿔야 함
+            burntime -= Time.deltaTime;
+        }
+
+        explosiveImage.gameObject.SetActive(burn > 0);
 
 
 
@@ -634,6 +664,10 @@ public class Player : MonoBehaviour //플레이어
     }
 
 
+
+
+
+
     void Hurt() //잠깐 붉은색 되었다가 서서히 회복
     {
         //sr.color = new Color(1, 1 - hurtTime, 1 - hurtTime);
@@ -642,6 +676,24 @@ public class Player : MonoBehaviour //플레이어
         hurtImage.color = new Color(c, c, c, 0.5f * hurtTime);
         hurtTime -= 4 * Time.deltaTime;
     }
+
+
+
+    public void RepeatEx()
+    {
+        InvokeRepeating(nameof(Explode), 0, 0.98f);
+    }
+    void Explode() //폭발성 데미지 - 지속 딜 Invoke용
+    {
+        //hurtImage는 주황색~
+        hurted = true;
+    }
+
+
+
+
+
+
 
 
     //******position, sprite, layer, scale******
@@ -718,7 +770,7 @@ public class Player : MonoBehaviour //플레이어
                             && mv.y > Y - 2 && mv.y < Y + 2)
                         {
                             Monster c0ijm = c0ij.GetComponent<Monster>();
-                            c0ijm.Apa();
+                            c0ijm.Apa(Color.red);
                             c0ijm.hp--;
                             if (poison) Invoke(nameof(c0ijm.AfterDamage), Random.Range(1, 30));
 
