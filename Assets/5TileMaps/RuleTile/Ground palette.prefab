@@ -219,7 +219,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 2
-      m_TileSpriteIndex: 2
+      m_TileSpriteIndex: 4
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -280,10 +280,12 @@ Tilemap:
     m_Data: {fileID: 21300000, guid: a02ccffb38c5da04981daed4d05b1074, type: 3}
   - m_RefCount: 1
     m_Data: {fileID: 21300000, guid: 496e60e499a65ec45b50fa833ad8486a, type: 3}
-  - m_RefCount: 1
-    m_Data: {fileID: 2084099125, guid: a66e3e931575d6048a6fbe37614e26ab, type: 3}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
   - m_RefCount: 1
     m_Data: {fileID: -395237050, guid: f656387c75954d94e916d909b3bd8bea, type: 3}
+  - m_RefCount: 1
+    m_Data: {fileID: 2084099125, guid: a66e3e931575d6048a6fbe37614e26ab, type: 3}
   m_TileMatrixArray:
   - m_RefCount: 5
     m_Data:
@@ -303,14 +305,32 @@ Tilemap:
       e31: 0
       e32: 0
       e33: 1
+  - m_RefCount: 0
+    m_Data:
+      e00: 0.000000059604645
+      e01: -0.99999994
+      e02: -0
+      e03: 0
+      e10: 0.99999994
+      e11: 0.000000059604645
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: -0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
   m_TileColorArray:
   - m_RefCount: 5
     m_Data: {r: 1, g: 1, b: 1, a: 1}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Origin: {x: -2, y: -3, z: 0}
-  m_Size: {x: 5, y: 3, z: 1}
+  m_Origin: {x: -2, y: -4, z: 0}
+  m_Size: {x: 5, y: 4, z: 1}
   m_TileAnchor: {x: 0.5, y: 0.5, z: 0}
   m_TileOrientation: 0
   m_TileOrientationMatrix:
@@ -460,6 +480,14 @@ CompositeCollider2D:
         Y: -30000000
       - X: -10000000
         Y: -30000000
+    - - X: 10000000
+        Y: -20000000
+      - X: 0
+        Y: -20000000
+      - X: 0
+        Y: -30000000
+      - X: 10000000
+        Y: -30000000
   m_CompositePaths:
     m_Paths:
     - - {x: 0, y: 0}
@@ -474,9 +502,13 @@ CompositeCollider2D:
       - {x: -2, y: -2}
       - {x: -2, y: -3}
       - {x: -1, y: -3}
+    - - {x: 1, y: -2}
+      - {x: 0, y: -2}
+      - {x: 0, y: -3}
+      - {x: 1, y: -3}
   m_VertexDistance: 0.0005
   m_OffsetDistance: 0
---- !u!114 &4472769009496144242
+--- !u!114 &2267446562086180691
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

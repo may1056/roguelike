@@ -212,9 +212,15 @@ public class GameManager : MonoBehaviour //게임 총괄
     {
     if (Input.GetKeyDown("p")) {
             if (ShopSet.activeSelf)
+            {
                 ShopSet.SetActive(false);
+                Time.timeScale = 1f;
+            }
               else
+            {
                 ShopSet.SetActive(true);
+                Time.timeScale = 0;
+            }
         }
             //상점 열고닫기
 
