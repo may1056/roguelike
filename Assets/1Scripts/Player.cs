@@ -130,7 +130,7 @@ public class Player : MonoBehaviour //플레이어
     public bool dashdeal;
     public Sprite dashdealEff, dashupgradeEff;
     //7. ~ 12. 빨핑파초노주 수정
-    public bool red, pink, blue, green, yellow, orange;
+    public bool red, pink, blue, green, yellow, orange, purple;
     //13. 독
     public bool poison;
 
@@ -176,7 +176,7 @@ public class Player : MonoBehaviour //플레이어
 
     void GetNewItem() //랜덤 아이템 얻기 - 임시
     {
-        itemNum = (Random.Range(1, 8), 7);
+        itemNum = (Random.Range(1, 15), Random.Range(1, 15));
         if (itemNum.Item1 == itemNum.Item2) itemNum.Item2 = -1; //겹치면 그냥 없앰
 
         manager.ItemInfo();
@@ -194,7 +194,7 @@ public class Player : MonoBehaviour //플레이어
         berserker = false; //5
         dashdeal = false; dashDist = 8; maxstamina = 3; //6
 
-        red = false; pink = false; blue = false; green = false; yellow = false; orange = false;
+        red = false; pink = false; blue = false; green = false; yellow = false; orange = false; purple = false;
         poison = false;
     }
     void ItemActive(int i) //아이템 설정 최신화
@@ -213,13 +213,15 @@ public class Player : MonoBehaviour //플레이어
             case 6: dashdeal = true; dashDist = 12; maxstamina = 5; stamina = 5; break;
 
             //common
-            case 7: red = true; break; //밸런스를 위해 붉은 수정 딜증 대상은 무기(일반공격, 무기파생스킬)로 한정
-            case 8: pink = true; break;
-            case 9: blue = true; break;
-            case 10: green = true; break;
-            case 11: yellow = true; break;
-            case 12: orange= true; break;
-            case 13: poison = true; break;
+            case 7: red = true; break; //밸런스를 위해 딜증 대상은 무기(일반공격, 무기파생스킬)로 한정
+            case 8: pink = true; break; //hp 오브 확률 증가
+            case 9: blue = true; break; //mp 오브 확률 증가
+            case 10: green = true; break; //이동 속도 증가
+            case 11: yellow = true; break; //공격 속도 증가
+            case 12: orange = true; break; //회피 활성화
+            case 13: purple = true; break; //치명 활성화
+
+            case 14: poison = true; break;
         }
     }
 
@@ -451,21 +453,16 @@ public class Player : MonoBehaviour //플레이어
         //공격당함
         if (hurted)
         {
-            unbeatableTime = maxunbeatableTime;
-            if (shield >= 1)
+            int r = Random.Range(0, 10);
+
+            if (orange && r < 2)
             {
-                shield--;
-                protect = true;
+                //회피
+                Debug.Log("회피");
             }
-            else
-            {
-                hp--;
-                protect = false;
-            }
-            manager.ChangeHPMP();
-            hurtTime = 1;
+            else BeforeHurt(1);
+
             hurted = false;
-            dontBehaveTime = 0;
         }
 
         if (inEnemies == 0) hurted = false;
@@ -607,8 +604,8 @@ public class Player : MonoBehaviour //플레이어
     {
         //좌우 이동 (등속, 손 떼면 바로 멈춤)
         float h = Input.GetAxisRaw("Horizontal");
-        // 속도 기본 값 10 + speed
-        transform.Translate((10 + speed) * (1 - slow)
+
+        transform.Translate(speed * (1 - slow) * (green ? 2 : 1)
             * Time.deltaTime * new Vector2(h, 0));
 
         //isWalking = h != 0;
@@ -667,6 +664,24 @@ public class Player : MonoBehaviour //플레이어
 
 
 
+    public void BeforeHurt(int d)
+    {
+        unbeatableTime = maxunbeatableTime;
+        if (shield >= d)
+        {
+            shield -= d;
+            protect = true;
+        }
+        else
+        {
+            hp -= d - shield;
+            shield = 0;
+            protect = false;
+        }
+        manager.ChangeHPMP();
+        hurtTime = 1;
+        dontBehaveTime = 0;
+    }
 
     void Hurt() //잠깐 붉은색 되었다가 서서히 회복
     {
@@ -772,7 +787,16 @@ public class Player : MonoBehaviour //플레이어
                             Monster c0ijm = c0ij.GetComponent<Monster>();
                             c0ijm.Apa(Color.red);
                             c0ijm.hp--;
-                            if (poison) Invoke(nameof(c0ijm.AfterDamage), Random.Range(1, 30));
+                            if (purple)
+                            {
+                                int r = Random.Range(0, 10);
+                                if (r < 2)
+                                {
+                                    hp--;
+                                    Debug.Log("치명");
+                                }
+                            }
+                            if (poison) c0ijm.RepeatAD();
 
                             GameObject dd = Instantiate(fadeEffect, mv, Quaternion.identity);
                             SpriteRenderer ddsr = dd.GetComponent<SpriteRenderer>();

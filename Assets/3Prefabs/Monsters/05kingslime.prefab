@@ -306,7 +306,7 @@ MonoBehaviour:
   monsterNum: 5
   fadeEffect: {fileID: 8326106217213998104, guid: c32a19154cf10874f974978490ab09ef, type: 3}
   doubleCircle: {fileID: 21300000, guid: bc8cdb377d76208459a0ccc268b24045, type: 3}
-  hp: 0
+  hp: 10
   maxhp: 10
   hc:
   - {fileID: -508144027, guid: 5e38e6b0e5266ec44ab65d691d41382f, type: 3}
@@ -314,7 +314,7 @@ MonoBehaviour:
   - {fileID: 1743799531, guid: 5e38e6b0e5266ec44ab65d691d41382f, type: 3}
   - {fileID: 845095873, guid: 5e38e6b0e5266ec44ab65d691d41382f, type: 3}
   - {fileID: -790288367, guid: 5e38e6b0e5266ec44ab65d691d41382f, type: 3}
-  Hurt: {fileID: 21300000, guid: 00a68fbfa7b9582469e2a0d5a406bf8d, type: 3}
+  Empty: {fileID: 21300000, guid: 5ac8fde242b2a6c4282edffd5b357642, type: 3}
   hpOrb: {fileID: 6510405994357380013, guid: f298c78827c8618408d5e5c4b44641cc, type: 3}
   mpOrb: {fileID: 2026748482929784485, guid: dfc753a499df8d14bb6a7fc313dcaa13, type: 3}
   coinOrb: {fileID: 2026748482929784485, guid: 70d4039dbc797ac488ff53131785d764, type: 3}
@@ -332,8 +332,9 @@ MonoBehaviour:
   Down: {fileID: 0}
   Up: {fileID: 0}
   Charge: {fileID: 0}
-  HurtDown: {fileID: 0}
-  HurtUp: {fileID: 0}
+  EmptyD: {fileID: 0}
+  EmptyU: {fileID: 0}
+  explosion: {fileID: 0}
 --- !u!212 &7937911736823455429
 SpriteRenderer:
   m_ObjectHideFlags: 0

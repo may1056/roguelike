@@ -28,11 +28,11 @@ public class GameManager : MonoBehaviour //게임 총괄
     //아이템
     readonly string[] Items = { "알파 수정",
         "부활", "자동 공격", "자해", "쉴드", "버서커", "강한 대쉬",
-        "붉은 수정", "분홍 수정", "푸른 수정", "초록 수정", "노란 수정", "주황 수정", "독", };
+        "붉은 수정", "분홍 수정", "푸른 수정", "초록 수정", "노란 수정", "주황 수정", "보라 수정", "독", };
 
     readonly int[] Items_legendary = { 2,
         1, 1, 1, 1, 1, 1,
-        0, 0, 0, 0, 0, 0, 0, }; //2: legend, 1: rare, 0: common
+        0, 0, 0, 0, 0, 0, 0, 0, }; //2: legend, 1: rare, 0: common
 
     //아이템별 확률
     //readonly float[] Items_p = { };
@@ -68,17 +68,19 @@ public class GameManager : MonoBehaviour //게임 총괄
     public Text isMWText;
 
 
-    public static int mapNum = 3; //맵 번호
+    public static int mapNum = 5; //맵 번호
     GameObject map; //맵이 들어가는 공간
 
     public GameObject[] maps; //맵 프리팹
     public GameObject[] mons; //맵 내 몬스터 집합 프리팹
 
     //맵별 페이즈 수
-    readonly int[] phases = { 1, 1, 3, 3, 1, };
+    readonly int[] phases = { 1, 1, 3, 3, 1, 1, 1, };
 
     //페이즈별 잡아야 할 몬스터 수, -1: 안 잡아도 된다
-    readonly int[,] enemies = { { 23, 0, 0, }, { -1, 0, 0, }, { 14, 15, 25, }, { 21, 25, 24, }, { 12, 0, 0, } };
+    readonly int[,] enemies
+        = { { 23, 0, 0, }, { -1, 0, 0, }, { 14, 15, 25, }, { 21, 25, 24, }, { 14, 0, 0, },
+        { 19, 0, 0, }, { 22, 0, 0, }};
 
     public bool making; //진행 중인지
     int nowPhase; //현재 페이즈
@@ -98,11 +100,13 @@ public class GameManager : MonoBehaviour //게임 총괄
     public GameObject Portal1; //쉬움, 보통
     public GameObject Portal2; //어려움, 기믹
 
-    readonly Vector2[,] portal_position //맵별 포탈 위치
-        = { { new Vector2(0, 0), new Vector2(999, 999) }, { new Vector2(0, 5), new Vector2(999, 999) }, { new Vector2(-2, 1), new Vector2(2, 1) }, { new Vector2(20, 1), new Vector2(26, 1) } };
+    readonly float[,,] portal_position //맵별 포탈 위치
+        = { { { 0, 0 }, { 999, 999 } }, { { 0, 5 }, { 999, 999 } }, { { -2, 1 }, { 2, 1 } }, { { 20, 1 }, { 26, 1 } }, { { 4.5f, -15 }, { 13.5f, -15 } },
+        { { 2.5f, -0.5f }, { 7.5f, -0.5f } }, { { 31.5f, 1.5f }, { 36.5f, 1.5f } } };
 
     readonly int[,] portal_mapNum //포탈별 다음 맵 번호, -1은 포탈 X
-        = { { 0, -1 }, { 2, -1 }, { 3, 1 }, { 2, 1 } };
+        = { { 0, -1 }, { 2, -1 }, { 5, 3 }, { 6, 4 }, { 2, 3 },
+        { 6, 4 }, { 5, 2 } };
 
 
 
@@ -205,17 +209,17 @@ public class GameManager : MonoBehaviour //게임 총괄
 
 
     void Update()
-    {   
-    if (Input.GetButtonDown("Cancel")) {
+    {
+    if (Input.GetKeyDown("p")) {
             if (ShopSet.activeSelf)
                 ShopSet.SetActive(false);
-              else  
+              else
                 ShopSet.SetActive(true);
         }
             //상점 열고닫기
 
 
-        if (progressTime > 4 && !prgEnd) EndProgress();
+        if (progressTime > 1 && !prgEnd) EndProgress();
         else progressTime += Time.unscaledDeltaTime; //TimeScale에 구애받지 않음
 
 
@@ -270,7 +274,7 @@ public class GameManager : MonoBehaviour //게임 총괄
 
             if (phaseTime > 0.5f && !appeared)
             {
-                Transform set = map.transform.GetChild(nowPhase + 1);
+                Transform set = map.transform.GetChild(nowPhase + 2);
                 for (int i = 0; i < set.childCount; i++)
                     set.GetChild(i).gameObject.SetActive(true);
                 appeared = true;
@@ -289,9 +293,12 @@ public class GameManager : MonoBehaviour //게임 총괄
         //전투가 끝났거나 다 잡을 필요 없으면 포탈들 정위치 후 보이기
         if (!making || enemies[mapNum, 0] == -1)
         {
-            Portal1.transform.position = portal_position[mapNum, 0];
+            Portal1.transform.position = new Vector2(
+                portal_position[mapNum, 0, 0], portal_position[mapNum, 0, 1]);
             Portal1.SetActive(true);
-            Portal2.transform.position = portal_position[mapNum, 1];
+
+            Portal2.transform.position = new Vector2(
+                portal_position[mapNum, 1, 0], portal_position[mapNum, 1, 1]);
             Portal2.SetActive(true);
         }
 
@@ -398,7 +405,7 @@ public class GameManager : MonoBehaviour //게임 총괄
         {
             for (int i = 0; i < phases[mapNum]; i++)
             {
-                Transform set = map.transform.GetChild(i + 2);
+                Transform set = map.transform.GetChild(i + 3);
                 Destroy(set.gameObject);
             }
             making = false;

@@ -95,8 +95,16 @@ public class PlayerBullet : MonoBehaviour
             Monster m = collision.transform.GetComponent<Monster>();
             m.Apa(Color.red);
             m.hp -= Player.player.atkPower;
-            if (Player.player.poison)
-                Invoke(nameof(m.AfterDamage), Random.Range(1, 30));
+            if (Player.player.purple) //보라 수정: 치명타
+            {
+                int r = Random.Range(0, 10);
+                if (r < 2)
+                {
+                    m.hp--;
+                    Debug.Log("치명");
+                }
+            }
+            if (Player.player.poison) m.RepeatAD();
 
             MakeEffect(collision.transform.position, Color.red, 1);
         }
@@ -120,8 +128,16 @@ public class PlayerBullet : MonoBehaviour
                 case 0:
                     m.Apa(Color.red);
                     m.hp -= Player.player.atkPower;
-                    if (Player.player.poison)
-                        Invoke(nameof(m.AfterDamage), Random.Range(1, 30));
+                    if (Player.player.purple) //보라 수정: 치명타
+                    {
+                        int r = Random.Range(0, 10);
+                        if (r < 2)
+                        {
+                            m.hp--;
+                            Debug.Log("치명");
+                        }
+                    }
+                    if (Player.player.poison) m.RepeatAD();
                     MakeEffect(transform.position, Color.red, 1);
                     break;
 
@@ -133,8 +149,16 @@ public class PlayerBullet : MonoBehaviour
                         m.pollution = 0.5f;
                         m.Apa(Color.red);
                         m.hp--; //자동 공격은 버서커 딜증 대상 아님
-                        if (Player.player.poison)
-                            Invoke(nameof(m.AfterDamage), Random.Range(1, 30));
+                        if (Player.player.purple) //보라 수정: 치명타
+                        {
+                            int r = Random.Range(0, 10);
+                            if (r < 2)
+                            {
+                                m.hp--;
+                                Debug.Log("치명");
+                            }
+                        }
+                        if (Player.player.poison) m.RepeatAD();
                         MakeEffect(transform.position, new Color(0.6f, 0.4f, 1), 0.7f);
                         CancelInvoke(nameof(m.RemovePollution));
                     }

@@ -144,7 +144,7 @@ MonoBehaviour:
   - {fileID: 1743799531, guid: 5e38e6b0e5266ec44ab65d691d41382f, type: 3}
   - {fileID: 845095873, guid: 5e38e6b0e5266ec44ab65d691d41382f, type: 3}
   - {fileID: -790288367, guid: 5e38e6b0e5266ec44ab65d691d41382f, type: 3}
-  Hurt: {fileID: 0}
+  Empty: {fileID: 0}
   hpOrb: {fileID: 6510405994357380013, guid: f298c78827c8618408d5e5c4b44641cc, type: 3}
   mpOrb: {fileID: 2026748482929784485, guid: dfc753a499df8d14bb6a7fc313dcaa13, type: 3}
   coinOrb: {fileID: 2026748482929784485, guid: 70d4039dbc797ac488ff53131785d764, type: 3}
@@ -162,8 +162,9 @@ MonoBehaviour:
   Down: {fileID: 21300000, guid: 2d087495753e2fb4ba10c8837b0827bc, type: 3}
   Up: {fileID: 21300000, guid: 916859cfa724aea48b57f38a38633c22, type: 3}
   Charge: {fileID: 21300000, guid: 05b5595434ed49a45959c70499ff9650, type: 3}
-  HurtDown: {fileID: 21300000, guid: 7624d6a85e4da214a9de98a88c72d793, type: 3}
-  HurtUp: {fileID: 21300000, guid: 3702aff40eaa5f541b0d43909ed88870, type: 3}
+  EmptyD: {fileID: 21300000, guid: a4ef2db9ff4cdea4c9d6f6541ac486f8, type: 3}
+  EmptyU: {fileID: 21300000, guid: fa9208e4f1e75944b98ad07e59dee45f, type: 3}
+  explosion: {fileID: 0}
 --- !u!212 &5809109816724192842
 SpriteRenderer:
   m_ObjectHideFlags: 0

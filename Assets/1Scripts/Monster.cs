@@ -9,10 +9,10 @@ public class Monster : MonoBehaviour //잡몹
     //00spider 01packman 02slime 03turret 04ice 05kingslime 06fire 07ghost
 
 
-    readonly float[,] limitX = //좌우 한계
-        { { -48, 48 }, { -55, 55 }, { -30, 30 }, { -4, 50 } ,{ -100,100} };
-    readonly float[,] limitY = //상하 한계
-        { { -4, 12 }, { -21, 49 }, { -3, 19 }, { -4, 30 },{ -100,100}  };
+    //readonly float[,] limitX = //좌우 한계
+    //    { { -48, 48 }, { -55, 55 }, { -30, 30 }, { -4, 50 } ,{ -100,100} };
+    //readonly float[,] limitY = //상하 한계
+     //   { { -4, 12 }, { -21, 49 }, { -3, 19 }, { -4, 30 },{ -100,100}  };
 
 
     /// <summary>
@@ -34,10 +34,6 @@ public class Monster : MonoBehaviour //잡몹
 
     Transform C;
     public Sprite[] hc = new Sprite[5]; //hp circles
-
-    Color darkpurple = new(0.3215f, 0.0588f, 0.6705f); //00
-    Color darkred = new(0.7686f, 0.0862f, 0.0078f); //01, 02
-    Color mol_lu = new(0.1f, 0.1f, 0.1f); //03
 
     SpriteRenderer sr;
     public Sprite Empty; //Hurt, Poisoned는 여기에 색 덧입힌다
@@ -258,7 +254,7 @@ public class Monster : MonoBehaviour //잡몹
             case 7: //ghost
                 H = 10.0f / dist;
                 Targeting();
-                if (dist < 1.5f) Pokbal();
+                if (dist < 0.5f) Pokbal();
                 break;
 
         } //switch
@@ -283,6 +279,16 @@ public class Monster : MonoBehaviour //잡몹
             Apa(Color.red);
             hp -= Player.player.atkPower;
 
+            if (Player.player.purple) //보라 수정: 치명타
+            {
+                int r = Random.Range(0, 10);
+                if (r < 2)
+                {
+                    hp--;
+                    Debug.Log("치명");
+                }
+            }
+
             PlayerAttack.curAttackCooltime = 0;
         }
 
@@ -297,7 +303,18 @@ public class Monster : MonoBehaviour //잡몹
         {
             Apa(Color.red);
             hp--;
+
+            if (Player.player.purple) //보라 수정: 치명타
+            {
+                int r = Random.Range(0, 10);
+                if (r < 2)
+                {
+                    hp--;
+                    Debug.Log("치명");
+                }
+            }
         }
+
 
 
         //무기 파생 스킬 범위 내에 있음
@@ -316,6 +333,16 @@ public class Monster : MonoBehaviour //잡몹
                     {
                         Apa(Color.red);
                         hp -= 2 * Player.player.atkPower;
+
+                        if (Player.player.purple) //보라 수정: 치명타
+                        {
+                            int r = Random.Range(0, 10);
+                            if (r < 2)
+                            {
+                                hp -= 2;
+                                Debug.Log("치명");
+                            }
+                        }
 
                         if (Player.player.poison)
                             Invoke(nameof(AfterDamage), Random.Range(1, 30));
@@ -361,12 +388,12 @@ public class Monster : MonoBehaviour //잡몹
 
             if (!Player.player.selfinjury && !Player.player.berserker)
             {
-                r = Random.Range(0, 30);
+                r = Random.Range(0, Player.player.pink ? 10 : 25);
                 if (r < 1) Instantiate(hpOrb, tp, Quaternion.identity);
             }
 
-            r = Random.Range(0, 10);
-            if (r < 2) Instantiate(mpOrb, tp, Quaternion.identity);
+            r = Random.Range(0, Player.player.blue ? 10 : 25);
+            if (r < 1) Instantiate(mpOrb, tp, Quaternion.identity);
 
             r = Random.Range(0, 10);
             if (r < 4) Instantiate(coinOrb, tp, Quaternion.identity);
@@ -408,8 +435,8 @@ public class Monster : MonoBehaviour //잡몹
         //좌표가 이상해지면 돌아오는 로직
         int m = GameManager.mapNum;
 
-        if (tp.x<limitX[m,0] || tp.x > limitX[m, 1]
-            || tp.y < limitY[m, 0] || tp.y > limitY[m, 1]) transform.position = firstP;
+        //if (tp.x<limitX[m,0] || tp.x > limitX[m, 1]
+           // || tp.y < limitY[m, 0] || tp.y > limitY[m, 1]) transform.position = firstP;
 
 
 
@@ -710,7 +737,7 @@ public class Monster : MonoBehaviour //잡몹
         GameObject hurt = Instantiate(fadeEffect, transform.position,
             Quaternion.identity);
 
-        SpriteRenderer hsr = hurt.GetComponent<SpriteRenderer>();
+        SpriteRenderer hsr = hurt.transform.GetComponent<SpriteRenderer>();
         hsr.flipX = sr.flipX;
         hsr.sortingOrder = 5;
 
@@ -738,10 +765,26 @@ public class Monster : MonoBehaviour //잡몹
         }
     }
 
-    public void AfterDamage() //poison 아이템 - Invoke용
+
+
+    public void RepeatAD() //AfterDamage() 반복
+    {
+        Invoke(nameof(AfterDamage), Random.Range(1, 30));
+    }
+    void AfterDamage() //poison 아이템 - Invoke용
     {
         Apa(Color.green);
         hp--;
+
+        if (Player.player.purple) //보라 수정: 치명타
+        {
+            int r = Random.Range(0, 10);
+            if (r < 2)
+            {
+                hp--;
+                Debug.Log("치명");
+            }
+        }
     }
 
 } //Enemy End
