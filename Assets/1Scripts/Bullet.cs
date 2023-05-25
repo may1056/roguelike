@@ -12,22 +12,12 @@ public class Bullet : MonoBehaviour //탄막
     public GameObject fadeEffect;
     public Sprite doubleCircle;
 
-    float r1, r2;
-
-
-
-    void Start()
-    {
-
-        r1 = Random.Range(0, 10) * 0.2f;
-    }
 
     void Update()
     {
         Vector2 tp = transform.position;
 
-        transform.Translate(bulletSpeed * (bulletType == 0 ? r1 : 1)
-            * Time.deltaTime * Vector2.right);
+        transform.Translate(bulletSpeed * Time.deltaTime * Vector2.right);
 
         if (Mathf.Abs(tp.x) > 100 || Mathf.Abs(tp.y) > 100) Destroy(gameObject);
 

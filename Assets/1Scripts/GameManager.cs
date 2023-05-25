@@ -312,7 +312,7 @@ public class GameManager : MonoBehaviour //게임 총괄
         GameObject P2S = Portal2.transform.GetChild(0).gameObject; //포탈2 S 텍스트
 
         //포탈1과 가까우면
-        if (Vector2.Distance(player.transform.position, Portal1.transform.position) < 2)
+        if (!making && Vector2.Distance(player.transform.position, Portal1.transform.position) < 2)
         {
             P1S.SetActive(true);
             P2S.SetActive(false);
@@ -323,7 +323,7 @@ public class GameManager : MonoBehaviour //게임 총괄
             }
         }
         //포탈2와 가까우면
-        else if (Vector2.Distance(player.transform.position, Portal2.transform.position) < 2)
+        else if (!making && Vector2.Distance(player.transform.position, Portal2.transform.position) < 2)
         {
             P1S.SetActive(false);
             P2S.SetActive(true);

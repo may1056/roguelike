@@ -16,6 +16,8 @@ public class PlayerBullet : MonoBehaviour
 
     float t;
 
+    float r1, r2;
+
 
     void Start()
     {
@@ -30,6 +32,9 @@ public class PlayerBullet : MonoBehaviour
                 transform.localScale = 2f * Vector2.one;
                 break;
         }
+
+        r1 = Random.Range(0, 10) * 0.2f;
+
 
     } //Start End
 
@@ -79,7 +84,7 @@ public class PlayerBullet : MonoBehaviour
 
         Vector2 tp = transform.position;
 
-        transform.Translate(bulletSpeed * t * Time.deltaTime * Vector2.right);
+        transform.Translate(bulletSpeed * (pbType == 0 ? r1 : 1) * t * Time.deltaTime * Vector2.right);
 
 
         if (Mathf.Abs(tp.x) > 100 || Mathf.Abs(tp.y) > 100) Destroy(gameObject);
