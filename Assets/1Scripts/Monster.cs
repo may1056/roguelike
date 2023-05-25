@@ -410,6 +410,7 @@ public class Monster : MonoBehaviour //잡몹
                         new Vector2(tp.x + i * 0.5f, tp.y), Quaternion.identity);
                     s.transform.SetParent(transform.parent);
                     s.SetActive(true);
+                    GameManager.killed -= 2;
                 }
             }
 
@@ -434,6 +435,8 @@ public class Monster : MonoBehaviour //잡몹
 
         //좌표가 이상해지면 돌아오는 로직
         int m = GameManager.mapNum;
+
+        // maplimit
 
         //if (tp.x<limitX[m,0] || tp.x > limitX[m, 1]
            // || tp.y < limitY[m, 0] || tp.y > limitY[m, 1]) transform.position = firstP;
@@ -703,6 +706,8 @@ public class Monster : MonoBehaviour //잡몹
     {
         int l = collision.gameObject.layer;
         if (l == 11 || l == 13) withPlayer = true;
+
+        if (l == 15) transform.position = firstP;
     }
 
 
@@ -728,6 +733,8 @@ public class Monster : MonoBehaviour //잡몹
         int l = collision.gameObject.layer;
         if (l >= 11 && l <= 13) withPlayer = false;
     }
+
+
 
 
 
