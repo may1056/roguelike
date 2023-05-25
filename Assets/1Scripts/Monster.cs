@@ -738,7 +738,7 @@ public class Monster : MonoBehaviour //잡몹
             Quaternion.identity);
 
         SpriteRenderer hsr = hurt.transform.GetComponent<SpriteRenderer>();
-        hsr.flipX = sr.flipX;
+        //hsr.flipX = sr.flipX;
         hsr.sortingOrder = 5;
 
         if (monsterNum == 4 || monsterNum == 6)

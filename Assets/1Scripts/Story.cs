@@ -16,13 +16,15 @@ public class Story : MonoBehaviour
 
     public bool onOption = false; // 옵션이 켜져있는가?
 
-    public Image[] backgrounimage; // 아마도 텍스트바 뒤에 뜰 그림
-
+    public Transform background;
+    public Sprite[] backgroundimages; // 아마도 텍스트바 뒤에 뜰 그림
+    Sprite backgroundimage;
 
 
     void Start()
     {
         trianglesr = textbarTriangle.GetComponent<Image>();
+        backgroundimage = background.GetComponent<Sprite>();
 
         InvokeRepeating("textbarTriangleAnimaition", 0, 1f);
     }
@@ -30,7 +32,7 @@ public class Story : MonoBehaviour
 
     void Update()
     {
-        if ((Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space)) && !onOption) textindex++; // 옵션 위에 있지 않을 때, 클릭&스페이스바 입력시 대화 넘어감 
+        if ((Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space)) && !onOption) textindex++; // 옵션 위에 있지 않을 때, 클릭&스페이스바 입력시 대화 넘어감
 
         textbar.text = texts[textindex];
     }

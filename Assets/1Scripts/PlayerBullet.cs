@@ -139,6 +139,7 @@ public class PlayerBullet : MonoBehaviour
                     }
                     if (Player.player.poison) m.RepeatAD();
                     MakeEffect(transform.position, Color.red, 1);
+                    Destroy(gameObject);
                     break;
 
                 case 2:
@@ -162,9 +163,9 @@ public class PlayerBullet : MonoBehaviour
                         MakeEffect(transform.position, new Color(0.6f, 0.4f, 1), 0.7f);
                         CancelInvoke(nameof(m.RemovePollution));
                     }
+                    Destroy(gameObject);
                     break;
             }
-            Destroy(gameObject);
         }
 
     } //OnTriggerEnter2D End

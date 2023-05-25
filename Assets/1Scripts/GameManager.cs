@@ -68,19 +68,19 @@ public class GameManager : MonoBehaviour //게임 총괄
     public Text isMWText;
 
 
-    public static int mapNum = 5; //맵 번호
+    public static int mapNum = 4; //맵 번호
     GameObject map; //맵이 들어가는 공간
 
     public GameObject[] maps; //맵 프리팹
     public GameObject[] mons; //맵 내 몬스터 집합 프리팹
 
     //맵별 페이즈 수
-    readonly int[] phases = { 1, 1, 3, 3, 1, 1, 1, };
+    readonly int[] phases = { 1, 1, 3, 3, 1, 1, 1, 1, };
 
     //페이즈별 잡아야 할 몬스터 수, -1: 안 잡아도 된다
     readonly int[,] enemies
-        = { { 23, 0, 0, }, { -1, 0, 0, }, { 14, 15, 25, }, { 21, 25, 24, }, { 14, 0, 0, },
-        { 19, 0, 0, }, { 22, 0, 0, }};
+        = { { 23, 0, 0, }, { -1, 0, 0, }, { 14, 15, 25, }, { 21, 25, 24, }, { 32, 0, 0, },
+        { 14, 0, 0, }, { 19, 0, 0, }, { 22, 0, 0, }};
 
     public bool making; //진행 중인지
     int nowPhase; //현재 페이즈
@@ -101,12 +101,12 @@ public class GameManager : MonoBehaviour //게임 총괄
     public GameObject Portal2; //어려움, 기믹
 
     readonly float[,,] portal_position //맵별 포탈 위치
-        = { { { 0, 0 }, { 999, 999 } }, { { 0, 5 }, { 999, 999 } }, { { -2, 1 }, { 2, 1 } }, { { 20, 1 }, { 26, 1 } }, { { 4.5f, -15 }, { 13.5f, -15 } },
-        { { 2.5f, -0.5f }, { 7.5f, -0.5f } }, { { 31.5f, 1.5f }, { 36.5f, 1.5f } } };
+        = { { { 0, 0 }, { 999, 999 } }, { { 0, 5 }, { 999, 999 } }, { { -2, 1 }, { 2, 1 } }, { { 20, 1 }, { 26, 1 } }, { { -2, 0 }, { 2, 0 } },
+        { { 4.5f, -15 }, { 13.5f, -15 } }, { { 2.5f, -0.5f }, { 7.5f, -0.5f } }, { { 31.5f, 1.5f }, { 36.5f, 1.5f } } };
 
     readonly int[,] portal_mapNum //포탈별 다음 맵 번호, -1은 포탈 X
-        = { { 0, -1 }, { 2, -1 }, { 5, 3 }, { 6, 4 }, { 2, 3 },
-        { 6, 4 }, { 5, 2 } };
+        = { { 0, -1 }, { 2, -1 }, { 5, 3 }, { 6, 4 }, { 5, 6 },
+        { 2, 3 }, { 5, 4 }, { 5, 2 } };
 
 
 
