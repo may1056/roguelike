@@ -48,9 +48,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bulletType: 5
-  bulletSpeed: 0
+  bulletSpeed: 1
   fadeEffect: {fileID: 8326106217213998104, guid: c32a19154cf10874f974978490ab09ef, type: 3}
   doubleCircle: {fileID: 21300000, guid: bc8cdb377d76208459a0ccc268b24045, type: 3}
+  pxb2: {fileID: 4423686249212107402, guid: 17cd025b17fb39a4294ed18c25b36ceb, type: 3}
+  pxb1: {fileID: 0}
 --- !u!212 &7487618894235900578
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -117,7 +119,7 @@ Rigidbody2D:
   m_UseAutoMass: 0
   m_Mass: 1
   m_LinearDrag: 0
-  m_AngularDrag: 0
+  m_AngularDrag: 1
   m_GravityScale: 0
   m_Material: {fileID: 0}
   m_Interpolate: 0

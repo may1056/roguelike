@@ -20,6 +20,7 @@ public class Boss2 : MonoBehaviour
         t = 0;
 
         InvokeRepeating(nameof(Rain), 5, T);
+        InvokeRepeating(nameof(LetBullet), 10, T);
     }
 
 
@@ -27,7 +28,7 @@ public class Boss2 : MonoBehaviour
 
     void Update()
     {
-        t += Time.deltaTime;
+        t += 0.5f * Time.deltaTime;
         transform.position = 7.5f * new Vector2(Mathf.Cos(t), Mathf.Sin(t));
     }
 

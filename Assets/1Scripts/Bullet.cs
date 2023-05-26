@@ -9,10 +9,38 @@ public class Bullet : MonoBehaviour //탄막
 
     public float bulletSpeed;
 
+
+    Rigidbody2D rigid;
+    SpriteRenderer sr;
+
+
     public GameObject fadeEffect;
     public Sprite doubleCircle;
 
     public GameObject pxb2, pxb1;
+
+
+
+    void Start()
+    {
+        rigid = GetComponent<Rigidbody2D>();
+        sr = GetComponent<SpriteRenderer>();
+
+        switch (bulletType)
+        {
+            case 5:
+                rigid.AddTorque(30);
+                InvokeRepeating(nameof(Next2px), 1, 1);
+                break;
+
+            case 6:
+                rigid.AddTorque(15);
+                InvokeRepeating(nameof(Next1px), 1, 1);
+                break;
+        }
+
+    } //Start End
+
 
 
     void Update()
@@ -80,7 +108,7 @@ public class Bullet : MonoBehaviour //탄막
             {
                 case 0: MakeEffect(Color.gray, 0.5f); break;
                 case 1: MakeEffect(new Color(0.56f, 0.71f, 0.84f), 1); break;
-                case 4: MakeEffect(transform.GetComponent<SpriteRenderer>().color, 0.1f); break;
+                case 4: MakeEffect(sr.color, 0.1f); break;
             }
             Destroy(gameObject);
             Debug.Log("콜");
@@ -90,28 +118,32 @@ public class Bullet : MonoBehaviour //탄막
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.layer == 9) //그라운드
+        int l = other.gameObject.layer;
+
+        if (l == 9) //그라운드
         {
             switch (bulletType)
             {
                 case 0: MakeEffect(Color.gray, 0.5f); break;
                 case 1: MakeEffect(new Color(0.56f, 0.71f, 0.84f), 1); break;
+                case 4: MakeEffect(sr.color, 0.1f); Destroy(gameObject); break;
+                case 5: MakeEffect(sr.color, 0.3f); Destroy(gameObject); break;
+                case 6: MakeEffect(sr.color, 0.2f); Destroy(gameObject); break;
+                case 7: MakeEffect(sr.color, 0.1f); Destroy(gameObject); break;
             }
-            Destroy(gameObject);
-            Debug.Log("그");
         }
 
-        if (other.CompareTag("Platform"))
+        if (l == 8) //블록
         {
             switch (bulletType)
             {
-                case 4: MakeEffect(transform.GetComponent<SpriteRenderer>().color, 0.1f); break;
+                case 4: MakeEffect(sr.color, 0.1f); Destroy(gameObject); break;
+                case 5: MakeEffect(sr.color, 0.3f); Destroy(gameObject); break;
+                case 6: MakeEffect(sr.color, 0.2f); Destroy(gameObject); break;
+                case 7: MakeEffect(sr.color, 0.1f); Destroy(gameObject); break;
             }
-            Destroy(gameObject);
-            Debug.Log("플");
         }
 
-        int l = other.gameObject.layer;
         if (l == 11 || l == 13) //플레이어
         {
             switch (bulletType)
@@ -146,8 +178,19 @@ public class Bullet : MonoBehaviour //탄막
                     break;
 
                 case 4:
+                case 7:
                     if (Player.unbeatableTime <= 0) Player.hurted = true;
                     MakeEffect(Color.red, 0.1f);
+                    break;
+
+                case 5:
+                    if (Player.unbeatableTime <= 0) Player.hurted = true;
+                    MakeEffect(Color.red, 0.3f);
+                    break;
+
+                case 6:
+                    if (Player.unbeatableTime <= 0) Player.hurted = true;
+                    MakeEffect(Color.red, 0.2f);
                     break;
 
             }
@@ -165,6 +208,16 @@ public class Bullet : MonoBehaviour //탄막
         effsr.sprite = doubleCircle;
         effsr.color = c;
         eff.transform.localScale = sc * Vector2.one;
+    }
+
+
+    void Next2px()
+    {
+        Instantiate(pxb2, transform.position, Quaternion.Euler(0, 0, Random.Range(0, 360)));
+    }
+    void Next1px()
+    {
+        Instantiate(pxb1, transform.position, Quaternion.Euler(0, 0, Random.Range(0, 360)));
     }
 
 } //Bullet End
