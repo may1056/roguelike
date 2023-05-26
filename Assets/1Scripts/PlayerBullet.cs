@@ -23,8 +23,6 @@ public class PlayerBullet : MonoBehaviour
     {
         sr = GetComponent<SpriteRenderer>();
 
-        t = 1;
-
         switch (pbType)
         {
             case 1:
@@ -33,8 +31,10 @@ public class PlayerBullet : MonoBehaviour
                 break;
         }
 
-        r1 = Random.Range(0, 10) * 0.2f;
+        r1 = Random.Range(3, 8) * 0.2f;
+        r2 = Random.Range(3, 8) * 0.2f;
 
+        t = r2;
 
     } //Start End
 
@@ -46,7 +46,7 @@ public class PlayerBullet : MonoBehaviour
         {
             t -= 0.5f * Time.deltaTime;
 
-            if (t <= 0.5f)
+            if (t <= r2 * 0.5f)
             {
                 float rand = 0.1f * Random.Range(0, 10);
                 sr.color = new Color(rand, rand, rand); //무채색 랜덤 계속 바뀜

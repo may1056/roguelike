@@ -5,12 +5,14 @@ using UnityEngine;
 public class Bullet : MonoBehaviour //탄막
 {
     public int bulletType;
-    //0: 일반 딜, 1: 슬로우, 2: 지속 딜
+    //0: 일반 딜, 1: 슬로우, 2: 지속 딜, 4: 비
 
     public float bulletSpeed;
 
     public GameObject fadeEffect;
     public Sprite doubleCircle;
+
+    public GameObject pxb2, pxb1;
 
 
     void Update()
@@ -19,12 +21,20 @@ public class Bullet : MonoBehaviour //탄막
 
         transform.Translate(bulletSpeed * Time.deltaTime * Vector2.right);
 
-        if (Mathf.Abs(tp.x) > 100 || Mathf.Abs(tp.y) > 100) Destroy(gameObject);
+        if (Mathf.Abs(tp.x) > 100 || Mathf.Abs(tp.y) > 100)
+        {
+            Destroy(gameObject);
+            Debug.Log("밖");
+        }
 
 
         //스킬 범위 내에 있음
         if (Mathf.Abs(PlayerAttack.skillP.y) < 100 &&
-            Vector2.Distance(tp, PlayerAttack.skillP) < 5.5f) Destroy(gameObject);
+            Vector2.Distance(tp, PlayerAttack.skillP) < 5.5f)
+        {
+            Destroy(gameObject);
+            Debug.Log("스");
+        }
 
 
 
@@ -40,12 +50,16 @@ public class Bullet : MonoBehaviour //탄막
                         && Mathf.Abs(wsp.y - tp.y) < 1;
                     bool inY = Mathf.Abs(wsp.y - tp.y) < 7.5f
                         && Mathf.Abs(wsp.x - tp.x) < 1;
-                    if (inX || inY) Destroy(gameObject);
+                    if (inX || inY)
+                    {
+                        Destroy(gameObject);
+                        Debug.Log("무");
+                    }
                     break;
             }
         }
 
-
+        /*
         //위치 저장에 의한 파괴
         if (Mathf.Abs(Player.posP[0].y) < 100)
         {
@@ -53,7 +67,7 @@ public class Bullet : MonoBehaviour //탄막
             {
                 if (Vector2.Distance(tp, Player.posP[i]) < 3) Destroy(gameObject);
             }
-        }
+        }*/
 
     } //Update End
 
@@ -66,15 +80,17 @@ public class Bullet : MonoBehaviour //탄막
             {
                 case 0: MakeEffect(Color.gray, 0.5f); break;
                 case 1: MakeEffect(new Color(0.56f, 0.71f, 0.84f), 1); break;
+                case 4: MakeEffect(transform.GetComponent<SpriteRenderer>().color, 0.1f); break;
             }
             Destroy(gameObject);
+            Debug.Log("콜");
         } //플랫폼
     }
 
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.layer == 9) //플랫폼
+        if (other.gameObject.layer == 9) //그라운드
         {
             switch (bulletType)
             {
@@ -82,6 +98,17 @@ public class Bullet : MonoBehaviour //탄막
                 case 1: MakeEffect(new Color(0.56f, 0.71f, 0.84f), 1); break;
             }
             Destroy(gameObject);
+            Debug.Log("그");
+        }
+
+        if (other.CompareTag("Platform"))
+        {
+            switch (bulletType)
+            {
+                case 4: MakeEffect(transform.GetComponent<SpriteRenderer>().color, 0.1f); break;
+            }
+            Destroy(gameObject);
+            Debug.Log("플");
         }
 
         int l = other.gameObject.layer;
@@ -117,6 +144,12 @@ public class Bullet : MonoBehaviour //탄막
                         else pl.burn += 0.035f;
                     }
                     break;
+
+                case 4:
+                    if (Player.unbeatableTime <= 0) Player.hurted = true;
+                    MakeEffect(Color.red, 0.1f);
+                    break;
+
             }
             Destroy(gameObject);
         }
