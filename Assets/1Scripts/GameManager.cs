@@ -68,7 +68,7 @@ public class GameManager : MonoBehaviour //게임 총괄
     public Text isMWText;
 
 
-    public static int mapNum = 4; //맵 번호
+    public static int mapNum = 2; //맵 번호
     GameObject map; //맵이 들어가는 공간
 
     public GameObject[] maps; //맵 프리팹

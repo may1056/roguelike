@@ -620,12 +620,21 @@ public class Player : MonoBehaviour //플레이어
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        int l = collision.gameObject.layer;
+
         //플랫폼 닿으면 점프 상태 냅다 해제 (잘 안 먹힘..)
         if (collision.gameObject.CompareTag("Platform")) isJumping = false;
 
         if (collision.gameObject.CompareTag("Enemy")) inEnemies++;
 
-        SlideCheck();
+        if (l == 17)
+        {
+            hp--;
+            manager.ChangeHPMP();
+        }
+
+
+            SlideCheck();
     }
 
 
