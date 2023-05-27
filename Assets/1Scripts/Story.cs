@@ -18,13 +18,13 @@ public class Story : MonoBehaviour
 
     public Transform background;
     public Sprite[] backgroundimages; // 아마도 텍스트바 뒤에 뜰 그림
-    Sprite backgroundimage;
+    Image backgroundimage;
 
 
     void Start()
     {
         trianglesr = textbarTriangle.GetComponent<Image>();
-        backgroundimage = background.GetComponent<Sprite>();
+        backgroundimage = background.GetComponent<Image>();
 
         InvokeRepeating("textbarTriangleAnimaition", 0, 1f);
     }
@@ -34,6 +34,7 @@ public class Story : MonoBehaviour
     {
         if ((Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space)) && !onOption) textindex++; // 옵션 위에 있지 않을 때, 클릭&스페이스바 입력시 대화 넘어감
 
+        backgroundimage.sprite = backgroundimages[0];
         textbar.text = texts[textindex];
     }
 
