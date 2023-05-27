@@ -11,6 +11,8 @@ public class Player : MonoBehaviour //플레이어
     public static Player player;
     //public static으로 설정한 변수는 다른 스크립트에서 맘대로 퍼갈 수 있다
 
+    public Boss2 boss2;
+
     Rigidbody2D rigid;
     SpriteRenderer sr;
     Animator anim;
@@ -801,7 +803,7 @@ public class Player : MonoBehaviour //플레이어
                                 int r = Random.Range(0, 10);
                                 if (r < 2)
                                 {
-                                    hp--;
+                                    c0ijm.hp--;
                                     Debug.Log("치명");
                                 }
                             }
@@ -817,7 +819,34 @@ public class Player : MonoBehaviour //플레이어
                 }
             }
         }
-    }
+
+        if (boss2.gameObject.activeSelf)
+        {
+            Vector2 b2p = boss2.transform.position;
+
+            if (((b2p.x > X1 && b2p.x < X2) || (b2p.x < X1 && b2p.x > X2))
+                && b2p.y > Y - 1 && b2p.y < Y + 1)
+            {
+                boss2.hp--;
+                if (purple)
+                {
+                    int r = Random.Range(0, 10);
+                    if (r < 2)
+                    {
+                        boss2.hp--;
+                        Debug.Log("치명");
+                    }
+                }
+                if (poison) boss2.RepeatAD();
+
+                GameObject dd = Instantiate(fadeEffect, b2p, Quaternion.identity);
+                SpriteRenderer ddsr = dd.GetComponent<SpriteRenderer>();
+                ddsr.sprite = dashdealEff;
+                ddsr.sortingOrder = 8;
+            }
+        }
+
+    } //DashDamage End
 
 
 

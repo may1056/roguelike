@@ -11,6 +11,7 @@ public class AutoAttack : MonoBehaviour
     public GameObject pollutingbullet;
 
 
+    public Boss2 boss2;
 
 
 
@@ -56,8 +57,13 @@ public class AutoAttack : MonoBehaviour
 
     void ShootBullet() //타겟이 있다면, 오염 탄알을 자기 위치에서 타겟을 바라보는 방향의 각도로 생성
     {
-        if (target != null) Instantiate(pollutingbullet, transform.position,
-                Quaternion.Euler(0, 0, Mathf.Rad2Deg * Mathf.Atan2(target.transform.position.y - transform.position.y, target.transform.position.x - transform.position.x)));
+        Vector2 tp = transform.position, b2tp = boss2.transform.position;
+
+        if (target != null) Instantiate(pollutingbullet, tp,
+            Quaternion.Euler(0, 0, Mathf.Rad2Deg * Mathf.Atan2(target.transform.position.y - tp.y, target.transform.position.x - tp.x)));
+
+        else if (boss2.gameObject.activeSelf && Vector2.Distance(tp, b2tp) < 5) Instantiate(pollutingbullet, tp,
+            Quaternion.Euler(0, 0, Mathf.Rad2Deg * Mathf.Atan2(b2tp.y - tp.y, b2tp.x - tp.x)));
     }
 
 } //AutoAttack

@@ -8,6 +8,8 @@ TagManager:
   - Attack
   - Enemy
   - SkillCircle
+  - Boss1
+  - Boss2
   layers:
   - Default
   - TransparentFX
@@ -29,7 +31,7 @@ TagManager:
   - spike
   - 
   - 
-  - 
+  - Boss
   - 
   - 
   - 

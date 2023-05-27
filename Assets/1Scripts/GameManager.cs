@@ -275,15 +275,22 @@ public class GameManager : MonoBehaviour //게임 총괄
         //적 불러오기
         if (making && progressTime > 4)
         {
-            MakeEnemy(nowPhase);
-            phaseTime += Time.deltaTime;
-
-            if (phaseTime > 0.5f && !appeared)
+            if (stage == 4) //보스
             {
-                Transform set = map.transform.GetChild(nowPhase + 2);
-                for (int i = 0; i < set.childCount; i++)
-                    set.GetChild(i).gameObject.SetActive(true);
-                appeared = true;
+
+            }
+            else //일반 스테이지
+            {
+                MakeEnemy(nowPhase);
+                phaseTime += Time.deltaTime;
+
+                if (phaseTime > 0.5f && !appeared)
+                {
+                    Transform set = map.transform.GetChild(nowPhase + 2);
+                    for (int i = 0; i < set.childCount; i++)
+                        set.GetChild(i).gameObject.SetActive(true);
+                    appeared = true;
+                }
             }
         }
 

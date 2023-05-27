@@ -25,14 +25,20 @@ public class PlayerBullet : MonoBehaviour
 
         switch (pbType)
         {
+            case 0:
+                r1 = Random.Range(3, 8) * 0.2f;
+                r2 = Random.Range(3, 8) * 0.2f;
+                break;
+
             case 1:
+                r1 = Random.Range(3, 8) * 0.2f;
+                r2 = Random.Range(3, 8) * 0.2f;
                 GetComponent<CircleCollider2D>().isTrigger = false;
                 transform.localScale = 2f * Vector2.one;
                 break;
-        }
 
-        r1 = Random.Range(3, 8) * 0.2f;
-        r2 = Random.Range(3, 8) * 0.2f;
+            case 2: r1 = 1; r2 = 1; break;
+        }
 
         t = r2;
 
@@ -55,7 +61,7 @@ public class PlayerBullet : MonoBehaviour
             if (t <= 0)
             {
                 //transform.Translate(10 * Vector2.up);
-                for(int i = 0; i < 8; i++) //8방향으로 심각하지 않은 탄알 날리기
+                for (int i = 0; i < 8; i++) //8방향으로 심각하지 않은 탄알 날리기
                 {
                     GameObject pb = Instantiate(this.gameObject,
                         transform.position, Quaternion.Euler(0, 0, 45 * i));
@@ -167,6 +173,56 @@ public class PlayerBullet : MonoBehaviour
                         if (Player.player.poison) m.RepeatAD();
                         MakeEffect(transform.position, new Color(0.6f, 0.4f, 1), 0.7f);
                         CancelInvoke(nameof(m.RemovePollution));
+                    }
+                    Destroy(gameObject);
+                    break;
+            }
+        }
+
+        if (other.CompareTag("Boss2")) //자연의 섭리
+        {
+            Boss2 b2 = other.transform.GetComponent<Boss2>();
+
+            switch (pbType)
+            {
+                case 0:
+                case 1:
+                    b2.Apa(Color.red);
+                    b2.hp -= Player.player.atkPower;
+                    if (Player.player.purple) //보라 수정: 치명타
+                    {
+                        int r = Random.Range(0, 10);
+                        if (r < 2)
+                        {
+                            b2.hp--;
+                            Debug.Log("치명");
+                        }
+                    }
+                    if (Player.player.poison) b2.RepeatAD();
+
+                    MakeEffect(other.transform.position, Color.red, 1);
+                    break;
+
+                case 2:
+                    if (b2.pollution > 0.5f) b2.pollution = 1;
+                    else b2.pollution += 0.5f;
+                    if (b2.polluted)
+                    {
+                        b2.pollution = 0.5f;
+                        b2.Apa(Color.red);
+                        b2.hp--; //자동 공격은 버서커 딜증 대상 아님
+                        if (Player.player.purple) //보라 수정: 치명타
+                        {
+                            int r = Random.Range(0, 10);
+                            if (r < 2)
+                            {
+                                b2.hp--;
+                                Debug.Log("치명");
+                            }
+                        }
+                        if (Player.player.poison) b2.RepeatAD();
+                        MakeEffect(transform.position, new Color(0.6f, 0.4f, 1), 0.7f);
+                        CancelInvoke(nameof(b2.RemovePollution));
                     }
                     Destroy(gameObject);
                     break;
