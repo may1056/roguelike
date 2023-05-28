@@ -182,6 +182,7 @@ public class PlayerBullet : MonoBehaviour
         if (other.CompareTag("Boss2")) //자연의 섭리
         {
             Boss2 b2 = other.transform.GetComponent<Boss2>();
+            if (b2.hide) b2.PlayerKnows();
 
             switch (pbType)
             {

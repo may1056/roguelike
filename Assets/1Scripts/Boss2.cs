@@ -6,7 +6,9 @@ using UnityEngine.UI;
 public class Boss2 : MonoBehaviour
 {
     //두 번째 보스 - 자연의 섭리
+    public static Boss2 boss2;
 
+    Rigidbody2D rigid;
     SpriteRenderer sr;
 
     float T; //주기
@@ -14,9 +16,26 @@ public class Boss2 : MonoBehaviour
 
     public int hp;
     public Text hpText; //임시 체력 텍스트
+    public Image hpBAR;
 
     Player player;
     public GameObject cam;
+
+
+    public bool phase2 = false;
+
+
+    //pattern0
+    public bool hide = false;
+    public GameObject jjab;
+    bool orbitRotating = true;
+    int mynum;
+    public Vector2[] orbitCenter = //궤도 중심
+        { Vector2.zero, new Vector2(-6.5f, -2), new Vector2(6.5f, -2), new Vector2(-11.5f, 2.5f), new Vector2(11.5f, 2.5f) };
+    public float[] orbitRadius = //궤도 반지름
+        { 7.5f, 6.5f, 6.5f, 4.5f, 4.5f };
+    GameObject[] jjabs = new GameObject[4];
+    public GameObject pxb1; //1 pixel bullet
 
     //pattern1
     public GameObject rain;
@@ -29,13 +48,15 @@ public class Boss2 : MonoBehaviour
     //pattern3
     public GameObject fadeEffect;
     public Sprite bigpx;
-    int[] x = new int[6];
-    int[] y = new int[6];
+    int[] x = new int[12];
+    int[] y = new int[12];
     int thenumberofsquares = 6;
 
+
+
+
     public Sprite Empty;
-
-
+    public Sprite doubleCircle;
 
 
     Vector2 tp;
@@ -45,8 +66,13 @@ public class Boss2 : MonoBehaviour
 
 
 
+
+
     void Start()
     {
+        boss2 = this;
+
+        rigid = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
 
         T = 15; //임시
@@ -55,12 +81,15 @@ public class Boss2 : MonoBehaviour
         player = Player.player;
         cam.GetComponent<Camera>().orthographicSize = 11;
 
-        InvokeRepeating(nameof(Rain), 5, T);
-        InvokeRepeating(nameof(LetBullet), 8, T);
-        InvokeRepeating(nameof(Square), 12, T);
-        InvokeRepeating(nameof(Square), 14, T);
+        Invoke(nameof(DashAttack), 3);
+        //InvokeRepeating(nameof(Rain), 5, T);
+        //InvokeRepeating(nameof(LetBullet), 8, T);
+        //InvokeRepeating(nameof(Square), 12, T);
+        //InvokeRepeating(nameof(Square), 14, T);
 
         hp = 100; //임시
+
+        InvokeRepeating(nameof(FollowEffect), 0.1f, 0.1f);
     }
 
 
@@ -68,12 +97,34 @@ public class Boss2 : MonoBehaviour
 
     void Update()
     {
+        if (hp <= 50)
+        {
+            phase2 = true;
+            thenumberofsquares = 12;
+        }
+
         cam.transform.position = -10 * Vector3.forward;
 
-        t += 0.5f * Time.deltaTime;
-        transform.position = 7.5f * new Vector2(Mathf.Cos(t), Mathf.Sin(t));
 
+        if (hide) sr.color = phase2 ? new Color(1, 1, 1, 0) : Color.white;
 
+        if (orbitRotating)
+        {
+            t += (phase2 ? 1 : 0.5f) * Time.deltaTime;
+            transform.position = new Vector2(
+                orbitRadius[mynum] * Mathf.Cos(t) + orbitCenter[mynum].x,
+                orbitRadius[mynum] * Mathf.Sin(t) + orbitCenter[mynum].y);
+        }
+        else
+        {
+            rigid.velocity = (1 - Time.deltaTime) * rigid.velocity;
+
+            sr.color = new Color(Random.Range(0, 11) * 0.1f,
+                Random.Range(0, 11) * 0.1f, Random.Range(0, 11) * 0.1f);
+
+            MakeEffect(doubleCircle, sr.color);
+            MakeEffect(sr.sprite, sr.color);
+        }
 
 
 
@@ -162,6 +213,96 @@ public class Boss2 : MonoBehaviour
 
 
 
+    void DashAttack() //패턴0-A. 반짝거리면서 플레이어에게 빠르게 달려든다
+    {
+        if (t > 8 && !phase2)
+        {
+            for (int i = 0; i < 4; i++) Destroy(jjabs[i].gameObject);
+        }
+        hide = false;
+        orbitRotating = false;
+
+        rigid.AddForce((phase2 ? 40 : 20) * new Vector2(
+            Player.player.transform.position.x - tp.x,
+            Player.player.transform.position.y - tp.y).normalized,
+            ForceMode2D.Impulse);
+
+        if (!IsInvoking(nameof(HideMyself))) Invoke(nameof(HideMyself), 1);
+    }
+    void HideMyself() //패턴0-B. 녹아들기 or 숨기
+    {
+        mynum = Random.Range(0, 5);
+
+        if (!phase2) //페이즈1: 텔레포트하면서 랜덤 궤도에서 도는 분신 생성
+                     //페이즈2: 텔레포트하면서 투명해지기
+        {
+            bool my = false;
+            for (int i = 0; i < 5; i++)
+            {
+                if (i == mynum) my = true;
+                else
+                {
+                    int I = my ? i - 1 : i;
+                    jjabs[I] = Instantiate(jjab);
+                    jjabs[I].GetComponent<Boss2JJAB>().num = i;
+                }
+            }
+            MakeEffect(doubleCircle, Color.white);
+        }
+        orbitRotating = true;
+
+        hide = true;
+        InvokeRepeating(nameof(JjabBullet), 0, phase2 ? 0.1f : 4);
+    }
+    void JjabBullet() //패턴0-C. 발각되기 전까지는 초록 탄막 발사
+    {
+        Color Green = new(Random.Range(0, 5) * 0.1f,
+                Random.Range(7, 11) * 0.1f, Random.Range(0, 5) * 0.1f);
+        int Speed = Random.Range(1, 6);
+
+        if (!phase2) //페이즈1: 모든 분신에서 8방향
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    GameObject jjabB = Instantiate(pxb1, jjabs[i].transform.position,
+                        Quaternion.Euler(0, 0, t * 360 + j * 45));
+                    jjabB.GetComponent<SpriteRenderer>().color = Green;
+                    jjabB.GetComponent<Bullet>().bulletSpeed = Speed;
+                }
+            }
+        }
+        else //페이즈2: 중앙에서 보스를 향해 흩뿌림
+        {
+            GameObject zeroB = Instantiate(pxb1, Vector2.zero,
+                Quaternion.Euler(0, 0, Mathf.Rad2Deg * Mathf.Atan2(tp.y, tp.x)));
+            zeroB.GetComponent<SpriteRenderer>().color = Green;
+            zeroB.GetComponent<Bullet>().bulletSpeed = Speed;
+        }
+    }
+    public void PlayerKnows()
+    {
+        hide = false;
+        sr.color = Color.white;
+        CancelInvoke(nameof(JjabBullet));
+
+        if (!phase2)
+        {
+            for (int i = 0; i < 4; i++)
+                jjabs[i].GetComponent<Boss2JJAB>().playerknows = true;
+        }
+
+        //데미지를 입으면 드러나고, 1초 뒤에 비가 내리고 2초 뒤에 붉은 탄막 날리고 4초 뒤에 1차 스퀘어 6초 뒤에 2차 스퀘어 10초 뒤에 처음부터 반복
+        Invoke(nameof(Rain), 1);
+        Invoke(nameof(LetBullet), 2);
+        Invoke(nameof(Square), 4);
+        Invoke(nameof(Square), 6);
+        Invoke(nameof(DashAttack), 10);
+    }
+
+
+
     void Rain() //패턴1. 1px 비가 내린다
     {
         for (int i = 0; i < 20; i++)
@@ -169,24 +310,35 @@ public class Boss2 : MonoBehaviour
     }
     void RainMaker()
     {
+        //페이즈1: 위쪽에서 떨어짐
         GameObject bi = Instantiate(rain, new Vector2(
             Random.Range(-189, 190) * 0.1f, 8.9f), Quaternion.identity);
         int n = Random.Range(0, 10);
         bi.GetComponent<SpriteRenderer>().color
-            = new Color(rainR[n], rainG[n], 1); //푸른색
+            = new Color(rainR[n], rainG[n], 1); //보기 좋은 푸른색
+
+        if (phase2) //페이즈2: 아래쪽에서도 올라감
+        {
+            GameObject bi2 = Instantiate(rain, new Vector2(
+            Random.Range(-189, 190) * 0.1f, -8.9f), Quaternion.identity);
+            int n2 = Random.Range(0, 10);
+            bi2.GetComponent<SpriteRenderer>().color
+                = new Color(rainR[n2], rainG[n2], 1);
+            bi2.GetComponent<Rigidbody2D>().gravityScale = -1;
+        }
     }
 
 
 
     void LetBullet() //패턴2. 3px 탄막이 2px 탄막을 뿌리고 2px 탄막이 1px 탄막을 뿌림
     {
-        for (int i = 0; i < 4; i++) Instantiate(pxb3,
-                transform.position, Quaternion.Euler(0, 0, Random.Range(0, 360)));
+        for (int i = 0; i < (phase2 ? 8 : 4); i++) Instantiate(pxb3,
+            transform.position, Quaternion.Euler(0, 0, Random.Range(0, 360)));
     }
 
 
 
-    void Square() //패턴3. 배경을 18분할하여 그중 6개 랜덤 선정 데미지
+    void Square() //패턴3. 배경을 18분할하여 그중 6 or 12개 랜덤 선정 데미지
     {
         //x좌표는 -15, -9, -3, 3, 9, 15 중 하나, y좌표는 -6, 0, 6 중 하나
         for (int i = 0; i < thenumberofsquares; i++)
@@ -238,6 +390,28 @@ public class Boss2 : MonoBehaviour
 
 
 
+    void MakeEffect(Sprite s, Color c)
+    {
+        GameObject eff = Instantiate(fadeEffect, tp, Quaternion.identity);
+        SpriteRenderer effsr = eff.GetComponent<SpriteRenderer>();
+        effsr.sprite = s;
+        effsr.color = c;
+    }
+
+
+    void FollowEffect()
+    {
+        if (!hide || !phase2) MakeEffect(sr.sprite, sr.color);
+    }
+
+
+
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (!orbitRotating && collision.gameObject.CompareTag("Player"))
+            Player.hurted = true;
+    }
 
 
     public void RemovePollution() //오염 제거
@@ -270,10 +444,14 @@ public class Boss2 : MonoBehaviour
         hsr.color = c;
 
         hurt.GetComponent<Fade>().k = 5;
+
+        if (hide) PlayerKnows();
     }
-    void ModifyHp() //hp circle 최신화
+    void ModifyHp() //hp bar 최신화
     {
-        hpText.text = hp.ToString();
+        //hpText.text = hp.ToString();
+
+        hpBAR.rectTransform.sizeDelta = new Vector2(hp * 3, 70);
     }
     public void RepeatAD() //AfterDamage() 반복
     {

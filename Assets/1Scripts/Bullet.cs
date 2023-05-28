@@ -108,7 +108,7 @@ public class Bullet : MonoBehaviour //탄막
             {
                 case 0: MakeEffect(Color.gray, 0.5f); break;
                 case 1: MakeEffect(new Color(0.56f, 0.71f, 0.84f), 1); break;
-                case 4: MakeEffect(sr.color, 0.1f); break;
+                case 4: case 5: case 6: case 7: MakeEffect(sr.color, 0.1f); break;
             }
             Destroy(gameObject);
             Debug.Log("콜");
@@ -126,10 +126,8 @@ public class Bullet : MonoBehaviour //탄막
             {
                 case 0: MakeEffect(Color.gray, 0.5f); break;
                 case 1: MakeEffect(new Color(0.56f, 0.71f, 0.84f), 1); break;
-                case 4: MakeEffect(sr.color, 1); Destroy(gameObject); break;
-                case 5: MakeEffect(sr.color, 3f); Destroy(gameObject); break;
-                case 6: MakeEffect(sr.color, 2f); Destroy(gameObject); break;
-                case 7: MakeEffect(sr.color, 1f); Destroy(gameObject); break;
+                case 4: case 5: case 6: case 7:
+                    MakeEffect(sr.color, 1); Destroy(gameObject); break;
             }
         }
 
@@ -178,20 +176,8 @@ public class Bullet : MonoBehaviour //탄막
                     break;
 
                 case 4:
-                    if (Player.unbeatableTime <= 0) Player.hurted = true;
-                    MakeEffect(Color.red, 1);
-                    break;
-
                 case 5:
-                    if (Player.unbeatableTime <= 0) Player.hurted = true;
-                    MakeEffect(Color.red, 3);
-                    break;
-
                 case 6:
-                    if (Player.unbeatableTime <= 0) Player.hurted = true;
-                    MakeEffect(Color.red, 2);
-                    break;
-
                 case 7:
                     if (Player.unbeatableTime <= 0) Player.hurted = true;
                     MakeEffect(Color.red, 1);

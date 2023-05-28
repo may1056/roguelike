@@ -843,6 +843,8 @@ public class Player : MonoBehaviour //플레이어
                 SpriteRenderer ddsr = dd.GetComponent<SpriteRenderer>();
                 ddsr.sprite = dashdealEff;
                 ddsr.sortingOrder = 8;
+
+                if (boss2.hide) boss2.PlayerKnows();
             }
         }
 
