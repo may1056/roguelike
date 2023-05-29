@@ -178,7 +178,7 @@ public class Player : MonoBehaviour //플레이어
 
     void GetNewItem() //랜덤 아이템 얻기 - 임시
     {
-        itemNum = (Random.Range(1, 15), Random.Range(1, 15));
+        itemNum = (4, Random.Range(1, 15));
         if (itemNum.Item1 == itemNum.Item2) itemNum.Item2 = -1; //겹치면 그냥 없앰
 
         manager.ItemInfo();

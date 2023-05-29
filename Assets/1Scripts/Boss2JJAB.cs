@@ -39,13 +39,11 @@ public class Boss2JJAB : MonoBehaviour
 
     void Update()
     {
-        t += 0.5f * Time.deltaTime;
+        t += (Boss2.boss2.phase2 ? 1 : 0.5f) * Time.deltaTime;
         MyPosition();
 
         if (playerknows) sr.color = Color.gray;
         else sr.color = Color.white;
-
-        if (Boss2.boss2.phase2) Destroy(gameObject);
 
     } //Update End
 
