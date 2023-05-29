@@ -269,7 +269,7 @@ public class Player : MonoBehaviour //플레이어
 
         //방향 전환
         if (Input.GetButton("Horizontal") && GameManager.prgEnd)
-            sr.flipX = Input.GetAxisRaw("Horizontal") == -1;
+            sr.flipX = Input.GetAxisRaw("Horizontal") == 1;
 
         F = sr.flipX; //하도 많이 써서 정의함
 
