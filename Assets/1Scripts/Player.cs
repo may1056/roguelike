@@ -85,7 +85,7 @@ public class Player : MonoBehaviour //플레이어
     public Sprite dashSprite;
     public float dashDist; //가능한 대쉬 거리
     public LayerMask lg; //Ground
-
+    Animator animm;
 
     //save position
     public Text posText;
@@ -146,7 +146,7 @@ public class Player : MonoBehaviour //플레이어
         rigid = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
-
+        animm = GetComponent<Animator>();
         weaponNum = 1; //임시
 
 
@@ -240,6 +240,11 @@ public class Player : MonoBehaviour //플레이어
         if (berserker && hp < 3) atkPower = red ? 3 : 2;
         else atkPower = red ? 2 : 1;
 
+        //animation player
+        if (rigid.velocity.normalized.x == 0)
+            animm.SetBool("iswalking2", false);
+        else
+            animm.SetBool("iswalking2", true);
 
 
 
