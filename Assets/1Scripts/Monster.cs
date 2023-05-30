@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public class Monster : MonoBehaviour //잡몹
 {
     public int monsterNum;
-    //00spider 01packman 02slime 03turret 04ice 05kingslime 06fire 07ghost
+    //00spider 01packman 02slime 03turret 04ice 05kingslime 06fire 07ghost 08dark
 
 
     //readonly float[,] limitX = //좌우 한계
@@ -235,6 +235,7 @@ public class Monster : MonoBehaviour //잡몹
 
             case 4: //ice
             case 6: //fire
+            case 8: //dark
                 H = tp.x > pp.x ? -2 : 2;
                 Targeting();
 
@@ -462,6 +463,7 @@ public class Monster : MonoBehaviour //잡몹
                     case 2: y = 1; break; case 3: y = 1.1f; break;
                     case 4: y = 1.5f; break; case 5: y = 0.85f; break;
                     case 6: y = 1.5f; break; case 7: y = 1.4f; break;
+                    case 8: y = 1.5f; break;
                 }
                 GameObject no = Instantiate(fadeEffect,
                     new Vector2(tp.x,tp.y+y), Quaternion.identity);

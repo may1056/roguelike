@@ -82,7 +82,7 @@ public class Boss2 : MonoBehaviour
         player = Player.player;
         cam.GetComponent<Camera>().orthographicSize = 11;
 
-        Invoke(nameof(DashAttack), 3);
+        Invoke(nameof(DashAttack), 1);
         //InvokeRepeating(nameof(Rain), 5, T);
         //InvokeRepeating(nameof(LetBullet), 8, T);
         //InvokeRepeating(nameof(Square), 12, T);
@@ -90,7 +90,7 @@ public class Boss2 : MonoBehaviour
 
         hp = 80; //임시
 
-        InvokeRepeating(nameof(FollowEffect), 0.1f, 0.1f);
+        InvokeRepeating(nameof(FollowEffect), 0.05f, 0.05f);
     }
 
 
@@ -108,11 +108,11 @@ public class Boss2 : MonoBehaviour
         cam.transform.position = -10 * Vector3.forward;
 
 
-        if (hide) sr.color = phase2 ? new Color(1, 1, 1, 0) : Color.white;
+        if (hide) sr.color = Color.white;
 
         if (orbitRotating)
         {
-            t += (phase2 ? 1 : 0.5f) * (1 - pollution) * Time.deltaTime;
+            t -= (phase2 ? 1 : 0.5f) * (1 - pollution) * Time.deltaTime;
             transform.position = new Vector2(
                 orbitRadius[mynum] * Mathf.Cos(t) + orbitCenter[mynum].x,
                 orbitRadius[mynum] * Mathf.Sin(t) + orbitCenter[mynum].y);
@@ -221,7 +221,7 @@ public class Boss2 : MonoBehaviour
 
     void DashAttack() //패턴0-A. 반짝거리면서 플레이어에게 빠르게 달려든다
     {
-        if (t > 4)
+        if (t < -4)
         {
             for (int i = 0; i < 4; i++) Destroy(jjabs[i].gameObject);
         }
@@ -291,7 +291,7 @@ public class Boss2 : MonoBehaviour
         Invoke(nameof(LetBullet), 2);
         Invoke(nameof(Square), 4);
         Invoke(nameof(Square), 6);
-        Invoke(nameof(DashAttack), 10);
+        Invoke(nameof(DashAttack), 8);
     }
 
 
@@ -325,7 +325,12 @@ public class Boss2 : MonoBehaviour
 
     void LetBullet() //패턴2. 3px 탄막이 2px 탄막을 뿌리고 2px 탄막이 1px 탄막을 뿌림
     {
-        for (int i = 0; i < (phase2 ? 8 : 4); i++) Instantiate(pxb3,
+        for (int i = 0; i < (phase2 ? 8 : 4); i++)
+            Invoke(nameof(ReleaseBullet), phase2 ? i * 0.125f : i * 0.25f);
+    }
+    void ReleaseBullet()
+    {
+        Instantiate(pxb3,
             transform.position, Quaternion.Euler(0, 0, Random.Range(0, 360)));
     }
 

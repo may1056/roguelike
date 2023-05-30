@@ -147,7 +147,7 @@ public class Player : MonoBehaviour //플레이어
         sr = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
         animm = GetComponent<Animator>();
-        weaponNum = 1; //임시
+        weaponNum = 0; //임시
 
 
         bg = transform.GetChild(2);
@@ -178,7 +178,7 @@ public class Player : MonoBehaviour //플레이어
 
     void GetNewItem() //랜덤 아이템 얻기 - 임시
     {
-        itemNum = (4, Random.Range(1, 15));
+        itemNum = (4, Random.Range(0, 15));
         if (itemNum.Item1 == itemNum.Item2) itemNum.Item2 = -1; //겹치면 그냥 없앰
 
         manager.ItemInfo();
@@ -204,7 +204,7 @@ public class Player : MonoBehaviour //플레이어
         switch (i)
         {
             //legend
-            case 0: break; //알파 수정
+            case 0: red = true; pink = true; blue = true; green = true; yellow = true; orange = true; purple = true; break; //알파 수정
 
             //rare
             case 1: canRevive = true; break;
@@ -241,11 +241,15 @@ public class Player : MonoBehaviour //플레이어
         else atkPower = red ? 2 : 1;
 
         //animation player
-        if (rigid.velocity.normalized.x == 0)
-            animm.SetBool("iswalking2", false);
-        else
+        if (Input.GetButton("Horizontal"))
             animm.SetBool("iswalking2", true);
+        else
+            animm.SetBool("iswalking2", false);
 
+        //if ()
+        //    animm.SetBool("isjumping2", false);
+        //else
+        //    animm.SetBool("isjumping2", true);
 
 
 
@@ -265,6 +269,7 @@ public class Player : MonoBehaviour //플레이어
         else notJumpTime = 0;
         isJumping = notJumpTime < 0.1f;
 
+        animm.SetBool("isjumping2", isJumping);
 
 
 

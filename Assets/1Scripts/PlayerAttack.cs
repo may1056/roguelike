@@ -75,7 +75,7 @@ public class PlayerAttack : MonoBehaviour
 
         wsP = new Vector2(9999, 9999);
 
-        GameManager.ismeleeWeapon = false;
+        GameManager.ismeleeWeapon = true;
         attackani.SetBool("IsmeleeWeapon", GameManager.ismeleeWeapon); // IsmeleeWeapon 파라미터도 GameManager.ismeleeWeapon 값따라 변경
     }
 

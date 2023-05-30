@@ -135,6 +135,12 @@ public class GameManager : MonoBehaviour //게임 총괄
     public Text coinText;
 
 
+    public Image Boss2WowWonderfulShit;
+
+
+
+
+
 
     void Awake()
     {
@@ -222,10 +228,10 @@ public class GameManager : MonoBehaviour //게임 총괄
                 Time.timeScale = 0;
             }
         }
-            //상점 열고닫기
+        //상점 열고닫기
 
 
-        if (progressTime > 1 && !prgEnd) EndProgress();
+        if (progressTime > (stage == 4 ? 8 : 4) && !prgEnd) EndProgress();
         else progressTime += Time.unscaledDeltaTime; //TimeScale에 구애받지 않음
 
 
@@ -277,6 +283,12 @@ public class GameManager : MonoBehaviour //게임 총괄
         {
             if (stage == 4) //보스
             {
+                if (progressTime > 8)
+                {
+                    Boss2WowWonderfulShit.gameObject.SetActive(false);
+                    Boss2.boss2.gameObject.SetActive(true);
+                }
+                else Boss2WowWonderfulShit.gameObject.SetActive(true);
 
             }
             else //일반 스테이지
