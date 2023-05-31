@@ -140,6 +140,9 @@ public class Player : MonoBehaviour //플레이어
     public bool poison;
 
 
+    // 보스전 전용 무기
+    public static bool Pickaxe = false;
+
 
     public void SaveHP()
     {

@@ -7,6 +7,8 @@ public class Itemcube : MonoBehaviour
     public int cubeNum;
     float dist;
 
+    public bool IsPickaxe = false; // 보스전 곡괭이
+
 
 
     void Update()
@@ -15,21 +17,27 @@ public class Itemcube : MonoBehaviour
 
         transform.GetChild(0).gameObject.SetActive(dist < 1); //E
 
-        if (dist < 1 && Input.GetKeyDown("e"))
-        {
-            if (Player.itemNum.Item1 == -1) //아이템1에 넣음
+        if(!IsPickaxe){
+            if (dist < 1 && Input.GetKeyDown("e"))
             {
-                Player.itemNum.Item1 = cubeNum;
-                GameManager.gameManager.ItemInfo();
-            }
-            else if (Player.itemNum.Item2 == -1) //아이템2에 넣음
-            {
-                Player.itemNum.Item2 = cubeNum;
-                GameManager.gameManager.ItemInfo();
-            }
-            else GameManager.gameManager.ItemChangeHaseyo();
+                if (Player.itemNum.Item1 == -1) //아이템1에 넣음
+                {
+                    Player.itemNum.Item1 = cubeNum;
+                    GameManager.gameManager.ItemInfo();
+                }
+                else if (Player.itemNum.Item2 == -1) //아이템2에 넣음
+                {
+                    Player.itemNum.Item2 = cubeNum;
+                    GameManager.gameManager.ItemInfo();
+                }
+                else GameManager.gameManager.ItemChangeHaseyo();
 
-            Destroy(gameObject);
+                Destroy(gameObject);
+            }
+        }
+        else
+        {
+            Player.Pickaxe = true;
         }
 
     } //Update End
