@@ -7,12 +7,14 @@ using TMPro;
 
 public class GameManager : MonoBehaviour //게임 총괄
 {
+    public static GameManager gameManager;
+
     public GameObject ShopSet;//상점 열고 닫/
     public Image Progress; //처음에 게임 진행 상황 알리기 위해
     float progressTime = 0; //4초까지 보여줄 거야
     public static bool prgEnd; //알려주는 거 끝났는지
 
-    static int floor = 2; //몇 층
+    static int floor = 3; //몇 층
     static int stage = 1; //몇 스테이지
 
     Transform p_l; //point_line
@@ -27,7 +29,7 @@ public class GameManager : MonoBehaviour //게임 총괄
 
     //아이템
     readonly string[] Items = { "알파 수정",
-        "부활", "자동 공격", "자해", "쉴드", "버서커", "강한 대쉬",
+        "부활", "자동 공격", "자해", "쉴드", "버서커", "대쉬 강화",
         "붉은 수정", "분홍 수정", "푸른 수정", "초록 수정", "노란 수정", "주황 수정", "보라 수정", "독", };
 
     readonly int[] Items_legendary = { 2,
@@ -41,7 +43,31 @@ public class GameManager : MonoBehaviour //게임 총괄
 
 
     public Text itemText;
+    public GameObject itemCube;
+    public Sprite[] itemSprites;
+    int icnum; //아이템 큐브 번호, 즉 새로 들어온 아이템을 뜻함
+    public GameObject itemChangeScreen;
 
+    readonly string[] Items_explaination =
+    {
+        "모든 수정의 능력치를 갖습니다.", //알파 수정
+
+        "사망 시 체력과 마나가 모두 충전된 상태로 부활합니다. (아이템 소멸)", //부활
+        "적을 타겟팅하는 공격자를 소환합니다. 약하지만, 적을 감속시킵니다.", //자동 공격
+        "크큭.. 왼손의 흑염룡이 미쳐 날뛰려 하는군.. 흑마법의 힘으로 모두 파.괴.해주겠어", //자해
+        "피격 시 체력 대신 소모되는 방어막을 2개 갖습니다. 시간이 지나면 회복됩니다.", //쉴드
+        "체력이 2 이하일 때 공격력이 1 증가합니다.", //버서커
+        "대쉬 폼 미쳤다 ㄷㄷ", //대쉬 강화
+
+        "무기의 공격력이 1 증가합니다.", //붉은 수정
+        "체력 오브가 나타날 확률이 증가합니다.", //분홍 수정
+        "마나 오브가 나타날 확률이 증가합니다.", //푸른 수정
+        "이동 속도가 증가합니다.", //초록 수정
+        "공격 속도가 증가합니다.", //노란 수정
+        "낮은 확률로 공격을 회피합니다.", //주황 수정
+        "낮은 확률로 치명타를 입힙니다.", //보라 수정
+        "타격 시 랜덤 시간 이후 추가 데미지가 발생합니다.", //독
+    };
 
 
 
@@ -123,7 +149,7 @@ public class GameManager : MonoBehaviour //게임 총괄
 
     public GameObject menuSet;
 
-    public static int killed; //킬 수
+    public static int killed = 0; //킬 수
     public Text killText;
     public static int realkilled; //실속 있는 킬 수
 
@@ -135,6 +161,8 @@ public class GameManager : MonoBehaviour //게임 총괄
     public Text coinText;
 
 
+    public Boss2 boss2;
+    public Image bossHpCase;
     public Image Boss2WowWonderfulShit;
 
 
@@ -144,6 +172,8 @@ public class GameManager : MonoBehaviour //게임 총괄
 
     void Awake()
     {
+        gameManager = this;
+
         //아래는 Canvas의 PROGRESS 오브젝트 관련
 
         prgEnd = false; //안 끝났어
@@ -167,8 +197,15 @@ public class GameManager : MonoBehaviour //게임 총괄
                 int n = f * (f - 1) - 1 + s;
 
                 //진행 상황에 맞는 건 살리고, 아닌 건 죽인다
-                if (f < floor || (f == floor && s <= stage))
+                if (f < floor)
                 {
+                    p_l.GetChild(n).GetComponent<Image>().color = Color.gray;
+                    p_l.GetChild(n).gameObject.SetActive(true);
+                    dot = n; //반응할 점 번호
+                }
+                else if (f == floor && s <= stage)
+                {
+                    p_l.GetChild(n).GetComponent<Image>().color = Color.white;
                     p_l.GetChild(n).gameObject.SetActive(true);
                     dot = n; //반응할 점 번호
                 }
@@ -176,6 +213,8 @@ public class GameManager : MonoBehaviour //게임 총괄
 
             }
         }
+
+        player.transform.GetChild(0).GetComponent<Camera>().orthographicSize = 8;
 
     } //Awake End
 
@@ -186,10 +225,6 @@ public class GameManager : MonoBehaviour //게임 총괄
         if (transform.childCount != 0)
             Destroy(transform.GetChild(0).gameObject); //맵 남아있으면 삭제
 
-        killed = 0;
-
-        coins = 0;
-
         realkilled = 0;
 
         //맵 불러오기
@@ -199,6 +234,8 @@ public class GameManager : MonoBehaviour //게임 총괄
         making = true;
         nowPhase = 0;
         phaseTime = 0;
+
+        bossHpCase.gameObject.SetActive(stage == 4);
 
     } //Start End
 
@@ -216,7 +253,7 @@ public class GameManager : MonoBehaviour //게임 총괄
 
     void Update()
     {
-    if (Input.GetKeyDown("p")) {
+        if (Input.GetKeyDown("o")) {
             if (ShopSet.activeSelf)
             {
                 ShopSet.SetActive(false);
@@ -281,12 +318,15 @@ public class GameManager : MonoBehaviour //게임 총괄
         //적 불러오기
         if (making && progressTime > 4)
         {
-            if (stage == 4) //보스
+            if (floor == 2 && stage == 4) //보스1
+            {
+            }
+            else if (floor == 3 && stage == 4) //보스2
             {
                 if (progressTime > 8)
                 {
                     Boss2WowWonderfulShit.gameObject.SetActive(false);
-                    Boss2.boss2.gameObject.SetActive(true);
+                    boss2.gameObject.SetActive(true);
                 }
                 else Boss2WowWonderfulShit.gameObject.SetActive(true);
 
@@ -365,6 +405,9 @@ public class GameManager : MonoBehaviour //게임 총괄
 
     void NextStage()
     {
+        player.SaveHP();
+        playerAtk.SaveMP();
+
         stage++;
 
         if (floor == 1 && stage == 3) //1-3은 없으니 2-1로 가라
@@ -409,7 +452,7 @@ public class GameManager : MonoBehaviour //게임 총괄
         //MP
         for(int i = 0; i < playerAtk.maxmp; i++)
         {
-            mps[i].color = Player.itemNum.Item1 == 2 || Player.itemNum.Item2 == 2 ?
+            mps[i].color = Player.itemNum.Item1 == 3 || Player.itemNum.Item2 == 3 ?
                 Color.black : new Color(0.3f, 0.3f, 0.8f); //자해 - 검정, 기본 - 마나 색
             mps[i].gameObject.SetActive(i < playerAtk.mp);
         }
@@ -435,6 +478,14 @@ public class GameManager : MonoBehaviour //게임 총괄
             }
             making = false;
             player.ClearBG();
+
+        newItem: icnum = Random.Range(0, 15);
+            if (icnum == Player.itemNum.Item1 || icnum == Player.itemNum.Item2)
+                goto newItem; //goto 쓰지 말라고 했던 것 같긴 한데 아무튼, 겹치면 다시 뽑음
+
+            GameObject ic = Instantiate(itemCube, Vector2.zero, Quaternion.identity);
+            ic.GetComponent<Itemcube>().cubeNum = icnum;
+            ic.GetComponent<SpriteRenderer>().sprite = itemSprites[icnum];
         }
 
         //다음 페이즈
@@ -465,13 +516,74 @@ public class GameManager : MonoBehaviour //게임 총괄
 
 
 
-    public void ItemInfo()
+    public void ItemInfo() //현재 무슨 아이템을 가지고 있나
     {
         int i1 = Player.itemNum.Item1, i2 = Player.itemNum.Item2;
 
         itemText.text = "1. " + (i1 == -1 ? "없음" : Items[i1]) +
             " 2. " + (i2 == -1 ? "없음" : Items[i2]);
     }
+
+    public void ItemChangeHaseyo() //인벤토리 꽉 참! 템 버려!
+    {
+        Transform[] bg = new Transform[3]; //background
+        Image[] it = new Image[3]; //item
+        Text[] na = new Text[3]; //name
+        Text[] ex = new Text[3]; //explaination
+
+        for (int i = 0; i < 3; i++)
+        {
+            bg[i] = itemChangeScreen.transform.GetChild(i);
+            it[i] = bg[i].GetChild(0).GetComponent<Image>();
+            na[i] = bg[i].GetChild(0).GetChild(0).GetComponent<Text>();
+            ex[i] = bg[i].GetChild(1).GetComponent<Text>();
+        }
+
+        it[0].sprite = itemSprites[Player.itemNum.Item1];
+        na[0].text = Items[Player.itemNum.Item1];
+        ex[0].text = Items_explaination[Player.itemNum.Item1];
+
+        it[1].sprite = itemSprites[Player.itemNum.Item2];
+        na[1].text = Items[Player.itemNum.Item2];
+        ex[1].text = Items_explaination[Player.itemNum.Item2];
+
+        it[2].sprite = itemSprites[icnum];
+        na[2].text = Items[icnum];
+        ex[2].text = Items_explaination[icnum];
+
+        itemChangeScreen.SetActive(true);
+    }
+
+    public void ItemThrow(int code) //1: item1 버리기, 2: item2 버리기, 3: 새로운 아이템 안 먹기
+    {
+        int deleteNum = icnum; //버리는 템 번호 (할당하래서 아무거나 넣음;)
+
+        switch (code)
+        {
+            case 1:
+                deleteNum = Player.itemNum.Item1;
+                Player.itemNum.Item1 = icnum;
+                break;
+
+            case 2:
+                deleteNum = Player.itemNum.Item2;
+                Player.itemNum.Item2 = icnum;
+                break;
+
+            case 3: deleteNum = icnum; break;
+        }
+
+        GameObject ic = Instantiate(itemCube,
+            Player.player.transform.position, Quaternion.identity);
+        ic.GetComponent<Itemcube>().cubeNum = deleteNum;
+        ic.GetComponent<SpriteRenderer>().sprite = itemSprites[deleteNum];
+
+        icnum = deleteNum;
+        itemChangeScreen.SetActive(false);
+    }
+
+
+
 
 
 

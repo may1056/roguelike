@@ -15,6 +15,16 @@ public class Mainmenu : MonoBehaviour // 게임매니저 사용하려했는데 �
 
     public void GameStart() // 게임 시작 버튼
     {
+        Player.player.hp = 6;
+        Player.player.SaveHP();
+        PlayerAttack.playerAtk.mp = 6;
+        PlayerAttack.playerAtk.SaveMP();
+
+        Player.itemNum = (-1, -1);
+
+        GameManager.killed = 0;
+        GameManager.coins = 0;
+
         SceneManager.LoadScene(1);
     }
 }

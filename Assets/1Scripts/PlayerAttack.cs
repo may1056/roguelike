@@ -35,6 +35,8 @@ public class PlayerAttack : MonoBehaviour
 
     public int mp;
     public int maxmp;
+    static int savedmp = 6;
+
     public float cooltime = 0;
 
     bool skilluse; //스킬 시전하는지
@@ -60,6 +62,11 @@ public class PlayerAttack : MonoBehaviour
 
 
 
+    public void SaveMP()
+    {
+        savedmp = mp;
+    }
+
 
     void Start()
     {
@@ -77,7 +84,11 @@ public class PlayerAttack : MonoBehaviour
 
         GameManager.ismeleeWeapon = true;
         attackani.SetBool("IsmeleeWeapon", GameManager.ismeleeWeapon); // IsmeleeWeapon 파라미터도 GameManager.ismeleeWeapon 값따라 변경
-    }
+
+        mp = savedmp;
+        manager.ChangeHPMP();
+
+    } //Start End
 
 
 

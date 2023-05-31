@@ -18,7 +18,7 @@ public class Player : MonoBehaviour //플레이어
     Animator anim;
 
 
-    public static (int, int) itemNum; //????이게 되네
+
     public static int weaponNum;
     //0채찍,
 
@@ -39,6 +39,7 @@ public class Player : MonoBehaviour //플레이어
 
     public int hp;
     public int maxhp;
+    static int savedhp = 6;
 
     public int shield;
     public int maxshield;
@@ -121,6 +122,8 @@ public class Player : MonoBehaviour //플레이어
 
 
     //아이템 관련
+    public static (int, int) itemNum = (-1, -1); //????이게 되네
+
     //1. 부활
     bool canRevive;
     public Image reviveImage;
@@ -131,12 +134,17 @@ public class Player : MonoBehaviour //플레이어
     //6. 강한 대쉬
     public bool dashdeal;
     public Sprite dashdealEff, dashupgradeEff;
-    //7. ~ 12. 빨핑파초노주 수정
+    //7. ~ 13. 빨핑파초노주보 수정
     public bool red, pink, blue, green, yellow, orange, purple;
-    //13. 독
+    //14. 독
     public bool poison;
 
 
+
+    public void SaveHP()
+    {
+        savedhp = hp;
+    }
 
 
     void Awake()
@@ -170,6 +178,7 @@ public class Player : MonoBehaviour //플레이어
     {
         GetNewItem();
 
+        hp = savedhp;
         manager.ChangeHPMP();
 
     } //Start End
@@ -178,8 +187,8 @@ public class Player : MonoBehaviour //플레이어
 
     void GetNewItem() //랜덤 아이템 얻기 - 임시
     {
-        itemNum = (4, Random.Range(0, 15));
-        if (itemNum.Item1 == itemNum.Item2) itemNum.Item2 = -1; //겹치면 그냥 없앰
+        //itemNum = (Random.Range(0, 15), Random.Range(0, 15));
+        //if (itemNum.Item1 == itemNum.Item2) itemNum.Item2 = -1; //겹치면 그냥 없앰
 
         manager.ItemInfo();
 
