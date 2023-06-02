@@ -143,6 +143,11 @@ public class Player : MonoBehaviour //플레이어
     public static bool Pickaxe = false;
 
 
+
+    public Sprite Empty;
+
+
+
     public void SaveHP()
     {
         savedhp = hp;
@@ -708,6 +713,13 @@ public class Player : MonoBehaviour //플레이어
         int c = protect ? 0 : 1;
         hurtImage.color = new Color(c, c, c, 0.5f * hurtTime);
         hurtTime -= 4 * Time.deltaTime;
+
+        GameObject aya = Instantiate(fadeEffect, transform.position, Quaternion.identity);
+        SpriteRenderer ayasr = aya.transform.GetComponent<SpriteRenderer>();
+        //ayasr.sprite = Empty;
+        ayasr.color = protect ? Color.gray : Color.red;
+        ayasr.flipX = F;
+        ayasr.sortingOrder = 8;
     }
 
 

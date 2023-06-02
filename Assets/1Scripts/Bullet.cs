@@ -127,7 +127,8 @@ public class Bullet : MonoBehaviour //탄막
                 case 0: MakeEffect(Color.gray, 0.5f); break;
                 case 1: MakeEffect(new Color(0.56f, 0.71f, 0.84f), 1); break;
                 case 4: case 5: case 6: case 7:
-                    MakeEffect(sr.color, 1); Destroy(gameObject); break;
+                    if (sr != null) MakeEffect(sr.color, 1);
+                    Destroy(gameObject); break;
             }
         }
 
@@ -149,6 +150,7 @@ public class Bullet : MonoBehaviour //탄막
                 case 0:
                     if (Player.unbeatableTime <= 0) Player.hurted = true;
                     MakeEffect(Color.red, 0.5f);
+                    Destroy(gameObject);
                     break;
 
                 case 1:
@@ -159,6 +161,7 @@ public class Bullet : MonoBehaviour //탄막
                         if (pl.slow > 0.965f) pl.slow = 1;
                         else pl.slow += 0.035f;
                     }
+                    Destroy(gameObject);
                     break;
 
                 case 2:
@@ -173,17 +176,24 @@ public class Bullet : MonoBehaviour //탄막
                         }
                         else pl.burn += 0.035f;
                     }
+                    Destroy(gameObject);
                     break;
+            }
+        }
 
+        if (l == 21)
+        {
+            switch (bulletType)
+            {
                 case 4:
                 case 5:
                 case 6:
                 case 7:
                     if (Player.unbeatableTime <= 0) Player.hurted = true;
                     MakeEffect(Color.red, 1);
+                    Destroy(gameObject);
                     break;
             }
-            Destroy(gameObject);
         }
 
     } //OnTriggerEnter2D End

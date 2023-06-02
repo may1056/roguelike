@@ -30,6 +30,7 @@ public class Boss2 : MonoBehaviour
     public bool hide = false;
     public GameObject jjab;
     bool orbitRotating = true;
+    float dashx, dashy;
     int mynum;
     public Vector2[] orbitCenter = //궤도 중심
         { Vector2.zero, new Vector2(-6.5f, -2), new Vector2(6.5f, -2), new Vector2(-11.5f, 2.5f), new Vector2(11.5f, 2.5f) };
@@ -43,9 +44,11 @@ public class Boss2 : MonoBehaviour
     public GameObject rain;
     readonly float[] rainR = { 0.3f, 0.4f, 0.4f, 0.4f, 0.5f, 0.5f, 0.6f, 0.6f, 0.7f, 0.8f },
         rainG = { 0.6f, 0.6f, 0.7f, 0.8f, 0.7f, 0.8f, 0.7f, 0.8f, 0.8f, 0.9f };
+    public Sprite rainfrom;
 
     //pattern2
     public GameObject pxb3; //3 pixel bullet
+    public Sprite bulletborder; //탄막 껍데기 스프라이트
 
     //pattern3
     public GameObject fadeEffect;
@@ -55,6 +58,7 @@ public class Boss2 : MonoBehaviour
     int thenumberofsquares = 6;
 
 
+    public Sprite Iamboss;
 
 
     public Sprite Empty;
@@ -95,8 +99,16 @@ public class Boss2 : MonoBehaviour
 
         hp = 80; //임시
 
-        InvokeRepeating(nameof(FollowEffect), 0.05f, 0.05f);
-    }
+        InvokeRepeating(nameof(FollowEffect), 0.1f, 0.1f);
+
+        //<- 보스
+        GameObject iab = Instantiate(fadeEffect, new Vector2(
+            transform.position.x + 2, transform.position.y), Quaternion.identity);
+        iab.transform.SetParent(transform);
+        iab.GetComponent<SpriteRenderer>().sprite = Iamboss;
+        iab.GetComponent<Fade>().k = 0.02f;
+
+    } //Start End
 
 
 
@@ -106,7 +118,7 @@ public class Boss2 : MonoBehaviour
         if (hp <= 30)
         {
             phase2 = true;
-            thenumberofsquares = 12;
+            thenumberofsquares = 9;
             hpText.color = new Color(1, 0, 0, 0.3f);
         }
 
@@ -117,11 +129,11 @@ public class Boss2 : MonoBehaviour
 
         if (orbitRotating)
         {
-            t -= 0.05f * (90 - hp) * (1 - pollution) * Time.deltaTime;
-            transform.SetPositionAndRotation(new Vector2(
+            t -= 0.02f * (100 - hp) * (1 - pollution) * Time.deltaTime;
+
+            transform.position = new Vector2(
                 orbitRadius[mynum] * Mathf.Cos(t) + orbitCenter[mynum].x,
-                orbitRadius[mynum] * Mathf.Sin(t) + orbitCenter[mynum].y),
-                Quaternion.Euler(0, 0, t));
+                orbitRadius[mynum] * Mathf.Sin(t) + orbitCenter[mynum].y);
 
             col.isTrigger = true;
         }
@@ -129,10 +141,6 @@ public class Boss2 : MonoBehaviour
         {
             rigid.velocity = (1 - Time.deltaTime) * rigid.velocity;
 
-            sr.color = new Color(Random.Range(0, 11) * 0.1f,
-                Random.Range(0, 11) * 0.1f, Random.Range(0, 11) * 0.1f);
-
-            MakeEffect(doubleCircle, sr.color);
             MakeEffect(sr.sprite, sr.color);
 
             col.isTrigger = false;
@@ -243,12 +251,28 @@ public class Boss2 : MonoBehaviour
         hide = false;
         orbitRotating = false;
 
-        rigid.AddForce((10 + 0.5f * (90 - hp) * (1 - pollution)) * new Vector2(
-            Player.player.transform.position.x - tp.x,
-            Player.player.transform.position.y - tp.y).normalized,
-            ForceMode2D.Impulse);
+        dashx = Player.player.transform.position.x - tp.x;
+        dashy = Player.player.transform.position.y - tp.y;
+
+        rigid.AddForce((10 + 0.2f * (100 - hp) * (1 - pollution))
+            * new Vector2(dashx, dashy).normalized, ForceMode2D.Impulse);
+
+        for (int i = 1; i < (phase2 ? 38 : 18); i++)
+            Invoke(nameof(DashBullet), i * (phase2 ? 0.025f : 0.05f));
 
         if (!IsInvoking(nameof(HideMyself))) Invoke(nameof(HideMyself), 1);
+    }
+    void DashBullet()
+    {
+        GameObject db = Instantiate(pxb1, tp, Quaternion.Euler(
+            0, 0, 180 + Mathf.Rad2Deg * Mathf.Atan2(dashy, dashx)));
+        db.transform.GetComponent<SpriteRenderer>().color = sr.color;
+        db.transform.GetComponent<Bullet>().bulletSpeed = 0.5f;
+
+        sr.color = new Color(Random.Range(0, 11) * 0.1f,
+                Random.Range(0, 11) * 0.1f, Random.Range(0, 11) * 0.1f);
+
+        MakeEffect(bulletborder, sr.color);
     }
     void HideMyself() //패턴0-B. 텔레포트하면서 랜덤 궤도에서 도는 분신 생성
     {
@@ -270,7 +294,7 @@ public class Boss2 : MonoBehaviour
         orbitRotating = true;
 
         hide = true;
-        InvokeRepeating(nameof(JjabBullet), 0, phase2 ? 0.5f : 4);
+        InvokeRepeating(nameof(JjabBullet), 0, phase2 ? 0.7f : 4);
     }
     void JjabBullet() //패턴0-C. 발각되기 전까지는 초록 탄막 발사
     {
@@ -289,6 +313,11 @@ public class Boss2 : MonoBehaviour
                     - jtp.y, player.transform.position.x - jtp.x) : t * 360 + j * 45));
                 jjabB.GetComponent<SpriteRenderer>().color = Green;
                 jjabB.GetComponent<Bullet>().bulletSpeed = Speed;
+
+                GameObject eff = Instantiate(fadeEffect, jtp, Quaternion.identity);
+                SpriteRenderer effsr = eff.GetComponent<SpriteRenderer>();
+                effsr.sprite = bulletborder;
+                effsr.color = Green;
             }
         }
     }
@@ -300,6 +329,9 @@ public class Boss2 : MonoBehaviour
 
         for (int i = 0; i < 4; i++)
             jjabs[i].GetComponent<Boss2JJAB>().playerknows = true;
+
+        MakeRainFrom(true, true, 1);
+        if (phase2) MakeRainFrom(false, true, 1);
 
         //데미지를 입으면 드러나고, 1초 뒤에 비가 내리고 2초 뒤에 붉은 탄막 날리고 4초 뒤에 1차 스퀘어 6초 뒤에 2차 스퀘어 10초 뒤에 처음부터 반복
         Invoke(nameof(Rain), 1);
@@ -315,12 +347,15 @@ public class Boss2 : MonoBehaviour
     {
         for (int i = 0; i < 20; i++)
             Invoke(nameof(RainMaker), i * 0.1f);
+
+        MakeRainFrom(true, false, 0.3f);
+        if (phase2) MakeRainFrom(false, false, 0.3f);
     }
     void RainMaker()
     {
         //페이즈1: 위쪽에서 떨어짐
         GameObject bi = Instantiate(rain, new Vector2(
-            Random.Range(-189, 190) * 0.1f, 8.9f), Quaternion.identity);
+            Random.Range(-179, 180) * 0.1f, 8.9f), Quaternion.identity);
         int n = Random.Range(0, 10);
         bi.GetComponent<SpriteRenderer>().color
             = new Color(rainR[n], rainG[n], 1); //보기 좋은 푸른색
@@ -328,12 +363,21 @@ public class Boss2 : MonoBehaviour
         if (phase2) //페이즈2: 아래쪽에서도 올라감
         {
             GameObject bi2 = Instantiate(rain, new Vector2(
-            Random.Range(-189, 190) * 0.1f, -8.9f), Quaternion.identity);
+            Random.Range(-179, 180) * 0.1f, -8.9f), Quaternion.identity);
             int n2 = Random.Range(0, 10);
             bi2.GetComponent<SpriteRenderer>().color
                 = new Color(rainR[n2], rainG[n2], 1);
             bi2.GetComponent<Rigidbody2D>().gravityScale = -1;
         }
+    }
+    void MakeRainFrom(bool ceiling, bool ud, float k)
+    {
+        GameObject rf = Instantiate(fadeEffect, (ceiling ? 9.5f : -9.5f) * Vector2.up,
+            Quaternion.Euler(0, 0, ceiling ? 0 : 180));
+        Fade rff = rf.GetComponent<Fade>();
+        rff.up_down = ud;
+        rff.k = k;
+        rf.GetComponent<SpriteRenderer>().sprite = rainfrom;
     }
 
 
@@ -347,11 +391,13 @@ public class Boss2 : MonoBehaviour
     {
         Instantiate(pxb3,
             transform.position, Quaternion.Euler(0, 0, Random.Range(0, 360)));
+
+        MakeEffect(bulletborder, new Color(1, 0.4f, 0));
     }
 
 
 
-    void Square() //패턴3. 배경을 18분할하여 그중 6 or 12개 랜덤 선정 데미지
+    void Square() //패턴3. 배경을 18분할하여 그중 6 or 9개 랜덤 선정 데미지
     {
         //x좌표는 -15, -9, -3, 3, 9, 15 중 하나, y좌표는 -6, 0, 6 중 하나
         for (int i = 0; i < thenumberofsquares; i++)
@@ -382,8 +428,24 @@ public class Boss2 : MonoBehaviour
         {
             if (x[i] - 3 < px && px < x[i] + 3 && y[i] - 3 < py && py < y[i] + 3)
                 area = true;
+
+            //붉은 탄막 (왼)
+            GameObject left = Instantiate(pxb1, new Vector2(
+                -17.9f, Random.Range(-89, 90) * 0.1f), Quaternion.identity);
+            RedBullet(left.transform);
+            //붉은 탄막 (오)
+            GameObject right = Instantiate(pxb1, new Vector2(
+                17.9f, Random.Range(-89, 90) * 0.1f), Quaternion.Euler(0, 0, 180));
+            RedBullet(right.transform);
         }
+
         if (area && Player.unbeatableTime <= 0) Player.hurted = true;
+    }
+    void RedBullet(Transform rb)
+    {
+        rb.GetComponent<SpriteRenderer>().color = Color.red;
+        rb.GetComponent<Bullet>().bulletSpeed = Random.Range(1, 6);
+        rb.localScale = 1.25f * Vector2.one;
     }
     void MakeSquare(float red, bool ud, int k)
     {
@@ -452,7 +514,7 @@ public class Boss2 : MonoBehaviour
 
         SpriteRenderer hsr = hurt.transform.GetComponent<SpriteRenderer>();
         //hsr.flipX = sr.flipX;
-        hsr.sortingOrder = 5;
+        hsr.sortingOrder = 21;
         hsr.sprite = Empty;
         hsr.color = c;
 

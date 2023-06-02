@@ -186,10 +186,10 @@ public class PlayerAttack : MonoBehaviour
             wsAvailable = true;
             wsgoing = 3;
             wscount = 3;
-            if (player.selfinjury) wsCool = 10; //자해 시 빠른 스킬
+            if (player.selfinjury) wsCool = 5; //자해 시 빠른 스킬
             else
             {
-                wsCool = 20;
+                wsCool = 10;
                 mp -= 2;
                 manager.ChangeHPMP();
             }

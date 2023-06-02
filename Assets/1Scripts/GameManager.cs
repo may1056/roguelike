@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviour //게임 총괄
     public static bool prgEnd; //알려주는 거 끝났는지
 
     static int floor = 3; //몇 층
-    static int stage = 1; //몇 스테이지
+    static int stage = 4; //몇 스테이지
 
     Transform p_l; //point_line
     int dot; //반짝거릴 점 번호
@@ -272,6 +272,9 @@ public class GameManager : MonoBehaviour //게임 총괄
 
         if (progressTime > (stage == 4 ? 8 : 4) && !prgEnd) EndProgress();
         else progressTime += Time.unscaledDeltaTime; //TimeScale에 구애받지 않음
+
+
+        ChangeHPMP();
 
 
         게임실행시간 += Time.deltaTime;

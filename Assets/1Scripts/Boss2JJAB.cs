@@ -39,11 +39,11 @@ public class Boss2JJAB : MonoBehaviour
 
     void Update()
     {
-        t += (Boss2.boss2.phase2 ? 1 : 0.5f) * Time.deltaTime;
+        t += 0.02f * (100 - Boss2.boss2.hp) * Time.deltaTime;
         MyPosition();
 
         if (playerknows) sr.color = Color.gray;
-        else sr.color = Color.white;
+        else sr.color = new Color(0.5f, 1, 0.5f);
 
     } //Update End
 
@@ -71,11 +71,12 @@ public class Boss2JJAB : MonoBehaviour
         MakeEffect(sr.sprite, sr.color);
     }
 
-
+    /*
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (playerknows && other.CompareTag("Player")
             && Player.unbeatableTime <= 0) Player.hurted = true;
     }
+    */
 
 } //Boss2JJAB End

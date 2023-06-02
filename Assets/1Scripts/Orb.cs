@@ -58,7 +58,6 @@ public class Orb : MonoBehaviour //구체
                 case 1: PlayerAttack.playerAtk.mp++; break;
                 case 2: GameManager.coins++; break;
             }
-            GameManager.gameManager.ChangeHPMP();
             Destroy(gameObject);
         }
     }
