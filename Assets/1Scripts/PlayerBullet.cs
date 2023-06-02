@@ -18,6 +18,8 @@ public class PlayerBullet : MonoBehaviour
 
     float r1, r2;
 
+    bool boss2dealed = false;
+
 
     void Start()
     {
@@ -91,6 +93,45 @@ public class PlayerBullet : MonoBehaviour
         Vector2 tp = transform.position;
 
         transform.Translate(bulletSpeed * (pbType == 0 ? r1 : 1) * t * Time.deltaTime * Vector2.right);
+
+
+        //보스2한테 총지팡이 스킬이 안 먹히는 것 때문에 콜라이더 충돌 대신 거리 계산으로 처리
+        if (Boss2.boss2.gameObject.activeSelf && pbType == 2)
+        {
+            Boss2 b2 = Boss2.boss2;
+            if (b2.hide) b2.PlayerKnows();
+
+            float boss2dist = Vector2.Distance(tp, b2.transform.position);
+
+            if (boss2dist < 1 && !boss2dealed)
+            {
+                boss2dealed = true;
+
+                if (b2.pollution > 0.5f) b2.pollution = 1;
+                else b2.pollution += 0.5f;
+                if (b2.polluted)
+                {
+                    b2.pollution = 0.5f;
+                    b2.Apa(Color.red);
+                    b2.hp--; //자동 공격은 버서커 딜증 대상 아님
+                    if (Player.player.purple) //보라 수정: 치명타
+                    {
+                        int r = Random.Range(0, 10);
+                        if (r < 2)
+                        {
+                            b2.hp--;
+                            Debug.Log("치명");
+                        }
+                    }
+                    if (Player.player.poison) b2.RepeatAD();
+                    MakeEffect(transform.position, new Color(0.6f, 0.4f, 1), 0.7f);
+                    CancelInvoke(nameof(b2.RemovePollution));
+                }
+                Destroy(gameObject);
+            }
+
+            if (boss2dist > 1) boss2dealed = false;
+        }
 
 
         if (Mathf.Abs(tp.x) > 100 || Mathf.Abs(tp.y) > 100) Destroy(gameObject);
@@ -202,30 +243,6 @@ public class PlayerBullet : MonoBehaviour
                     if (Player.player.poison) b2.RepeatAD();
 
                     MakeEffect(other.transform.position, Color.red, 1);
-                    break;
-
-                case 2:
-                    if (b2.pollution > 0.5f) b2.pollution = 1;
-                    else b2.pollution += 0.5f;
-                    if (b2.polluted)
-                    {
-                        b2.pollution = 0.5f;
-                        b2.Apa(Color.red);
-                        b2.hp--; //자동 공격은 버서커 딜증 대상 아님
-                        if (Player.player.purple) //보라 수정: 치명타
-                        {
-                            int r = Random.Range(0, 10);
-                            if (r < 2)
-                            {
-                                b2.hp--;
-                                Debug.Log("치명");
-                            }
-                        }
-                        if (Player.player.poison) b2.RepeatAD();
-                        MakeEffect(transform.position, new Color(0.6f, 0.4f, 1), 0.7f);
-                        CancelInvoke(nameof(b2.RemovePollution));
-                    }
-                    Destroy(gameObject);
                     break;
             }
         }

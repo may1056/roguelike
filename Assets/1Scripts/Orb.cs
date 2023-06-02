@@ -5,6 +5,7 @@ using UnityEngine;
 public class Orb : MonoBehaviour //구체
 {
     Rigidbody2D rigid;
+    CircleCollider2D col;
 
     float dist;
     public int kind; //0: hp오브, 1: mp오브, 2: 동전
@@ -17,6 +18,7 @@ public class Orb : MonoBehaviour //구체
     private void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
+        col = GetComponent<CircleCollider2D>();
     }
 
 
@@ -38,11 +40,13 @@ public class Orb : MonoBehaviour //구체
 
             rigid.mass = 0;
             rigid.gravityScale = 0;
+            col.isTrigger = true;
         }
         else //그냥 있는다
         {
             rigid.mass = 0.2f;
-            rigid.gravityScale = 1;
+            rigid.gravityScale = 0.5f;
+            col.isTrigger = false;
         }
 
 
@@ -54,9 +58,12 @@ public class Orb : MonoBehaviour //구체
                 case 1: PlayerAttack.playerAtk.mp++; break;
                 case 2: GameManager.coins++; break;
             }
-            Player.getOrb = true;
+            GameManager.gameManager.ChangeHPMP();
             Destroy(gameObject);
         }
     }
+
+
+
 
 } //Orb End

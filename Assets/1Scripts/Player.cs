@@ -104,7 +104,6 @@ public class Player : MonoBehaviour //플레이어
     Vector2 slideP;
     public LayerMask lb; //Block
 
-    public static bool getOrb; //오브 먹었는지
 
 
     SpriteRenderer bgsr; //배경 스프라이트렌더러
@@ -167,8 +166,6 @@ public class Player : MonoBehaviour //플레이어
 
         unbeatableTime = 0;
 
-        getOrb = false;
-
         bgsr = bg.GetComponent<SpriteRenderer>();
 
         canRevive = false;
@@ -179,9 +176,10 @@ public class Player : MonoBehaviour //플레이어
 
     void Start()
     {
+        hp = savedhp;
+
         GetNewItem();
 
-        hp = savedhp;
         manager.ChangeHPMP();
 
     } //Start End
@@ -204,7 +202,7 @@ public class Player : MonoBehaviour //플레이어
         canRevive = false; //1
         transform.GetChild(6).gameObject.SetActive(false); //2
         maxhp = 6; selfinjury = false; //3
-        maxshield = 0; shield = 0; //4
+        maxshield = 1; shield = 1; //4
         berserker = false; //5
         dashdeal = false; dashDist = 8; maxstamina = 3; //6
 
@@ -588,19 +586,6 @@ public class Player : MonoBehaviour //플레이어
             manager.ChangeHPMP();
         }
 
-
-
-
-
-        //ㅇㅂㅇㅂㅇㅂㅇㅂㅇㅂㅇㅂㅇㅂㅇㅂㅇㅂㅇㅂㅇㅂㅇㅂㅇㅂㅇㅂㅇㅂ
-
-        if (getOrb)
-        {
-            manager.ChangeHPMP();
-            getOrb = false;
-        }
-
-        //if (mp > maxmp) mp = maxmp;
 
 
 

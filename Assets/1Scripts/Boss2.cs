@@ -10,9 +10,9 @@ public class Boss2 : MonoBehaviour
     public static Boss2 boss2;
 
     Rigidbody2D rigid;
+    BoxCollider2D col;
     SpriteRenderer sr;
 
-    float T; //주기
     float t; //시간
 
     public int hp;
@@ -37,10 +37,11 @@ public class Boss2 : MonoBehaviour
         { 7.5f, 6.5f, 6.5f, 4.5f, 4.5f };
     GameObject[] jjabs = new GameObject[4];
     public GameObject pxb1; //1 pixel bullet
+    public GameObject hpOrb, mpOrb;
 
     //pattern1
     public GameObject rain;
-    float[] rainR = { 0.3f, 0.4f, 0.4f, 0.4f, 0.5f, 0.5f, 0.6f, 0.6f, 0.7f, 0.8f },
+    readonly float[] rainR = { 0.3f, 0.4f, 0.4f, 0.4f, 0.5f, 0.5f, 0.6f, 0.6f, 0.7f, 0.8f },
         rainG = { 0.6f, 0.6f, 0.7f, 0.8f, 0.7f, 0.8f, 0.7f, 0.8f, 0.8f, 0.9f };
 
     //pattern2
@@ -68,15 +69,19 @@ public class Boss2 : MonoBehaviour
 
 
 
+    void Awake()
+    {
+        boss2 = this;
+        gameObject.SetActive(false);
+    }
+
 
     void Start()
     {
-        boss2 = this;
-
         rigid = GetComponent<Rigidbody2D>();
+        col = GetComponent<BoxCollider2D>();
         sr = GetComponent<SpriteRenderer>();
 
-        T = 15; //임시
         t = 0;
 
         player = Player.player;
@@ -112,10 +117,13 @@ public class Boss2 : MonoBehaviour
 
         if (orbitRotating)
         {
-            t -= (phase2 ? 1 : 0.5f) * (1 - pollution) * Time.deltaTime;
-            transform.position = new Vector2(
+            t -= 0.05f * (90 - hp) * (1 - pollution) * Time.deltaTime;
+            transform.SetPositionAndRotation(new Vector2(
                 orbitRadius[mynum] * Mathf.Cos(t) + orbitCenter[mynum].x,
-                orbitRadius[mynum] * Mathf.Sin(t) + orbitCenter[mynum].y);
+                orbitRadius[mynum] * Mathf.Sin(t) + orbitCenter[mynum].y),
+                Quaternion.Euler(0, 0, t));
+
+            col.isTrigger = true;
         }
         else
         {
@@ -126,6 +134,8 @@ public class Boss2 : MonoBehaviour
 
             MakeEffect(doubleCircle, sr.color);
             MakeEffect(sr.sprite, sr.color);
+
+            col.isTrigger = false;
         }
 
 
@@ -223,12 +233,17 @@ public class Boss2 : MonoBehaviour
     {
         if (t < -4)
         {
-            for (int i = 0; i < 4; i++) Destroy(jjabs[i].gameObject);
+            for (int i = 0; i < 4; i++)
+            {
+                Instantiate(Random.Range(0, 3) == 0 ? mpOrb : hpOrb,
+                    jjabs[i].transform.position, Quaternion.identity);
+                Destroy(jjabs[i].gameObject);
+            }
         }
         hide = false;
         orbitRotating = false;
 
-        rigid.AddForce((phase2 ? 40 : 20) * (1 - pollution) * new Vector2(
+        rigid.AddForce((10 + 0.5f * (90 - hp) * (1 - pollution)) * new Vector2(
             Player.player.transform.position.x - tp.x,
             Player.player.transform.position.y - tp.y).normalized,
             ForceMode2D.Impulse);

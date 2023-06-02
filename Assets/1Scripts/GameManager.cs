@@ -55,7 +55,7 @@ public class GameManager : MonoBehaviour //게임 총괄
         "사망 시 체력과 마나가 모두 충전된 상태로 부활합니다. (아이템 소멸)", //부활
         "적을 타겟팅하는 공격자를 소환합니다. 약하지만, 적을 감속시킵니다.", //자동 공격
         "크큭.. 왼손의 흑염룡이 미쳐 날뛰려 하는군.. 흑마법의 힘으로 모두 파.괴.해주겠어", //자해
-        "피격 시 체력 대신 소모되는 방어막을 2개 갖습니다. 시간이 지나면 회복됩니다.", //쉴드
+        "피격 시 체력 대신 소모되는 방어막을 하나 더 갖습니다. 시간이 지나면 회복됩니다.", //쉴드
         "체력이 2 이하일 때 공격력이 1 증가합니다.", //버서커
         "대쉬 폼 미쳤다 ㄷㄷ", //대쉬 강화
 
@@ -164,7 +164,7 @@ public class GameManager : MonoBehaviour //게임 총괄
     public Boss2 boss2;
     public Image bossHpCase;
     public Image Boss2WowWonderfulShit;
-
+    public GameObject boss2map;
 
 
 
@@ -228,7 +228,9 @@ public class GameManager : MonoBehaviour //게임 총괄
         realkilled = 0;
 
         //맵 불러오기
-        map = Instantiate(maps[mapNum]); //맵을 생성한다
+        if (stage == 4) map = Instantiate(boss2map);
+        else map = Instantiate(maps[mapNum]); //맵을 생성한다
+
         map.transform.SetParent(gameObject.transform); //게임매니저가 맵의 부모가 됨
 
         making = true;
