@@ -89,7 +89,10 @@ public class Boss2 : MonoBehaviour
         t = 0;
 
         player = Player.player;
+
         cam.GetComponent<Camera>().orthographicSize = 11;
+
+        player.transform.GetChild(2).gameObject.SetActive(false);
 
         Invoke(nameof(DashAttack), 1);
 
@@ -118,8 +121,6 @@ public class Boss2 : MonoBehaviour
 
         if (hp <= 0) //발광
         {
-            //SceneManager.LoadScene(3);
-
             if (hp > -5)
             {
                 CancelInvoke();
@@ -131,10 +132,15 @@ public class Boss2 : MonoBehaviour
                 {
                     for (int i = 0; i < 4; i++) Destroy(jjabs[i].gameObject);
                 }
+                col.isTrigger = true;
             }
 
             t += Time.deltaTime;
             if (t > 120) CancelInvoke(nameof(Craziness));
+            if (t > 125)
+            {
+                SceneManager.LoadScene(3);
+            }
 
             transform.position = Vector2.zero;
         }
@@ -255,31 +261,31 @@ public class Boss2 : MonoBehaviour
 
     void Craziness()
     {
-        for (int i = 0; i < 20; i++)
+        for (int i = 0; i < (t < 110 ? 10 : 25); i++)
         {
             GameObject b = Instantiate(pxb1, tp,
                 Quaternion.Euler(0, 0, 10 * i + hp));
             b.GetComponent<SpriteRenderer>().color = Color.gray;
             b.GetComponent<Bullet>().bulletSpeed = Random.Range(4, 6);
-            b.transform.localScale = 0.1f * Random.Range(10, 21) * Vector2.one;
+            b.transform.localScale = 0.1f * Random.Range(5, 21) * Vector2.one;
 
             GameObject _b = Instantiate(pxb1, tp,
                 Quaternion.Euler(0, 0, -10 * i - hp));
             _b.GetComponent<SpriteRenderer>().color = Color.black;
             _b.GetComponent<Bullet>().bulletSpeed = Random.Range(4, 6);
-            _b.transform.localScale = 0.1f * Random.Range(10, 21) * Vector2.one;
+            _b.transform.localScale = 0.1f * Random.Range(5, 21) * Vector2.one;
 
             GameObject __b = Instantiate(pxb1, tp,
                 Quaternion.Euler(0, 0, Random.Range(0, 360)));
             __b.GetComponent<SpriteRenderer>().color = new Color(0.75f, 0.75f, 0.75f);
             __b.GetComponent<Bullet>().bulletSpeed = Random.Range(3, 5);
-            __b.transform.localScale = 0.1f * Random.Range(10, 21) * Vector2.one;
+            __b.transform.localScale = 0.1f * Random.Range(5, 21) * Vector2.one;
 
             GameObject ___b = Instantiate(pxb1, tp,
                 Quaternion.Euler(0, 0, Random.Range(0, 360)));
             ___b.GetComponent<SpriteRenderer>().color = new Color(0.25f, 0.25f, 0.25f);
             ___b.GetComponent<Bullet>().bulletSpeed = Random.Range(5, 7);
-            ___b.transform.localScale = 0.1f * Random.Range(10, 21) * Vector2.one;
+            ___b.transform.localScale = 0.1f * Random.Range(5, 21) * Vector2.one;
         }
         hp -= 10 + Random.Range(0, 3);
     }

@@ -97,6 +97,13 @@ public class Bullet : MonoBehaviour //탄막
             }
         }*/
 
+        if (bulletType >= 4 && bulletType <= 7 &&
+            (tp.x > 19 || tp.x < -19 || tp.y > 9 || tp.y < -9))
+        {
+            if (sr != null) MakeEffect(sr.color, 1);
+            Destroy(gameObject);
+        }
+
     } //Update End
 
 
