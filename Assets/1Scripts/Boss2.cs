@@ -102,7 +102,7 @@ public class Boss2 : MonoBehaviour
             transform.position.x + 2, transform.position.y), Quaternion.identity);
         iab.transform.SetParent(transform);
         iab.GetComponent<SpriteRenderer>().sprite = Iamboss;
-        iab.GetComponent<Fade>().k = 0.01f;
+        iab.GetComponent<Fade>().k = 0.02f;
 
     } //Start End
 
@@ -127,9 +127,14 @@ public class Boss2 : MonoBehaviour
                 t = 100;
                 InvokeRepeating(nameof(Craziness),1,0.2f);
                 sr.color = Color.white;
+                if (jjabs[1] != null)
+                {
+                    for (int i = 0; i < 4; i++) Destroy(jjabs[i].gameObject);
+                }
             }
 
             t += Time.deltaTime;
+            if (t > 120) CancelInvoke(nameof(Craziness));
 
             transform.position = Vector2.zero;
         }
@@ -140,7 +145,7 @@ public class Boss2 : MonoBehaviour
             if (hp <= 30)
             {
                 phase2 = true;
-                thenumberofsquares = 9;
+                thenumberofsquares = 8;
                 hpText.color = new Color(1, 0, 0, 0.3f);
             }
 
@@ -250,27 +255,40 @@ public class Boss2 : MonoBehaviour
 
     void Craziness()
     {
-        float r = Random.Range(0, 10) * 0.1f;
-        GameObject bb = Instantiate(fadeEffect);
-        SpriteRenderer bbsr = bb.GetComponent<SpriteRenderer>();
-        bbsr.sprite = bulletborder;
-        bbsr.color = new Color(r, r, r);
-
-        for (int i = 0; i < 60; i++)
+        for (int i = 0; i < 20; i++)
         {
             GameObject b = Instantiate(pxb1, tp,
-                Quaternion.Euler(0, 0, i * 6 + hp + Random.Range(0, 6)));
-            b.GetComponent<SpriteRenderer>().color = new Color(r, r, r);
-            b.transform.localScale = 0.1f * Random.Range(5, 16) * Vector2.one;
+                Quaternion.Euler(0, 0, 10 * i + hp));
+            b.GetComponent<SpriteRenderer>().color = Color.gray;
+            b.GetComponent<Bullet>().bulletSpeed = Random.Range(4, 6);
+            b.transform.localScale = 0.1f * Random.Range(10, 21) * Vector2.one;
+
+            GameObject _b = Instantiate(pxb1, tp,
+                Quaternion.Euler(0, 0, -10 * i - hp));
+            _b.GetComponent<SpriteRenderer>().color = Color.black;
+            _b.GetComponent<Bullet>().bulletSpeed = Random.Range(4, 6);
+            _b.transform.localScale = 0.1f * Random.Range(10, 21) * Vector2.one;
+
+            GameObject __b = Instantiate(pxb1, tp,
+                Quaternion.Euler(0, 0, Random.Range(0, 360)));
+            __b.GetComponent<SpriteRenderer>().color = new Color(0.75f, 0.75f, 0.75f);
+            __b.GetComponent<Bullet>().bulletSpeed = Random.Range(3, 5);
+            __b.transform.localScale = 0.1f * Random.Range(10, 21) * Vector2.one;
+
+            GameObject ___b = Instantiate(pxb1, tp,
+                Quaternion.Euler(0, 0, Random.Range(0, 360)));
+            ___b.GetComponent<SpriteRenderer>().color = new Color(0.25f, 0.25f, 0.25f);
+            ___b.GetComponent<Bullet>().bulletSpeed = Random.Range(5, 7);
+            ___b.transform.localScale = 0.1f * Random.Range(10, 21) * Vector2.one;
         }
-        hp--;
+        hp -= 10 + Random.Range(0, 3);
     }
 
 
 
     void DashAttack() //패턴0-A. 반짝거리면서 플레이어에게 빠르게 달려든다
     {
-        if (t < -4)
+        if (jjabs[1] != null)
         {
             for (int i = 0; i < 4; i++)
             {
@@ -288,8 +306,8 @@ public class Boss2 : MonoBehaviour
         rigid.AddForce((10 + 0.2f * (100 - hp) * (1 - pollution))
             * new Vector2(dashx, dashy).normalized, ForceMode2D.Impulse);
 
-        for (int i = 1; i < (phase2 ? 38 : 18); i++)
-            Invoke(nameof(DashBullet), i * (phase2 ? 0.025f : 0.05f));
+        for (int i = 1; i < (phase2 ? 18 : 8); i++)
+            Invoke(nameof(DashBullet), i * (phase2 ? 0.05f : 0.1f));
 
         if (!IsInvoking(nameof(HideMyself))) Invoke(nameof(HideMyself), 1);
     }
@@ -325,7 +343,7 @@ public class Boss2 : MonoBehaviour
         orbitRotating = true;
 
         hide = true;
-        InvokeRepeating(nameof(JjabBullet), 0, phase2 ? 0.7f : 4);
+        InvokeRepeating(nameof(JjabBullet), 0, phase2 ? 1 : 3);
     }
     void JjabBullet() //패턴0-C. 발각되기 전까지는 초록 탄막 발사
     {
@@ -336,12 +354,12 @@ public class Boss2 : MonoBehaviour
 
         for (int i = 0; i < 4; i++)
         {
-            for (int j = 0; j < (phase2 ? 1 : 8); j++)
+            for (int j = 0; j < (phase2 ? 1 : 4); j++)
             {
                 Vector2 jtp = jjabs[i].transform.position;
                 GameObject jjabB = Instantiate(pxb1, jtp, Quaternion.Euler(0, 0,
                     phase2 ? Mathf.Rad2Deg * Mathf.Atan2(player.transform.position.y
-                    - jtp.y, player.transform.position.x - jtp.x) : t * 360 + j * 45));
+                    - jtp.y, player.transform.position.x - jtp.x) : t * 360 + j * 90));
                 jjabB.GetComponent<SpriteRenderer>().color = Green;
                 jjabB.GetComponent<Bullet>().bulletSpeed = Speed;
 
@@ -376,8 +394,8 @@ public class Boss2 : MonoBehaviour
 
     void Rain() //패턴1. 1px 비가 내린다
     {
-        for (int i = 0; i < 20; i++)
-            Invoke(nameof(RainMaker), i * 0.1f);
+        for (int i = 0; i < 15; i++)
+            Invoke(nameof(RainMaker), i * 0.13f);
 
         MakeRainFrom(true, false, 0.3f);
         if (phase2) MakeRainFrom(false, false, 0.3f);
@@ -415,8 +433,8 @@ public class Boss2 : MonoBehaviour
 
     void LetBullet() //패턴2. 3px 탄막이 2px 탄막을 뿌리고 2px 탄막이 1px 탄막을 뿌림
     {
-        for (int i = 0; i < (phase2 ? 8 : 4); i++)
-            Invoke(nameof(ReleaseBullet), phase2 ? i * 0.125f : i * 0.25f);
+        for (int i = 0; i < (phase2 ? 6 : 3); i++)
+            Invoke(nameof(ReleaseBullet), phase2 ? i * 0.15f : i * 0.3f);
     }
     void ReleaseBullet()
     {
@@ -460,14 +478,17 @@ public class Boss2 : MonoBehaviour
             if (x[i] - 3 < px && px < x[i] + 3 && y[i] - 3 < py && py < y[i] + 3)
                 area = true;
 
-            //붉은 탄막 (왼)
-            GameObject left = Instantiate(pxb1, new Vector2(
-                -17.9f, Random.Range(-89, 90) * 0.1f), Quaternion.identity);
-            RedBullet(left.transform);
-            //붉은 탄막 (오)
-            GameObject right = Instantiate(pxb1, new Vector2(
-                17.9f, Random.Range(-89, 90) * 0.1f), Quaternion.Euler(0, 0, 180));
-            RedBullet(right.transform);
+            if (i < thenumberofsquares / 2)
+            {
+                //붉은 탄막 (왼)
+                GameObject left = Instantiate(pxb1, new Vector2(
+                    -17.9f, Random.Range(-89, 90) * 0.1f), Quaternion.identity);
+                RedBullet(left.transform);
+                //붉은 탄막 (오)
+                GameObject right = Instantiate(pxb1, new Vector2(
+                    17.9f, Random.Range(-89, 90) * 0.1f), Quaternion.Euler(0, 0, 180));
+                RedBullet(right.transform);
+            }
         }
 
         if (area && Player.unbeatableTime <= 0) Player.hurted = true;
