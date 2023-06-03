@@ -162,7 +162,7 @@ public class GameManager : MonoBehaviour //게임 총괄
 
 
     public Boss2 boss2;
-    public Image bossHpCase;
+    public Image bossHpLine;
     public Image Boss2WowWonderfulShit;
     public GameObject boss2map;
 
@@ -237,7 +237,7 @@ public class GameManager : MonoBehaviour //게임 총괄
         nowPhase = 0;
         phaseTime = 0;
 
-        bossHpCase.gameObject.SetActive(stage == 4);
+        bossHpLine.gameObject.SetActive(stage == 4);
 
     } //Start End
 

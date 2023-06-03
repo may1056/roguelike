@@ -57,9 +57,12 @@ public class Boss2 : MonoBehaviour
     int[] x = new int[12];
     int[] y = new int[12];
     int thenumberofsquares = 6;
+    public Sprite redfrom;
 
 
     public Sprite Iamboss;
+
+    Transform ground, block;
 
 
     public Sprite Empty;
@@ -90,7 +93,7 @@ public class Boss2 : MonoBehaviour
 
         player = Player.player;
 
-        cam.GetComponent<Camera>().orthographicSize = 11;
+        cam.GetComponent<Camera>().orthographicSize = 12;
 
         player.transform.GetChild(2).gameObject.SetActive(false);
 
@@ -107,6 +110,9 @@ public class Boss2 : MonoBehaviour
         iab.GetComponent<SpriteRenderer>().sprite = Iamboss;
         iab.GetComponent<Fade>().k = 0.02f;
 
+        ground = GameManager.gameManager.transform.GetChild(0).GetChild(0);
+        block = GameManager.gameManager.transform.GetChild(0).GetChild(1);
+
     } //Start End
 
 
@@ -121,6 +127,8 @@ public class Boss2 : MonoBehaviour
 
         if (hp <= 0) //발광
         {
+            transform.position = Vector2.zero;
+
             if (hp > -5)
             {
                 CancelInvoke();
@@ -133,26 +141,29 @@ public class Boss2 : MonoBehaviour
                     for (int i = 0; i < 4; i++) Destroy(jjabs[i].gameObject);
                 }
                 col.isTrigger = true;
+                MakeEffect(doubleCircle, Color.white);
+                ground.GetComponent<SpriteRenderer>().color = Color.white;
+                block.GetComponent<SpriteRenderer>().color = Color.white;
             }
 
             t += Time.deltaTime;
             if (t > 120) CancelInvoke(nameof(Craziness));
-            if (t > 125)
+            if (t > 130)
             {
                 SceneManager.LoadScene(3);
             }
-
-            transform.position = Vector2.zero;
         }
 
 
         else //페이즈 1, 2
         {
-            if (hp <= 30)
+            if (hp <= 30 && !phase2)
             {
                 phase2 = true;
                 thenumberofsquares = 8;
                 hpText.color = new Color(1, 0, 0, 0.3f);
+                ground.GetComponent<SpriteRenderer>().color = new Color(1, 0.5f, 0.5f);
+                block.GetComponent<SpriteRenderer>().color = new Color(1, 0.5f, 0.5f);
             }
 
             if (hide) sr.color = Color.white;
@@ -472,10 +483,16 @@ public class Boss2 : MonoBehaviour
 
         MakeSquare(0.5f, true, 1);
         Invoke(nameof(DeathSquare), 1);
+
+        MakeRedFrom(true, true, 1);
+        MakeRedFrom(false, true, 1);
     }
     void DeathSquare()
     {
         MakeSquare(1, false, 2);
+
+        MakeRedFrom(true, false, 2);
+        MakeRedFrom(false, false, 2);
 
         float px = player.transform.position.x, py = player.transform.position.y;
         bool area = false;
@@ -518,6 +535,15 @@ public class Boss2 : MonoBehaviour
             sqsr.sprite = bigpx;
             sqsr.color = new Color(red, 0, 0);
         }
+    }
+    void MakeRedFrom(bool wall, bool ud, int k)
+    {
+        GameObject rf = Instantiate(fadeEffect, (wall ? 18.5f : -18.5f) * Vector2.right,
+            Quaternion.Euler(0, 0, wall ? 0 : 180));
+        Fade rff = rf.GetComponent<Fade>();
+        rff.up_down = ud;
+        rff.k = k;
+        rf.GetComponent<SpriteRenderer>().sprite = redfrom;
     }
 
 
@@ -589,6 +615,10 @@ public class Boss2 : MonoBehaviour
 
         if (hp > 0) hpBAR.rectTransform.sizeDelta = new Vector2(hp * 4, 70);
         else hpBAR.gameObject.SetActive(false);
+
+        if (t > 100 && t < 120)
+            hpCASE.rectTransform.sizeDelta = new Vector2(16 * (120 - t), 70);
+        else if (t >= 120) hpCASE.gameObject.SetActive(false);
     }
     public void RepeatAD() //AfterDamage() 반복
     {
