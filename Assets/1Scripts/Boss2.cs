@@ -29,7 +29,7 @@ public class Boss2 : MonoBehaviour
 
     //pattern0
     public bool hide = false;
-    public GameObject jjab;
+    public GameObject jjab; //프리팹 2ssoB
     bool orbitRotating = true;
     float dashx, dashy;
     int mynum;
@@ -95,7 +95,7 @@ public class Boss2 : MonoBehaviour
 
         cam.GetComponent<Camera>().orthographicSize = 12;
 
-        player.transform.GetChild(2).gameObject.SetActive(false);
+        player.transform.GetChild(2).gameObject.SetActive(false); //background
 
         Invoke(nameof(DashAttack), 1);
 
@@ -270,7 +270,7 @@ public class Boss2 : MonoBehaviour
 
 
 
-    void Craziness()
+    void Craziness() //발광
     {
         for (int i = 0; i < (t < 110 ? 10 : 25); i++)
         {
@@ -305,7 +305,7 @@ public class Boss2 : MonoBehaviour
 
     void DashAttack() //패턴0-A. 반짝거리면서 플레이어에게 빠르게 달려든다
     {
-        if (jjabs[1] != null)
+        if (jjabs[1] != null) //
         {
             for (int i = 0; i < 4; i++)
             {
@@ -314,35 +314,35 @@ public class Boss2 : MonoBehaviour
                 Destroy(jjabs[i].gameObject);
             }
         }
-        hide = false;
-        orbitRotating = false;
+        hide = false; //숨지 않아 - 숨는다는 의미는 분신들 사이에 숨어있다.
+        orbitRotating = false; //궤도에서 벗어난다
 
         dashx = Player.player.transform.position.x - tp.x;
         dashy = Player.player.transform.position.y - tp.y;
 
-        rigid.AddForce((10 + 0.2f * (100 - hp) * (1 - pollution))
-            * new Vector2(dashx, dashy).normalized, ForceMode2D.Impulse);
+        rigid.AddForce((10 + 0.2f * (100 - hp) * (1 - pollution)) //자동 공격 오염 받음. 무려
+            * new Vector2(dashx, dashy).normalized, ForceMode2D.Impulse); //가속. 플레이어한테.
 
-        for (int i = 1; i < (phase2 ? 18 : 8); i++)
-            Invoke(nameof(DashBullet), i * (phase2 ? 0.05f : 0.1f));
+        for (int i = 0; i < (phase2 ? 19 : 9); i++)
+            Invoke(nameof(DashBullet), i * (phase2 ? 0.05f : 0.1f)); //뒤로 탄막 뿌림
 
         if (!IsInvoking(nameof(HideMyself))) Invoke(nameof(HideMyself), 1);
     }
     void DashBullet()
     {
-        GameObject db = Instantiate(pxb1, tp, Quaternion.Euler(
-            0, 0, 180 + Mathf.Rad2Deg * Mathf.Atan2(dashy, dashx)));
+        sr.color = new Color(Random.Range(0, 11) * 0.1f,
+                Random.Range(0, 11) * 0.1f, Random.Range(0, 11) * 0.1f); //랜덤 색상 지정
+
+        GameObject db = Instantiate(pxb1, tp, Quaternion.Euler( //pixel bullet 1px
+            0, 0, 180 + Mathf.Rad2Deg * Mathf.Atan2(dashy, dashx))); //dashbullet
         db.transform.GetComponent<SpriteRenderer>().color = sr.color;
         db.transform.GetComponent<Bullet>().bulletSpeed = 0.5f;
-
-        sr.color = new Color(Random.Range(0, 11) * 0.1f,
-                Random.Range(0, 11) * 0.1f, Random.Range(0, 11) * 0.1f);
 
         MakeEffect(bulletborder, sr.color);
     }
     void HideMyself() //패턴0-B. 텔레포트하면서 랜덤 궤도에서 도는 분신 생성
     {
-        mynum = Random.Range(0, 5);
+        mynum = Random.Range(0, 5); //5개 중 하나
 
         bool my = false;
         for (int i = 0; i < 5; i++)
@@ -357,9 +357,9 @@ public class Boss2 : MonoBehaviour
         }
         MakeEffect(doubleCircle, Color.white);
 
-        orbitRotating = true;
+        orbitRotating = true; //궤도를 돌기 시작
 
-        hide = true;
+        hide = true; //숨는다
         InvokeRepeating(nameof(JjabBullet), 0, phase2 ? 1 : 3);
     }
     void JjabBullet() //패턴0-C. 발각되기 전까지는 초록 탄막 발사
