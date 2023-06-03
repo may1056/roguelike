@@ -110,8 +110,8 @@ public class Boss2 : MonoBehaviour
         iab.GetComponent<SpriteRenderer>().sprite = Iamboss;
         iab.GetComponent<Fade>().k = 0.02f;
 
-        ground = GameManager.gameManager.transform.GetChild(0).GetChild(0);
-        block = GameManager.gameManager.transform.GetChild(0).GetChild(1);
+        //ground = GameManager.gameManager.transform.GetChild(0).GetChild(0);
+        //block = GameManager.gameManager.transform.GetChild(0).GetChild(1);
 
     } //Start End
 
@@ -142,8 +142,8 @@ public class Boss2 : MonoBehaviour
                 }
                 col.isTrigger = true;
                 MakeEffect(doubleCircle, Color.white);
-                ground.GetComponent<SpriteRenderer>().color = Color.white;
-                block.GetComponent<SpriteRenderer>().color = Color.white;
+                //ground.GetComponent<SpriteRenderer>().color = Color.white;
+                //block.GetComponent<SpriteRenderer>().color = Color.white;
             }
 
             t += Time.deltaTime;
