@@ -18,6 +18,7 @@ public class Boss2 : MonoBehaviour
     public int hp;
     public Text hpText; //임시 체력 텍스트
     public Image hpBAR;
+    public Image hpCASE;
 
     Player player;
     public GameObject cam;
@@ -72,7 +73,6 @@ public class Boss2 : MonoBehaviour
 
 
 
-
     void Awake()
     {
         boss2 = this;
@@ -92,10 +92,6 @@ public class Boss2 : MonoBehaviour
         cam.GetComponent<Camera>().orthographicSize = 11;
 
         Invoke(nameof(DashAttack), 1);
-        //InvokeRepeating(nameof(Rain), 5, T);
-        //InvokeRepeating(nameof(LetBullet), 8, T);
-        //InvokeRepeating(nameof(Square), 12, T);
-        //InvokeRepeating(nameof(Square), 14, T);
 
         hp = 80; //임시
 
@@ -106,7 +102,7 @@ public class Boss2 : MonoBehaviour
             transform.position.x + 2, transform.position.y), Quaternion.identity);
         iab.transform.SetParent(transform);
         iab.GetComponent<SpriteRenderer>().sprite = Iamboss;
-        iab.GetComponent<Fade>().k = 0.02f;
+        iab.GetComponent<Fade>().k = 0.01f;
 
     } //Start End
 
@@ -115,125 +111,160 @@ public class Boss2 : MonoBehaviour
 
     void Update()
     {
-        if (hp <= 30)
-        {
-            phase2 = true;
-            thenumberofsquares = 9;
-            hpText.color = new Color(1, 0, 0, 0.3f);
-        }
-
         cam.transform.position = -10 * Vector3.forward;
 
-
-        if (hide) sr.color = Color.white;
-
-        if (orbitRotating)
-        {
-            t -= 0.02f * (100 - hp) * (1 - pollution) * Time.deltaTime;
-
-            transform.position = new Vector2(
-                orbitRadius[mynum] * Mathf.Cos(t) + orbitCenter[mynum].x,
-                orbitRadius[mynum] * Mathf.Sin(t) + orbitCenter[mynum].y);
-
-            col.isTrigger = true;
-        }
-        else
-        {
-            rigid.velocity = (1 - Time.deltaTime) * rigid.velocity;
-
-            MakeEffect(sr.sprite, sr.color);
-
-            col.isTrigger = false;
-        }
-
-
-
-
-        if (hp <= 0) SceneManager.LoadScene(3);
-
-
-
-        //이하 Monster.cs에서 가져옴
-
         tp = transform.position;
-        ModifyHp();
-        //피 닳는 시스템
-        if (inAttackArea && (Input.GetMouseButtonDown(0)
-            || Input.GetKeyDown("j")) && //내가 마우스가 없어서 임시로 설정한 키
-            PlayerAttack.curAttackCooltime >= PlayerAttack.maxAttackCooltime
-             && GameManager.prgEnd)
+
+
+        if (hp <= 0) //발광
         {
-            Apa(Color.red);
-            hp -= Player.player.atkPower;
-            if (Player.player.purple) //보라 수정: 치명타
+            //SceneManager.LoadScene(3);
+
+            if (hp > -5)
             {
-                int r = Random.Range(0, 10);
-                if (r < 2)
-                {
-                    hp--;
-                    Debug.Log("치명");
-                }
+                CancelInvoke();
+                hp = -10;
+                t = 100;
+                InvokeRepeating(nameof(Craziness),1,0.2f);
+                sr.color = Color.white;
             }
-            PlayerAttack.curAttackCooltime = 0;
+
+            t += Time.deltaTime;
+
+            transform.position = Vector2.zero;
         }
-        //스킬 범위 내에 있음
-        if (Mathf.Abs(PlayerAttack.skillP.y) < 100 &&
-            Vector2.Distance(tp, PlayerAttack.skillP) < 5.5f)
+
+
+        else //페이즈 1, 2
         {
-            Apa(Color.red);
-            hp--;
-            if (Player.player.purple) //보라 수정: 치명타
+            if (hp <= 30)
             {
-                int r = Random.Range(0, 10);
-                if (r < 2)
-                {
-                    hp--;
-                    Debug.Log("치명");
-                }
+                phase2 = true;
+                thenumberofsquares = 9;
+                hpText.color = new Color(1, 0, 0, 0.3f);
             }
-        }
-        //무기 파생 스킬 범위 내에 있음
-        Vector2 wsp = PlayerAttack.wsP;
-        if (Mathf.Abs(wsp.y) < 100)
-        {
-            switch (Player.weaponNum)
+
+            if (hide) sr.color = Color.white;
+
+            if (orbitRotating)
             {
-                case 0:
-                    bool inX = Mathf.Abs(wsp.x - tp.x) < 7.5f
-                        && Mathf.Abs(wsp.y - tp.y) < 1;
-                    bool inY = Mathf.Abs(wsp.y - tp.y) < 7.5f
-                        && Mathf.Abs(wsp.x - tp.x) < 1;
-                    if (inX || inY)
+                t -= 0.02f * (100 - hp) * (1 - pollution) * Time.deltaTime;
+
+                transform.position = new Vector2(
+                    orbitRadius[mynum] * Mathf.Cos(t) + orbitCenter[mynum].x,
+                    orbitRadius[mynum] * Mathf.Sin(t) + orbitCenter[mynum].y);
+
+                col.isTrigger = true;
+            }
+            else
+            {
+                rigid.velocity = (1 - Time.deltaTime) * rigid.velocity;
+
+                MakeEffect(sr.sprite, sr.color);
+
+                col.isTrigger = false;
+            }
+
+            //이하 Monster.cs에서 가져옴
+
+            ModifyHp();
+            //피 닳는 시스템
+            if (inAttackArea && (Input.GetMouseButtonDown(0)
+                || Input.GetKeyDown("j")) && //내가 마우스가 없어서 임시로 설정한 키
+                PlayerAttack.curAttackCooltime >= PlayerAttack.maxAttackCooltime
+                 && GameManager.prgEnd)
+            {
+                Apa(Color.red);
+                hp -= Player.player.atkPower;
+                if (Player.player.purple) //보라 수정: 치명타
+                {
+                    int r = Random.Range(0, 10);
+                    if (r < 2)
                     {
-                        Apa(Color.red);
-                        hp -= 2 * Player.player.atkPower;
-                        if (Player.player.purple) //보라 수정: 치명타
-                        {
-                            int r = Random.Range(0, 10);
-                            if (r < 2)
-                            {
-                                hp -= 2;
-                                Debug.Log("치명");
-                            }
-                        }
-                        if (Player.player.poison)
-                            Invoke(nameof(AfterDamage), Random.Range(1, 30));
+                        hp--;
+                        Debug.Log("치명");
                     }
-                    break;
+                }
+                PlayerAttack.curAttackCooltime = 0;
             }
+            //스킬 범위 내에 있음
+            if (Mathf.Abs(PlayerAttack.skillP.y) < 100 &&
+                Vector2.Distance(tp, PlayerAttack.skillP) < 5.5f)
+            {
+                Apa(Color.red);
+                hp--;
+                if (Player.player.purple) //보라 수정: 치명타
+                {
+                    int r = Random.Range(0, 10);
+                    if (r < 2)
+                    {
+                        hp--;
+                        Debug.Log("치명");
+                    }
+                }
+            }
+            //무기 파생 스킬 범위 내에 있음
+            Vector2 wsp = PlayerAttack.wsP;
+            if (Mathf.Abs(wsp.y) < 100)
+            {
+                switch (Player.weaponNum)
+                {
+                    case 0:
+                        bool inX = Mathf.Abs(wsp.x - tp.x) < 7.5f
+                            && Mathf.Abs(wsp.y - tp.y) < 1;
+                        bool inY = Mathf.Abs(wsp.y - tp.y) < 7.5f
+                            && Mathf.Abs(wsp.x - tp.x) < 1;
+                        if (inX || inY)
+                        {
+                            Apa(Color.red);
+                            hp -= 2 * Player.player.atkPower;
+                            if (Player.player.purple) //보라 수정: 치명타
+                            {
+                                int r = Random.Range(0, 10);
+                                if (r < 2)
+                                {
+                                    hp -= 2;
+                                    Debug.Log("치명");
+                                }
+                            }
+                            if (Player.player.poison)
+                                Invoke(nameof(AfterDamage), Random.Range(1, 30));
+                        }
+                        break;
+                }
+            }
+            //자동 공격 오염
+            polluted = pollution == 1;
+            if (polluted) Invoke(nameof(RemovePollution), 1);
+            else if (pollution > 0 && !polluted) pollution -= 0.3f * Time.deltaTime;
+            transform.GetChild(0).GetComponent<SpriteRenderer>().color
+                = new Color(1, 1, 1, pollution);
+            transform.GetChild(0).gameObject.SetActive(pollution > 0);
         }
-        //자동 공격 오염
-        polluted = pollution == 1;
-        if (polluted) Invoke(nameof(RemovePollution), 1);
-        else if (pollution > 0 && !polluted) pollution -= 0.3f * Time.deltaTime;
-        transform.GetChild(0).GetComponent<SpriteRenderer>().color
-            = new Color(1, 1, 1, pollution);
-        transform.GetChild(0).gameObject.SetActive(pollution > 0);
 
     } //Update End
 
 
 
+
+
+    void Craziness()
+    {
+        float r = Random.Range(0, 10) * 0.1f;
+        GameObject bb = Instantiate(fadeEffect);
+        SpriteRenderer bbsr = bb.GetComponent<SpriteRenderer>();
+        bbsr.sprite = bulletborder;
+        bbsr.color = new Color(r, r, r);
+
+        for (int i = 0; i < 60; i++)
+        {
+            GameObject b = Instantiate(pxb1, tp,
+                Quaternion.Euler(0, 0, i * 6 + hp + Random.Range(0, 6)));
+            b.GetComponent<SpriteRenderer>().color = new Color(r, r, r);
+            b.transform.localScale = 0.1f * Random.Range(5, 16) * Vector2.one;
+        }
+        hp--;
+    }
 
 
 
@@ -509,24 +540,28 @@ public class Boss2 : MonoBehaviour
     }
     public void Apa(Color c)
     {
-        GameObject hurt = Instantiate(fadeEffect, transform.position,
+        if (hp > 0)
+        {
+            GameObject hurt = Instantiate(fadeEffect, transform.position,
             Quaternion.identity);
 
-        SpriteRenderer hsr = hurt.transform.GetComponent<SpriteRenderer>();
-        //hsr.flipX = sr.flipX;
-        hsr.sortingOrder = 21;
-        hsr.sprite = Empty;
-        hsr.color = c;
+            SpriteRenderer hsr = hurt.transform.GetComponent<SpriteRenderer>();
+            //hsr.flipX = sr.flipX;
+            hsr.sortingOrder = 21;
+            hsr.sprite = Empty;
+            hsr.color = c;
 
-        hurt.GetComponent<Fade>().k = 5;
+            hurt.GetComponent<Fade>().k = 5;
 
-        if (hide) PlayerKnows();
+            if (hide) PlayerKnows();
+        }
     }
     void ModifyHp() //hp bar 최신화
     {
         hpText.text = hp.ToString(); //임시
 
-        hpBAR.rectTransform.sizeDelta = new Vector2(hp * 4, 70);
+        if (hp > 0) hpBAR.rectTransform.sizeDelta = new Vector2(hp * 4, 70);
+        else hpBAR.gameObject.SetActive(false);
     }
     public void RepeatAD() //AfterDamage() 반복
     {
@@ -534,16 +569,19 @@ public class Boss2 : MonoBehaviour
     }
     void AfterDamage() //poison 아이템 - Invoke용
     {
-        Apa(Color.green);
-        hp--;
-
-        if (Player.player.purple) //보라 수정: 치명타
+        if (hp > 0)
         {
-            int r = Random.Range(0, 10);
-            if (r < 2)
+            Apa(Color.green);
+            hp--;
+
+            if (Player.player.purple) //보라 수정: 치명타
             {
-                hp--;
-                Debug.Log("치명");
+                int r = Random.Range(0, 10);
+                if (r < 2)
+                {
+                    hp--;
+                    Debug.Log("치명");
+                }
             }
         }
     }
