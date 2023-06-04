@@ -228,8 +228,8 @@ public class GameManager : MonoBehaviour //게임 총괄
         realkilled = 0;
 
         //맵 불러오기
-        if (stage == 4) map = Instantiate(boss2map);
-        else map = Instantiate(maps[mapNum]); //맵을 생성한다
+       if (stage == 4) map = Instantiate(boss2map);
+       else map = Instantiate(maps[mapNum]); //맵을 생성한다
 
         map.transform.SetParent(gameObject.transform); //게임매니저가 맵의 부모가 됨
 
