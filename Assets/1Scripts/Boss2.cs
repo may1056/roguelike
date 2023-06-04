@@ -162,8 +162,8 @@ public class Boss2 : MonoBehaviour
                 phase2 = true;
                 thenumberofsquares = 8;
                 hpText.color = new Color(1, 0, 0, 0.3f);
-                ground.GetComponent<SpriteRenderer>().color = new Color(1, 0.5f, 0.5f);
-                block.GetComponent<SpriteRenderer>().color = new Color(1, 0.5f, 0.5f);
+                //ground.GetComponent<SpriteRenderer>().color = new Color(1, 0.5f, 0.5f);
+                //block.GetComponent<SpriteRenderer>().color = new Color(1, 0.5f, 0.5f);
             }
 
             if (hide) sr.color = Color.white;
@@ -365,18 +365,18 @@ public class Boss2 : MonoBehaviour
     void JjabBullet() //패턴0-C. 발각되기 전까지는 초록 탄막 발사
     {
         Color Green = new(Random.Range(0, 5) * 0.1f,
-                Random.Range(7, 11) * 0.1f, Random.Range(0, 5) * 0.1f);
-        int Speed = Random.Range(1, 6);
-        if (phase2) Speed += 2;
+                Random.Range(7, 11) * 0.1f, Random.Range(0, 5) * 0.1f); //다양한 초록색
+        int Speed = Random.Range(1, 6); //1~5 속도 랜덤
+        if (phase2) Speed += 2; //2페이즈는 더 빠름
 
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 4; i++) //작은 i
         {
-            for (int j = 0; j < (phase2 ? 1 : 4); j++)
+            for (int j = 0; j < (phase2 ? 1 : 4); j++) //한 번에 탄막을 몇 번 쏘느냐?
             {
-                Vector2 jtp = jjabs[i].transform.position;
-                GameObject jjabB = Instantiate(pxb1, jtp, Quaternion.Euler(0, 0,
+                Vector2 jtp = jjabs[i].transform.position; //분신의 위치
+                GameObject jjabB = Instantiate(pxb1, jtp, Quaternion.Euler(0, 0, //jjabBullet
                     phase2 ? Mathf.Rad2Deg * Mathf.Atan2(player.transform.position.y
-                    - jtp.y, player.transform.position.x - jtp.x) : t * 360 + j * 90));
+                    - jtp.y, player.transform.position.x - jtp.x) : t * 360 + j * 90)); //t는 시간에 따라 요상하게 변하는 변수, j*90 (0<=j<=3)
                 jjabB.GetComponent<SpriteRenderer>().color = Green;
                 jjabB.GetComponent<Bullet>().bulletSpeed = Speed;
 
@@ -389,17 +389,17 @@ public class Boss2 : MonoBehaviour
     }
     public void PlayerKnows()
     {
-        hide = false;
+        hide = false; //숨는 것 끝
         sr.color = Color.white;
-        CancelInvoke(nameof(JjabBullet));
+        CancelInvoke(nameof(JjabBullet)); //짭에서 초록 탄막 이제 그만 쏴
 
         for (int i = 0; i < 4; i++)
-            jjabs[i].GetComponent<Boss2JJAB>().playerknows = true;
+            jjabs[i].GetComponent<Boss2JJAB>().playerknows = true; //분신들도 알아차렸다!
 
         MakeRainFrom(true, true, 1);
         if (phase2) MakeRainFrom(false, true, 1);
 
-        //데미지를 입으면 드러나고, 1초 뒤에 비가 내리고 2초 뒤에 붉은 탄막 날리고 4초 뒤에 1차 스퀘어 6초 뒤에 2차 스퀘어 10초 뒤에 처음부터 반복
+        //데미지를 입으면 드러나고, 1초 뒤에 비가 내리고 2초 뒤에 붉은 탄막 날리고 4초 뒤에 1차 스퀘어 6초 뒤에 2차 스퀘어 8초 뒤에 처음부터 반복
         Invoke(nameof(Rain), 1);
         Invoke(nameof(LetBullet), 2);
         Invoke(nameof(Square), 4);
@@ -429,7 +429,7 @@ public class Boss2 : MonoBehaviour
         if (phase2) //페이즈2: 아래쪽에서도 올라감
         {
             GameObject bi2 = Instantiate(rain, new Vector2(
-            Random.Range(-179, 180) * 0.1f, -8.9f), Quaternion.identity);
+                Random.Range(-179, 180) * 0.1f, -8.9f), Quaternion.identity);
             int n2 = Random.Range(0, 10);
             bi2.GetComponent<SpriteRenderer>().color
                 = new Color(rainR[n2], rainG[n2], 1);
@@ -463,7 +463,7 @@ public class Boss2 : MonoBehaviour
 
 
 
-    void Square() //패턴3. 배경을 18분할하여 그중 6 or 9개 랜덤 선정 데미지
+    void Square() //패턴3. 배경을 18분할하여 그중 6 or 8개 랜덤 선정 데미지
     {
         //x좌표는 -15, -9, -3, 3, 9, 15 중 하나, y좌표는 -6, 0, 6 중 하나
         for (int i = 0; i < thenumberofsquares; i++)
@@ -596,7 +596,7 @@ public class Boss2 : MonoBehaviour
         if (hp > 0)
         {
             GameObject hurt = Instantiate(fadeEffect, transform.position,
-            Quaternion.identity);
+                Quaternion.identity);
 
             SpriteRenderer hsr = hurt.transform.GetComponent<SpriteRenderer>();
             //hsr.flipX = sr.flipX;

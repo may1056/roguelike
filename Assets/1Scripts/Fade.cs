@@ -8,7 +8,7 @@ public class Fade : MonoBehaviour //서서히 사라지는 효과
     float t; //fadetimegoes
 
     public bool up_down = false; //true: 짙어짐(up), false: 옅어짐(down)
-    public float k = 3;
+    public float k = 3; //k가 커지면 속도 빠르고, 작아지면 느려짐
 
     void Start()
     {

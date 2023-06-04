@@ -42,8 +42,8 @@ public class Boss2JJAB : MonoBehaviour
         t += 0.02f * (100 - Boss2.boss2.hp) * Time.deltaTime;
         MyPosition();
 
-        if (playerknows) sr.color = Color.gray;
-        else sr.color = new Color(0.5f, 1, 0.5f);
+        if (playerknows) sr.color = Color.gray; //보스 발각
+        else sr.color = new Color(0.5f, 1, 0.5f); //초록이기는 한데 좀 밝은 색
 
     } //Update End
 
