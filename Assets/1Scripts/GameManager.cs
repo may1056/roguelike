@@ -269,6 +269,23 @@ public class GameManager : MonoBehaviour //게임 총괄
         }
         //상점 열고닫기
 
+        if (Input.GetKeyDown("1"))
+        {
+            if (GameManager.coins >= 2)
+            {
+                Player.player.hp += 6;
+                GameManager.coins -= 2;
+            }
+
+        }
+        if (Input.GetKeyDown("2"))
+        {
+            if (GameManager.coins >= 2)
+            {
+                PlayerAttack.playerAtk.mp += 6;
+                GameManager.coins -= 2;
+            }
+        }
 
         if (progressTime > (stage == 4 ? 8 : 4) && !prgEnd) EndProgress();
         else progressTime += Time.unscaledDeltaTime; //TimeScale에 구애받지 않음
