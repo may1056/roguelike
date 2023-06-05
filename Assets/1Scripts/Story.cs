@@ -69,7 +69,7 @@ public class Story : MonoBehaviour
             imageindex++;
             }
 
-        if (textindex <= 8) // 텍스트 갯수 증가시 수정필요
+        if (textindex >= 8) // 텍스트 갯수 증가시 수정필요
         {
             SceneManager.LoadScene(1);
         }
