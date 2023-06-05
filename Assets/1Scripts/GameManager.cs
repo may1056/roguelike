@@ -171,6 +171,7 @@ public class GameManager : MonoBehaviour //게임 총괄
     public Image Boss2WowWonderfulShit;
     public GameObject boss2map;
 
+    public float pstimer;
 
 
 
@@ -290,24 +291,29 @@ public class GameManager : MonoBehaviour //게임 총괄
             }
         }
         //상점 열고닫기
-
-        if (Input.GetKeyDown("1"))
-        {
-            if (coins >= 2)
+        pstimer += Time.deltaTime;
+        if (15 <= pstimer) {
+            if (Input.GetKeyDown("1"))
             {
-                Player.player.hp += 6;
-                coins -= 2;
-            }
+                pstimer = 0;
+                if (coins >= 10)
+                {
+                    Player.player.hp += 6;
+                    coins -= 10;
+                }
 
-        }
-        if (Input.GetKeyDown("2"))
-        {
-            if (coins >= 2)
+            }
+            if (Input.GetKeyDown("2"))
             {
-                PlayerAttack.playerAtk.mp += 6;
-                coins -= 2;
+                pstimer = 0;
+                if (coins >= 10)
+                {
+                    PlayerAttack.playerAtk.mp += 6;
+                    coins -= 10;
+                }
             }
         }
+      
 
 
         ChangeHPMP();
