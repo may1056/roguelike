@@ -180,8 +180,7 @@ public class Player : MonoBehaviour //플레이어
         SaveHP();
         //itemNum = (-1, -1);
 
-        GameManager.killed = 0;
-        GameManager.coins = 0;
+
     } //Awake End
 
 
