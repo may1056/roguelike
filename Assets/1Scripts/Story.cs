@@ -6,6 +6,8 @@ using UnityEngine.SceneManagement;
 
 public class Story : MonoBehaviour
 {
+    public static bool isEnding = false;
+
     // 텍스트바 점멸하는 세모
     public Transform textbarTriangle;
     public Image trianglesr;
@@ -19,7 +21,6 @@ public class Story : MonoBehaviour
     public bool onOption = false; // 옵션이 켜져있는가?
 
     // 배경화면
-    public Transform background;
     public Sprite[] backgroundimages; // 텍스트바 뒤에 뜰 그림 // 놀랍게도 이미지 컴포넌트에 들어가는 것은 스프라이트였다..
     public Image backgroundimage;
     public int imageindex = 0;
@@ -32,11 +33,19 @@ public class Story : MonoBehaviour
     AudioSource menusound;
 
 
+    //엔딩
+    public string[] endtexts;
+    public int endtextindex = 0;
+    public Sprite[] endbackgroundimages;
+    public Image endbackgroundimage;
+    public AudioClip endstoryAudio;
+
+
+
 
     void Start()
     {
         trianglesr = textbarTriangle.GetComponent<Image>();
-        backgroundimage = background.GetComponent<Image>();
         storyAudioSource = GetComponent<AudioSource>();
         menusound = transform.GetChild(0).GetComponent<AudioSource>();
 
