@@ -68,7 +68,10 @@ public class Story : MonoBehaviour
             textindex++;
             imageindex++;
             }
-
+        if (textindex <= 8)
+        {
+            SceneManager.LoadScene(1);
+        }
         
     }
 
