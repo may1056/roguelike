@@ -654,8 +654,12 @@ public class Player : MonoBehaviour //플레이어
             manager.ChangeHPMP();
         }
 
+        if (l == 15)
+        {
+            transform.position = new Vector2(0, 0); // 맵탈출시 원상복귀 
+        }
 
-            SlideCheck();
+        SlideCheck();
     }
 
 

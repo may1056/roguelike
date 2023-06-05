@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -116,6 +117,14 @@ public class Monster : MonoBehaviour //잡몹
     public Sprite explosion;
 
 
+    // 죽을때, 발사할때
+
+    AudioSource firesound;
+    AudioSource Diesound;
+    SpriteRenderer invisible; //health
+    SpriteRenderer invisible1; //monster 본체
+    BoxCollider2D invisible2; //monster 본체
+
 
 
 
@@ -172,6 +181,12 @@ public class Monster : MonoBehaviour //잡몹
                 pol.localScale = new Vector2(0.2f, 0.2f); break;
         }*/
 
+        invisible2 = transform.gameObject.GetComponent<BoxCollider2D>();
+        invisible1 = transform.gameObject.GetComponent<SpriteRenderer>();
+        invisible = transform.GetChild(0).gameObject.GetComponent<SpriteRenderer>();
+        Diesound = transform.GetChild(2).gameObject.GetComponent<AudioSource>();
+        firesound = transform.GetChild(3).gameObject.GetComponent<AudioSource>();
+
     } //Start End
 
 
@@ -224,6 +239,7 @@ public class Monster : MonoBehaviour //잡몹
                 //탄막 발사
                 if (bulletTime <= 0 && moving)
                 {
+                    firesound.Play();
                     bulletTime = 3;
                     AngleSelected = Quaternion.Euler(0, 0, Mathf.Rad2Deg *
                         Mathf.Atan2(Player.player.transform.position.y - tp.y,
@@ -247,7 +263,9 @@ public class Monster : MonoBehaviour //잡몹
                     InvokeRepeating(nameof(FrontJump), 1, 7); //앞으로 점프
                     InvokeRepeating(nameof(JumpStop), 2, 7); //점프 끝
                     InvokeRepeating(nameof(OnShoot), 5, 7); //장전
+                    InvokeRepeating(nameof(forfiresound), 6, 7); // ++ 발사소리 추가
                     InvokeRepeating(nameof(OffShoot), 6, 7); //발사
+
                     InvokeRepeating(nameof(ReturnDown), 7, 7); //원상복귀
                 }
                 break;
@@ -399,25 +417,27 @@ public class Monster : MonoBehaviour //잡몹
             r = Random.Range(0, 10);
             if (r < 4) Instantiate(coinOrb, tp, Quaternion.identity);
 
-            GameManager.killed++; //죽으면서 킬 수 올리고 감
-            GameManager.realkilled++;
-            withPlayer = false;
+            //GameManager.killed++; //죽으면서 킬 수 올리고 감
+            //GameManager.realkilled++;
+            //withPlayer = false;
 
-            if (K)
-            {
-                for (int i = -1; i <= 1; i += 2)
-                {
-                    GameObject s = Instantiate(littleslime,
-                        new Vector2(tp.x + i * 0.5f, tp.y), Quaternion.identity);
-                    s.transform.SetParent(transform.parent);
-                    s.SetActive(true);
-                    GameManager.killed -= 2;
-                }
-            }
+            //if (K)
+            //{
+            //    for (int i = -1; i <= 1; i += 2)
+            //    {
+            //        GameObject s = Instantiate(littleslime,
+            //            new Vector2(tp.x + i * 0.5f, tp.y), Quaternion.identity);
+            //        s.transform.SetParent(transform.parent);
+            //        s.SetActive(true);
+            //        GameManager.killed -= 2;
+            //    }
+            //}
 
             //DecideEffect(Color.white);
 
-            Destroy(this.gameObject);
+            //***수정예정****//
+            //Destroy(this.gameObject);
+            Die();
         }
 
 
@@ -538,6 +558,11 @@ public class Monster : MonoBehaviour //잡몹
         D_U = true;
     }
 
+    void forfiresound()
+    {
+        firesound.Play();
+    }
+
 
 
     void Pokbal() //유령 펑
@@ -556,11 +581,13 @@ public class Monster : MonoBehaviour //잡몹
             poksr.sortingOrder = 8;
         }
 
-        GameManager.killed++; //죽으면서 킬 수 올리고 감
-        GameManager.realkilled++;
-        withPlayer = false;
+        //GameManager.killed++; //죽으면서 킬 수 올리고 감
+        //GameManager.realkilled++;
+        //withPlayer = false;
 
-        Destroy(gameObject);
+        //Destroy(gameObject);
+        firesound.Play();
+        Die();
     }
 
 
@@ -794,6 +821,40 @@ public class Monster : MonoBehaviour //잡몹
                 Debug.Log("치명");
             }
         }
+    }
+
+    void Die()
+    {
+        Diesound.Play();
+        invisible.color = new Color(1, 1, 1, 0); //health 가림
+        invisible1.color = new Color(1, 1, 1, 0); //monster 가림
+        invisible2.enabled = false; //플레이어와의 충돌방지
+        hp++; // hp 0인 상태로 for문 돌아서 버그생김
+        if (monsterNum == 7) transform.position = new Vector2 (9999,9999);
+        StartCoroutine(realdie());
+    }
+
+    IEnumerator realdie()
+    {
+        yield return new WaitForSeconds(1.0f);
+
+        GameManager.killed++; //죽으면서 킬 수 올리고 감
+        GameManager.realkilled++;
+        withPlayer = false;
+
+        if (K)
+        {
+            for (int i = -1; i <= 1; i += 2)
+            {
+                GameObject s = Instantiate(littleslime,
+                    new Vector2(tp.x + i * 0.5f, tp.y), Quaternion.identity);
+                s.transform.SetParent(transform.parent);
+                s.SetActive(true);
+                GameManager.killed -= 2;
+            }
+        }
+
+        Destroy(this.gameObject);
     }
 
 } //Enemy End
