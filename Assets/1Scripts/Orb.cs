@@ -54,9 +54,9 @@ public class Orb : MonoBehaviour //구체
         {
             switch (kind)
             {
-                case 0: Player.player.hp++; break;
-                case 1: PlayerAttack.playerAtk.mp++; break;
-                case 2: GameManager.coins++; break;
+                case 0: Player.player.hp++; GameManager.gameManager.recover.Play(); break;
+                case 1: PlayerAttack.playerAtk.mp++; GameManager.gameManager.recover.Play(); break;
+                case 2: GameManager.coins++; Player.player.pickupcoin.Play();  break;
             }
             Destroy(gameObject);
         }

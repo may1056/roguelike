@@ -175,6 +175,8 @@ public class GameManager : MonoBehaviour //게임 총괄
     public float pstimermp = 0;//mp postion
 
 
+    public AudioSource recover;
+
 
 
     void Awake()

@@ -147,6 +147,14 @@ public class Player : MonoBehaviour //플레이어
     public Sprite Empty;
 
 
+    public AudioSource dodge;
+    public AudioSource jump;
+    public AudioSource recover;
+    public AudioSource ouch;
+    public AudioSource pickupcoin;
+    public AudioSource pickupitem;
+
+
 
     public void SaveHP()
     {
@@ -179,7 +187,6 @@ public class Player : MonoBehaviour //플레이어
         hp = 6;
         SaveHP();
         //itemNum = (-1, -1);
-
 
     } //Awake End
 
@@ -281,6 +288,7 @@ public class Player : MonoBehaviour //플레이어
             && !isJumping && GameManager.prgEnd)
         {
             rigid.AddForce((1 - slow) * jumpPower * Vector2.up, ForceMode2D.Impulse);
+            jump.Play();
             isJumping = true;
             sr.sprite = players[2];
         }
@@ -491,6 +499,7 @@ public class Player : MonoBehaviour //플레이어
             if (orange && r < 2)
             {
                 //회피
+                dodge.Play();
                 Debug.Log("회피");
             }
             else BeforeHurt(1);
@@ -592,6 +601,7 @@ public class Player : MonoBehaviour //플레이어
         dontBehaveTime += Time.deltaTime;
         if (dontBehaveTime > (selfinjury ? 10 : 3) && shield < maxshield)
         {
+            recover.Play();
             shield++;
             dontBehaveTime = 0;
             manager.ChangeHPMP();

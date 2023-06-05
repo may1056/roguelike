@@ -21,6 +21,7 @@ public class Itemcube : MonoBehaviour
         if (!IsPickaxe) {
             if (dist < 1 && Input.GetKeyDown("e"))
             {
+                Player.player.pickupitem.Play();
                 GameManager.gameManager.ItemGettodaje();
                 Destroy(gameObject);
             }
