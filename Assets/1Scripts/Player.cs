@@ -502,7 +502,11 @@ public class Player : MonoBehaviour //플레이어
                 dodge.Play();
                 Debug.Log("회피");
             }
-            else BeforeHurt(1);
+            else
+            {
+                ouch.Play();
+                BeforeHurt(1);
+            }
 
             hurted = false;
         }
