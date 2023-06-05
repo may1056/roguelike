@@ -402,6 +402,8 @@ MonoBehaviour:
   bossHpLine: {fileID: 105205991}
   Boss2WowWonderfulShit: {fileID: 1058536961}
   boss2map: {fileID: 7027551587049074450, guid: 306c50e3ee5d7b047b8fb0d5a7880178, type: 3}
+  pstimerhp: 0
+  pstimermp: 0
 --- !u!4 &25397026
 Transform:
   m_ObjectHideFlags: 0

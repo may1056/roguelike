@@ -136,7 +136,10 @@ public class Monster : MonoBehaviour //잡몹
 
         DecideEffect(Color.black);
 
-        gameObject.SetActive(false); //일단 감춤
+        if (monsterNum < 10)
+        {
+            gameObject.SetActive(false);
+        } //일단 감춤
 
     } //Awake End
 
@@ -274,6 +277,13 @@ public class Monster : MonoBehaviour //잡몹
                 H = 10.0f / dist;
                 Targeting();
                 if (dist < 0.5f) Pokbal();
+                break;
+            case 10: //spider
+                //플레이어를 향해 이동 방향을 변경한다 (아프면 빨라짐)
+                if (tp.x > pp.x) H = hp == maxhp ? -2 : -4;
+                else H = hp == maxhp ? 2 : 4;
+
+                Targeting();
                 break;
 
         } //switch
@@ -450,7 +460,9 @@ public class Monster : MonoBehaviour //잡몹
         if (withPlayerTime > 0.29f)
         {
             withPlayerTime = -0.5f;
-            if (monsterNum < 3 && Player.unbeatableTime <= 0) Player.hurted = true;
+            if ((monsterNum < 3 || monsterNum > 9) && Player.unbeatableTime <= 0) Player.hurted = true;
+
+           
         }
 
 
@@ -474,7 +486,7 @@ public class Monster : MonoBehaviour //잡몹
         //가까우면 이동 시작
         if (dist < noticeDist)
         {
-            if (!moving)
+            if (!moving && monsterNum<10)
             {
                 float y = 0; //몬스터별 느낌표 위치 오프셋 (y축 방향)
                 switch (monsterNum)
@@ -484,6 +496,9 @@ public class Monster : MonoBehaviour //잡몹
                     case 4: y = 1.5f; break; case 5: y = 0.85f; break;
                     case 6: y = 1.5f; break; case 7: y = 1.4f; break;
                     case 8: y = 1.5f; break;
+                    
+                        
+                  
                 }
                 GameObject no = Instantiate(fadeEffect,
                     new Vector2(tp.x,tp.y+y), Quaternion.identity);
@@ -683,6 +698,20 @@ public class Monster : MonoBehaviour //잡몹
                 if (moving) transform.Translate(H * (1 - pollution) * Time.deltaTime
                     * new Vector2(pp.x - tp.x, pp.y - tp.y).normalized);
                 break;
+            case 10: //spider
+                if (moving)
+                {
+                    transform.Translate(H * (1 - pollution) *
+                        Time.deltaTime * Vector2.right);
+
+                    //벽에 막혀 안 움직이면 점프
+                   
+
+                    
+
+                    
+                }
+                break;
         }
 
     } //FixedUpdate End
@@ -717,6 +746,9 @@ public class Monster : MonoBehaviour //잡몹
 
             case 5: //킹슬라임
                 MakeEffect(new Vector2(tp.x, tp.y + 0.1f), c, 1.5f);
+                break;
+            case 10: //pon
+                MakeEffect(new Vector2(tp.x, tp.y - 0.9f), c, 3.1f);
                 break;
         }
     }
