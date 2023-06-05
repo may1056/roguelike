@@ -171,8 +171,8 @@ public class GameManager : MonoBehaviour //게임 총괄
     public Image Boss2WowWonderfulShit;
     public GameObject boss2map;
 
-    public float pstimerhp = 0;
-    public float pstimermp = 0;
+    public float pstimerhp = 0;//hp postion
+    public float pstimermp = 0;//mp postion
 
 
 

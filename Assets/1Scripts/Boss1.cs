@@ -55,6 +55,9 @@ public class Boss1 : MonoBehaviour{
     public float pollution = 0; //오염 정도
     public bool polluted = false; //오염되었는지
 
+    public GameObject pon, knight, bishop, look, king;
+    
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         int l = collision.gameObject.layer;
@@ -118,10 +121,20 @@ public class Boss1 : MonoBehaviour{
            
         }
     }
+    private void Ponspon()
+    {
+        for(int i = 0; i < 8; i++)
+        {
+            GameObject ponsss = Instantiate(pon, transform.position, Quaternion.identity);
+            transform.position = new Vector2(-10 + i * 2, 0);
+        }
+    }
     private void Start()
     {
         player = Player.player;
         sr = GetComponent<SpriteRenderer>();
+        InvokeRepeating(nameof(Ponspon), 3, 19);
+
     }
     private void Update()
     {
