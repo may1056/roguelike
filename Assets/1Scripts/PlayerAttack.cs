@@ -88,6 +88,9 @@ public class PlayerAttack : MonoBehaviour
         mp = savedmp;
         manager.ChangeHPMP();
 
+        // 초기화
+        mp = 6;
+        SaveMP();
     } //Start End
 
 

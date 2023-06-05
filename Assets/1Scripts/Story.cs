@@ -29,6 +29,8 @@ public class Story : MonoBehaviour
     public AudioSource storyAudioSource;
     public int audioindex = 0;
 
+    AudioSource menusound;
+
 
 
     void Start()
@@ -36,6 +38,7 @@ public class Story : MonoBehaviour
         trianglesr = textbarTriangle.GetComponent<Image>();
         backgroundimage = background.GetComponent<Image>();
         storyAudioSource = GetComponent<AudioSource>();
+        menusound = transform.GetChild(0).GetComponent<AudioSource>();
         
         onOption = false;
 
@@ -72,11 +75,13 @@ public class Story : MonoBehaviour
     public void OptionbuttonOn()
     {
         onOption = true;
+        MenuSound();
     }
 
     public void OptionbuttonOff()
     {
         onOption = false;
+        MenuSound();
     }
 
     public void audiotest()
@@ -90,5 +95,9 @@ public class Story : MonoBehaviour
         triangleenable = !triangleenable;
         if (triangleenable) trianglesr.color = new Color(1, 1, 1, 1);
         else trianglesr.color = new Color(1, 1, 1, 0);
+    }
+    public void MenuSound()
+    {
+        menusound.Play();
     }
 }
