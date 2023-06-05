@@ -11806,7 +11806,7 @@ MonoBehaviour:
   pollution: 0
   polluted: 0
   pon: {fileID: 4054863937716352401, guid: f46c6e8d554e74ef2b468e33ce96008b, type: 3}
-  knight: {fileID: 0}
+  knight: {fileID: 428938650024458855, guid: 6a801a2040fa341d8a354434a5ca3aa1, type: 3}
   bishop: {fileID: 0}
   look: {fileID: 0}
   king: {fileID: 0}

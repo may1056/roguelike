@@ -126,6 +126,7 @@ public class Boss1 : MonoBehaviour{
         for(int i = 0; i < 8; i++)
         {
             GameObject ponsss = Instantiate(pon, transform.position, Quaternion.identity);
+            GameObject knightsss = Instantiate(knight, transform.position, Quaternion.identity);
             transform.position = new Vector2(-10 + i * 2, 0);
         }
     }
