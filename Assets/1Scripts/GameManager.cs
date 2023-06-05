@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour //게임 총괄
 
     Transform p_l; //point_line
     int dot; //반짝거릴 점 번호
+    Transform nowOn;
 
 
     //ㅋㅋㅋㅋㅋㅋㅋㅋ
@@ -44,13 +45,17 @@ public class GameManager : MonoBehaviour //게임 총괄
 
     public Text itemText;
     public GameObject itemCube;
+    GameObject nowItemCube;
     public Sprite[] itemSprites;
     int icnum; //아이템 큐브 번호, 즉 새로 들어온 아이템을 뜻함
     public GameObject itemChangeScreen;
+    public Image itemGet;
+    bool getto = false;
+    public Image item1Image, item2Image;
 
     readonly string[] Items_explaination =
     {
-        "모든 수정의 능력치를 갖습니다.", //알파 수정
+        "모든 수정의 능력치를 갖습니다. 단, 다른 수정의 효과는 무시합니다.", //알파 수정
 
         "사망 시 체력과 마나가 모두 충전된 상태로 부활합니다. (아이템 소멸)", //부활
         "적을 타겟팅하는 공격자를 소환합니다. 약하지만, 적을 감속시킵니다.", //자동 공격
@@ -185,7 +190,7 @@ public class GameManager : MonoBehaviour //게임 총괄
             = floor.ToString() + " - " + stage.ToString(); //층 - 스테이지
 
         //point_line은 점과 선 집합이며, 각 점에는 같은 번호에 해당하는 선이 종속되어 있다.
-        p_l = Progress.rectTransform.GetChild(1);
+        p_l = Progress.rectTransform.GetChild(2);
 
         dot = 0; //초기화
 
@@ -199,7 +204,10 @@ public class GameManager : MonoBehaviour //게임 총괄
                 //진행 상황에 맞는 건 살리고, 아닌 건 죽인다
                 if (f < floor)
                 {
-                    p_l.GetChild(n).GetComponent<Image>().color = Color.gray;
+                    p_l.GetChild(n).GetComponent<Image>().color
+                        = new Color(0.2f, 0.2f, 0.2f);
+                    if (n > 0) p_l.GetChild(n).GetChild(0).GetComponent<Image>().color
+                            = new Color(0.2f, 0.2f, 0.2f);
                     p_l.GetChild(n).gameObject.SetActive(true);
                     dot = n; //반응할 점 번호
                 }
@@ -213,6 +221,14 @@ public class GameManager : MonoBehaviour //게임 총괄
 
             }
         }
+
+        nowOn = Progress.rectTransform.GetChild(1);
+        nowOn.transform.position = p_l.GetChild(dot).position;
+
+        RectTransform nort = nowOn.GetComponent<RectTransform>();
+        if (stage == 4) nort.sizeDelta = new Vector2(50, 50);
+        else nort.sizeDelta = new Vector2(35, 35);
+
 
         player.transform.GetChild(0).GetComponent<Camera>().orthographicSize = 8;
 
@@ -255,13 +271,19 @@ public class GameManager : MonoBehaviour //게임 총괄
 
     void Update()
     {
+        if (progressTime > (stage == 4 ? 8 : 4) && !prgEnd) EndProgress();
+        else progressTime += Time.unscaledDeltaTime; //TimeScale에 구애받지 않음
+
+        nowOn.GetComponent<Image>().color = new Color(1, 0, 0, progressTime % 1);
+
+
         if (Input.GetKeyDown("o")) {
             if (ShopSet.activeSelf)
             {
                 ShopSet.SetActive(false);
                 Time.timeScale = 1f;
             }
-              else
+            else
             {
                 ShopSet.SetActive(true);
                 Time.timeScale = 0;
@@ -271,24 +293,21 @@ public class GameManager : MonoBehaviour //게임 총괄
 
         if (Input.GetKeyDown("1"))
         {
-            if (GameManager.coins >= 2)
+            if (coins >= 2)
             {
                 Player.player.hp += 6;
-                GameManager.coins -= 2;
+                coins -= 2;
             }
 
         }
         if (Input.GetKeyDown("2"))
         {
-            if (GameManager.coins >= 2)
+            if (coins >= 2)
             {
                 PlayerAttack.playerAtk.mp += 6;
-                GameManager.coins -= 2;
+                coins -= 2;
             }
         }
-
-        if (progressTime > (stage == 4 ? 8 : 4) && !prgEnd) EndProgress();
-        else progressTime += Time.unscaledDeltaTime; //TimeScale에 구애받지 않음
 
 
         ChangeHPMP();
@@ -421,6 +440,8 @@ public class GameManager : MonoBehaviour //게임 총괄
         }
 
 
+        if (getto && Input.GetKeyDown("e")) Equip();
+
 
     } //Update End
 
@@ -505,9 +526,9 @@ public class GameManager : MonoBehaviour //게임 총괄
             if (icnum == Player.itemNum.Item1 || icnum == Player.itemNum.Item2)
                 goto newItem; //goto 쓰지 말라고 했던 것 같긴 한데 아무튼, 겹치면 다시 뽑음
 
-            GameObject ic = Instantiate(itemCube, Vector2.zero, Quaternion.identity);
-            ic.GetComponent<Itemcube>().cubeNum = icnum;
-            ic.GetComponent<SpriteRenderer>().sprite = itemSprites[icnum];
+            nowItemCube = Instantiate(itemCube, Vector2.zero, Quaternion.identity);
+            nowItemCube.GetComponent<Itemcube>().cubeNum = icnum;
+            nowItemCube.GetComponent<SpriteRenderer>().sprite = itemSprites[icnum];
         }
 
         //다음 페이즈
@@ -542,8 +563,22 @@ public class GameManager : MonoBehaviour //게임 총괄
     {
         int i1 = Player.itemNum.Item1, i2 = Player.itemNum.Item2;
 
-        itemText.text = "1. " + (i1 == -1 ? "없음" : Items[i1]) +
-            " 2. " + (i2 == -1 ? "없음" : Items[i2]);
+        //itemText.text = "1. " + (i1 == -1 ? "없음" : Items[i1]) +
+        //    " 2. " + (i2 == -1 ? "없음" : Items[i2]);
+
+        if (i1 == -1) item1Image.gameObject.SetActive(false);
+        else
+        {
+            item1Image.gameObject.SetActive(true);
+            item1Image.sprite = itemSprites[i1];
+        }
+
+        if (i2 == -1) item2Image.gameObject.SetActive(false);
+        else
+        {
+            item2Image.gameObject.SetActive(true);
+            item2Image.sprite = itemSprites[i2];
+        }
     }
 
     public void ItemChangeHaseyo() //인벤토리 꽉 참! 템 버려!
@@ -602,8 +637,53 @@ public class GameManager : MonoBehaviour //게임 총괄
 
         icnum = deleteNum;
         itemChangeScreen.SetActive(false);
+
+        ItemInfo();
+
+        getto = false;
     }
 
+
+    public void ItemGettodaje()
+    {
+        Image it; //item
+        Text na; //name
+        Text ex; //explaination
+
+        it = itemGet.transform.GetChild(0).GetComponent<Image>();
+        na = it.transform.GetChild(0).GetComponent<Text>();
+        ex = itemGet.transform.GetChild(1).GetComponent<Text>();
+
+        it.sprite = itemSprites[icnum];
+        na.text = Items[icnum];
+        ex.text = Items_explaination[icnum];
+
+        itemGet.gameObject.SetActive(true);
+        getto = true;
+    }
+    public void Throw()
+    {
+        itemGet.gameObject.SetActive(false);
+
+        ItemThrow(3);
+    }
+    public void Equip()
+    {
+        itemGet.gameObject.SetActive(false);
+        getto = false;
+
+        if (Player.itemNum.Item1 == -1) //아이템1에 넣음
+        {
+            Player.itemNum.Item1 = icnum;
+            ItemInfo();
+        }
+        else if (Player.itemNum.Item2 == -1) //아이템2에 넣음
+        {
+            Player.itemNum.Item2 = icnum;
+            ItemInfo();
+        }
+        else ItemChangeHaseyo();
+    }
 
 
 

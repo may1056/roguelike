@@ -39,7 +39,7 @@ public class Story : MonoBehaviour
         backgroundimage = background.GetComponent<Image>();
         storyAudioSource = GetComponent<AudioSource>();
         menusound = transform.GetChild(0).GetComponent<AudioSource>();
-        
+
         onOption = false;
 
         backgroundimage.sprite = backgroundimages[imageindex];
@@ -73,7 +73,7 @@ public class Story : MonoBehaviour
         {
             SceneManager.LoadScene(1);
         }
-        
+
     }
 
     public void OptionbuttonOn()
@@ -97,8 +97,7 @@ public class Story : MonoBehaviour
     void textbarTriangleAnimaition() // 단순하게 깜빡거리는게 전부인 개선의 여지가 많아 보이는 코드,, 그냥 애니메이션으로 대체할 예정
     {
         triangleenable = !triangleenable;
-        if (triangleenable) trianglesr.color = new Color(1, 1, 1, 1);
-        else trianglesr.color = new Color(1, 1, 1, 0);
+        trianglesr.color = new Color(1, 1, 1, triangleenable ? 1 : 0);
     }
     public void MenuSound()
     {

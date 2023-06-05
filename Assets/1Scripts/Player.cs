@@ -178,7 +178,7 @@ public class Player : MonoBehaviour //플레이어
         // 초기화
         hp = 6;
         SaveHP();
-        itemNum = (-1, -1);
+        //itemNum = (-1, -1);
 
         GameManager.killed = 0;
         GameManager.coins = 0;
