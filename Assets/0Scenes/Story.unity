@@ -236,10 +236,10 @@ RectTransform:
   m_Father: {fileID: 877256707}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.000061035, y: 0.000030518}
-  m_SizeDelta: {x: 1366, y: 768}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &72333253
 CanvasRenderer:
@@ -1716,7 +1716,7 @@ GameObject:
   - component: {fileID: 1933661286}
   - component: {fileID: 1933661285}
   m_Layer: 5
-  m_Name: Button (Legacy)
+  m_Name: Audio
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1850,7 +1850,7 @@ GameObject:
   - component: {fileID: 2074511833}
   - component: {fileID: 2074511832}
   m_Layer: 5
-  m_Name: Button (Legacy)
+  m_Name: Input
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1871,10 +1871,10 @@ RectTransform:
   m_Father: {fileID: 877256707}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1366, y: 768}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2074511832
 MonoBehaviour:
@@ -1998,7 +1998,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2116061001}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 815.5584, y: 277.07278, z: -6.150272}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2023,18 +2023,17 @@ MonoBehaviour:
   textbar: {fileID: 1750835197}
   texts:
   - "\uC5EC\uAE30\uB294 \uC624\uB958\uB098\uC11C \uBE44\uC6CC\uC57C \uD574\uC694"
-  - "\uC548\uB155\uD558\uC138\uC6941"
-  - "\uBC18\uAC00\uC6CC2"
-  - "\uD14C\uC2A4\uD2B8\uC6A9\uC785\uB2C8\uB2E43"
-  - "\uC5714"
-  - "\uBC415"
-  - "\uBC415"
-  - "\uBC415"
-  - "\uBC415"
-  - "\uBC415"
+  - "\uBA3C \uC61B\uB0A0,"
+  - "\uB9DD\uD1A0\uB97C \uAC10\uC740 \uC6A9\uC0AC\uAC00 \uC788\uC5C8\uB2E4. (??)"
+  - "\uADF8\uC758 \uC9C0\uD558 \uC720\uC801\uC740 \uC218\uC2ED \uB144\uAC04 \uBC29\uCE58\uB418\uC5C8\uB2E4."
+  - "\uACFC\uAC70\uC758 \uACFC\uC624\uB97C \uBC14\uB85C\uC7A1\uAE30 \uC704\uD574"
+  - "\uC6A9\uC0AC\uB294 \uC704\uD5D8\uD55C \uADF8\uACF3\uC73C\uB85C"
+  - "\uBE44\uB85C\uC18C \uB2E4\uC2DC\uAE08 \uD5A5\uD55C\uB2E4."
+  - "\uC720\uC801\uC758 \uC874\uC7AC\uC5D0 \uCC45\uC784\uC744 \uC9C0\uACE0\uC790."
+  - .
+  - .
   textindex: 1
   onOption: 0
-  background: {fileID: 72333251}
   backgroundimages:
   - {fileID: 21300000, guid: a02ccffb38c5da04981daed4d05b1074, type: 3}
   - {fileID: 21300000, guid: a02ccffb38c5da04981daed4d05b1074, type: 3}
@@ -2045,13 +2044,19 @@ MonoBehaviour:
   - {fileID: 21300000, guid: a02ccffb38c5da04981daed4d05b1074, type: 3}
   - {fileID: 21300000, guid: a02ccffb38c5da04981daed4d05b1074, type: 3}
   - {fileID: 21300000, guid: a02ccffb38c5da04981daed4d05b1074, type: 3}
-  backgroundimage: {fileID: 0}
+  backgroundimage: {fileID: 72333254}
   imageindex: 0
   storyAudio:
   - {fileID: 8300000, guid: 718bf07902aef6743861bde24b1f4b48, type: 3}
   - {fileID: 8300000, guid: 6d30c58ae0d3cd04799d86c85a8a4f1f, type: 3}
   storyAudioSource: {fileID: 0}
   audioindex: 0
+  endtexts:
+  - 
+  endtextindex: 0
+  endbackgroundimages: []
+  endbackgroundimage: {fileID: 0}
+  endstoryAudio: {fileID: 0}
 --- !u!114 &2116061004
 MonoBehaviour:
   m_ObjectHideFlags: 0
