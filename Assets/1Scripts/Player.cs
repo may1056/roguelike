@@ -361,7 +361,7 @@ public class Player : MonoBehaviour //플레이어
              && GameManager.prgEnd)
         {
             onceDashed = true;
-
+            Soundmanager.soundmanager.dashsound.Play();
             transform.position = new Vector2(m, tp.y);
             tp = transform.position;
 

@@ -28,7 +28,7 @@ public class PlayerAttack : MonoBehaviour
     public float attackspeed = 0; // 공격 속도
     public static Vector2 attackP;
     public Sprite attackSprite;
-    bool attackuse = false;
+    public static bool attackuse = false;
     Vector2 mousePosition;
     float weaponangle;
 
@@ -116,9 +116,11 @@ public class PlayerAttack : MonoBehaviour
             && (curAttackCooltime >= maxAttackCooltime); //j는 임시 공격 키
 
 
+
         // 근접공격 쿨타임, 애니메이션
         if (attackuse && GameManager.ismeleeWeapon)
         {
+            //Soundmanager.soundmanager.swordsounds[0].Play();
             float x = player.F ? -2 : 2;
             //attackP = new Vector2(transform.position.x + x, transform.position.y);
             //attacksr.color = new Color(1, 1, 1, 1);
@@ -126,6 +128,7 @@ public class PlayerAttack : MonoBehaviour
         }
         else if (attackuse) //원거리 공격 쿨타임, 애니메이션?
         {
+            Soundmanager.soundmanager.magicgunsounds[0].Play();
             float x = player.F ? -2 : 2;
             //attackP = new Vector2(transform.position.x + x, transform.position.y);
 
@@ -160,6 +163,7 @@ public class PlayerAttack : MonoBehaviour
 
         if (skilluse) //약한 스킬
         {
+            Soundmanager.soundmanager.basicskillsound.Play();
             if (player.selfinjury) cooltime = 1.5f;
             else
             {
@@ -204,6 +208,7 @@ public class PlayerAttack : MonoBehaviour
             switch (Player.weaponNum)
             {
                 case 0:
+                    Soundmanager.soundmanager.swordsounds[1].Play();
                     WeaponSkill0(wscount);
                     wsgoing -= 2 * Time.deltaTime;
                     break;
@@ -258,6 +263,7 @@ public class PlayerAttack : MonoBehaviour
     {
         for(int i = -2; i <= 2; i++)
         {
+            Soundmanager.soundmanager.magicgunsounds[1].Play();
             GameObject ws1 = Instantiate(playerbullet,
                 transform.position, Quaternion.Euler(0, 0, 20 * i + (player.F ? 180 : 0)));
             ws1.GetComponent<PlayerBullet>().pbType = 1;
