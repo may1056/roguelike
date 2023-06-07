@@ -45,7 +45,6 @@ public class PlayerAttack : MonoBehaviour
 
 
     //weapon skill
-    public Text wsText;
     float wsCool = 0;
     public static Vector2 wsP;
     bool wsAvailable = false;
@@ -55,9 +54,11 @@ public class PlayerAttack : MonoBehaviour
     //아 모르겠다 코드 막 짜야지.. 변수만 몇 개야
 
 
-    readonly Color[] colors =
-        { new Color(1, 0.6f, 1), Color.red, new Color(1, 0.6f, 0), Color.yellow,
-        new Color(0, 0.7f, 1), Color.blue, new Color(0.6f, 0.3f, 1),};
+
+    public Image skillZ, skillX;
+    Text skillZcooltimeText, skillXcooltimeText;
+    public Sprite swordX, gunwandX;
+
 
 
 
@@ -82,6 +83,9 @@ public class PlayerAttack : MonoBehaviour
 
         wsP = new Vector2(9999, 9999);
 
+        skillZcooltimeText = skillZ.transform.GetChild(1).GetComponent<Text>();
+        skillXcooltimeText = skillX.transform.GetChild(1).GetComponent<Text>();
+
         GameManager.ismeleeWeapon = true;
         attackani.SetBool("IsmeleeWeapon", GameManager.ismeleeWeapon); // IsmeleeWeapon 파라미터도 GameManager.ismeleeWeapon 값따라 변경
 
@@ -91,6 +95,7 @@ public class PlayerAttack : MonoBehaviour
         // 초기화
         mp = 6;
         SaveMP();
+
     } //Start End
 
 
@@ -149,14 +154,25 @@ public class PlayerAttack : MonoBehaviour
         //else attacksr.color = new Color(1, 1, 1, 0);
 
 
-
+        if (Input.GetKeyDown("j") && curAttackCooltime <= 0)
+        {
+            //소리
+        }
 
 
 
         //ㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋ
 
         //기본 탑재 스킬
-        if (cooltime > 0) cooltime -= Time.deltaTime;
+        if (cooltime > 0)
+        {
+            cooltime -= Time.deltaTime;
+            skillZcooltimeText.text = cooltime.ToString("N1");
+        }
+        else skillZcooltimeText.text = null;
+
+        skillZ.transform.GetChild(0).GetComponent<Image>().
+            fillAmount = cooltime / (player.selfinjury ? 1.5f : 3.0f); //cover
 
         skilluse = cooltime <= 0 && Input.GetKeyDown("z") && mp >= 1
             && GameManager.prgEnd;
@@ -183,9 +199,12 @@ public class PlayerAttack : MonoBehaviour
         if (wsCool > 0)
         {
             wsCool -= Time.deltaTime;
-            wsText.text = wsCool.ToString("N1");
+            skillXcooltimeText.text = wsCool.ToString("N1");
         }
-        else wsText.text = "0";
+        else skillXcooltimeText.text = null;
+
+        skillX.transform.GetChild(0).GetComponent<Image>().
+                fillAmount = wsCool / (player.selfinjury ? 5.0f : 10.0f); //Filled
 
         if (wsCool <= 0 && Input.GetKeyDown("x") && mp >= 2
             && GameManager.prgEnd)
@@ -205,7 +224,7 @@ public class PlayerAttack : MonoBehaviour
 
         if (wsAvailable)
         {
-            switch (Player.weaponNum)
+            switch (Player.weaponNum.Item1)
             {
                 case 0:
                     Soundmanager.soundmanager.swordsounds[1].Play();
@@ -254,6 +273,7 @@ public class PlayerAttack : MonoBehaviour
             wsP = transform.position;
             wscount--;
             player.MakeEffect(transform.position, ws0sprite, 10, 1);
+            //소리
         }
         else wsP = new Vector2(9999, 9999);
     }
@@ -277,6 +297,7 @@ public class PlayerAttack : MonoBehaviour
         //애니메이션 변경 자체는 애니메이터 파라미터에서 하는걸로 하고 여기서는 컨트롤러 값 수정
         //attackani.SetInteger("컨트롤러 이름", 변경값) 이게 변경 함수니 기억하렴 종환아 + SetFloat,SetBool,SetTrigger
 
+        /*
         if (GameManager.ismeleeWeapon) //근접공격이면 콜라이더 활성화 아니면 비활성화
         {
             attackbc.enabled = true;
@@ -286,7 +307,14 @@ public class PlayerAttack : MonoBehaviour
 
         }
         else attackbc.enabled = false;
+        */ //일단 주석 처리함
 
+        if (Player.weaponNum.Item2 != -1)
+        {
+            int temp = Player.weaponNum.Item1;
+            Player.weaponNum.Item1 = Player.weaponNum.Item2;
+            Player.weaponNum.Item2 = temp;
+        }
     }
 
     public void Ismeleechange() // onclick
@@ -294,9 +322,10 @@ public class PlayerAttack : MonoBehaviour
         GameManager.ismeleeWeapon = !GameManager.ismeleeWeapon;
         attackani.SetBool("IsmeleeWeapon", GameManager.ismeleeWeapon); // IsmeleeWeapon 파라미터도 GameManager.ismeleeWeapon 값따라 변경
 
+        skillX.sprite = GameManager.ismeleeWeapon ? swordX : gunwandX;
 
-        if (Player.weaponNum == 0) Player.weaponNum = 1;
-        else Player.weaponNum = 0;
+        WeaponChange();
     }
+
 
 } //PlayerAttack End

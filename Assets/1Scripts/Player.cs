@@ -19,7 +19,7 @@ public class Player : MonoBehaviour //플레이어
 
 
 
-    public static int weaponNum;
+    public static (int, int) weaponNum;
     //0채찍,
 
 
@@ -170,7 +170,7 @@ public class Player : MonoBehaviour //플레이어
         sr = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
         animm = GetComponent<Animator>();
-        weaponNum = 0; //임시
+        weaponNum = (0, 1); //임시
 
 
         bg = transform.GetChild(2);
@@ -669,7 +669,7 @@ public class Player : MonoBehaviour //플레이어
 
         if (l == 15)
         {
-            transform.position = new Vector2(0, 0); // 맵탈출시 원상복귀 
+            transform.position = new Vector2(0, 0); // 맵탈출시 원상복귀
         }
 
         SlideCheck();

@@ -158,17 +158,16 @@ public class GameManager : MonoBehaviour //게임 총괄
     public Text killText;
     public static int realkilled; //실속 있는 킬 수
 
-    public Text coolText; //쿨타임
-    //public Text atkcoolText; //일반공격 쿨타임
-
 
     public static int coins = 0;
     public Text coinText;
 
 
-    public Boss2 boss2;
     public Image bossHpLine;
     public Image Boss2WowWonderfulShit;
+    public Boss1 boss1;
+    public GameObject boss1map;
+    public Boss2 boss2;
     public GameObject boss2map;
 
     public float pstimerhp = 0;//hp postion
@@ -248,8 +247,8 @@ public class GameManager : MonoBehaviour //게임 총괄
         realkilled = 0;
 
         //맵 불러오기
-       if (stage == 4) map = Instantiate(boss2map);
-       else map = Instantiate(maps[mapNum]); //맵을 생성한다
+        if (stage == 4) map = Instantiate(floor == 2 ? boss1map : boss2map);
+        else map = Instantiate(maps[mapNum]); //맵을 생성한다
 
         map.transform.SetParent(gameObject.transform); //게임매니저가 맵의 부모가 됨
 
@@ -297,22 +296,22 @@ public class GameManager : MonoBehaviour //게임 총괄
         pstimerhp += Time.deltaTime;
         pstimermp += Time.deltaTime;
         if (15 <= pstimerhp) {
-            
-            
+
+
             if (Input.GetKeyDown("1"))
             {
-                
-                
+
+
                 if (coins >= 10)
                 {
-                    
+
                     Player.player.hp += 6;
                     coins -= 10;
                     pstimerhp = 0;
                 }
 
             }
-           
+
         }
         if (15 <= pstimermp)
         {
@@ -341,8 +340,6 @@ public class GameManager : MonoBehaviour //게임 총괄
         stat[2].text = "이동속도: " + Player.player.speed.ToString();
         stat[3].text = "점프력: " + Player.player.jumpPower.ToString();
 
-
-        coolText.text = "쿨타임: " + playerAtk.cooltime.ToString("N0") + "초";
 
         //메뉴창 표시
         if (Input.GetButtonDown("Cancel") && progressTime > 4)

@@ -125,6 +125,8 @@ public class Boss2 : MonoBehaviour
         tp = transform.position;
 
 
+        ModifyHp();
+
         if (hp <= 0) //발광
         {
             transform.position = Vector2.zero;
@@ -189,7 +191,6 @@ public class Boss2 : MonoBehaviour
 
             //이하 Monster.cs에서 가져옴
 
-            ModifyHp();
             //피 닳는 시스템
             if (inAttackArea && (Input.GetMouseButtonDown(0)
                 || Input.GetKeyDown("j")) && //내가 마우스가 없어서 임시로 설정한 키
@@ -229,7 +230,7 @@ public class Boss2 : MonoBehaviour
             Vector2 wsp = PlayerAttack.wsP;
             if (Mathf.Abs(wsp.y) < 100)
             {
-                switch (Player.weaponNum)
+                switch (Player.weaponNum.Item1)
                 {
                     case 0:
                         bool inX = Mathf.Abs(wsp.x - tp.x) < 7.5f

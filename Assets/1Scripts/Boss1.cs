@@ -32,14 +32,14 @@ public class Boss1 : MonoBehaviour{
     public GameObject hpOrb, mpOrb;
 
     //pattern1
-  
+
 
     //pattern2
 
 
     //pattern3
     public GameObject fadeEffect;
-  
+
 
 
     public Sprite Empty;
@@ -56,7 +56,7 @@ public class Boss1 : MonoBehaviour{
     public bool polluted = false; //오염되었는지
 
     public GameObject pon, knight, bishop, look, king;
-    
+
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
@@ -118,7 +118,7 @@ public class Boss1 : MonoBehaviour{
 
             hurt.GetComponent<Fade>().k = 5;
 
-           
+
         }
     }
     private void Ponspon()
@@ -144,10 +144,10 @@ public class Boss1 : MonoBehaviour{
         dist = Vector2.Distance(tp, pp);
 
         H = tp.x > pp.x ? -3 : 3;
-        
+
 
         Targeting();
-      
+
 
         if (hp <= 0)
         {
@@ -203,7 +203,7 @@ public class Boss1 : MonoBehaviour{
         Vector2 wsp = PlayerAttack.wsP;
         if (Mathf.Abs(wsp.y) < 100)
         {
-            switch (Player.weaponNum)
+            switch (Player.weaponNum.Item1)
             {
                 case 0:
                     bool inX = Mathf.Abs(wsp.x - tp.x) < 7.5f
@@ -271,7 +271,7 @@ public class Boss1 : MonoBehaviour{
         //가까우면 이동 시작
         if (dist < noticeDist)
         {
-           
+
             moving = true;
         }
     }
@@ -282,16 +282,12 @@ public class Boss1 : MonoBehaviour{
             transform.Translate(H * (1 - pollution) *
                 Time.deltaTime * Vector2.right);
 
-         
-            
+
+
 
 
             }
 
         }
-    }
 
-
-
-
-   
+    } //Boss1 End

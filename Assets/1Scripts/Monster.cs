@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class Monster : MonoBehaviour //잡몹
 {
@@ -10,11 +9,6 @@ public class Monster : MonoBehaviour //잡몹
     public int monsterNum;
     //00spider 01packman 02slime 03turret 04ice 05kingslime 06fire 07ghost 08dark
 
-
-    //readonly float[,] limitX = //좌우 한계
-    //    { { -48, 48 }, { -55, 55 }, { -30, 30 }, { -4, 50 } ,{ -100,100} };
-    //readonly float[,] limitY = //상하 한계
-     //   { { -4, 12 }, { -21, 49 }, { -3, 19 }, { -4, 30 },{ -100,100}  };
 
 
     /// <summary>
@@ -300,8 +294,9 @@ public class Monster : MonoBehaviour //잡몹
             }
 
             PlayerAttack.curAttackCooltime = 0;
-        }
+            PlayerAttack.attackuse = false ;
 
+        }
 
 
 
@@ -332,7 +327,7 @@ public class Monster : MonoBehaviour //잡몹
 
         if (Mathf.Abs(wsp.y) < 100)
         {
-            switch (Player.weaponNum)
+            switch (Player.weaponNum.Item1)
             {
                 case 0:
                     bool inX = Mathf.Abs(wsp.x - tp.x) < 7.5f
@@ -407,6 +402,11 @@ public class Monster : MonoBehaviour //잡몹
 
             r = Random.Range(0, 10);
             if (r < 4) Instantiate(coinOrb, tp, Quaternion.identity);
+            if (monsterNum == 20)
+            {
+                for (int i = 0; i < 5; i++)
+                    Instantiate(coinOrb, tp, Quaternion.Euler(0, 0, i * 72));
+            }
 
             GameManager.killed++; //죽으면서 킬 수 올리고 감
             GameManager.realkilled++;
@@ -444,7 +444,7 @@ public class Monster : MonoBehaviour //잡몹
             withPlayerTime = -0.5f;
             if ((monsterNum < 3 || monsterNum > 9) && Player.unbeatableTime <= 0) Player.hurted = true;
 
-           
+
         }
 
 
@@ -478,9 +478,9 @@ public class Monster : MonoBehaviour //잡몹
                     case 4: y = 1.5f; break; case 5: y = 0.85f; break;
                     case 6: y = 1.5f; break; case 7: y = 1.4f; break;
                     case 8: y = 1.5f; break;
-                    
-                        
-                  
+
+
+
                 }
                 GameObject no = Instantiate(fadeEffect,
                     new Vector2(tp.x,tp.y+y), Quaternion.identity);
@@ -686,11 +686,11 @@ public class Monster : MonoBehaviour //잡몹
                         Time.deltaTime * Vector2.right);
 
                     //벽에 막혀 안 움직이면 점프
-                   
 
-                    
 
-                    
+
+
+
                 }
                 break;
         }
