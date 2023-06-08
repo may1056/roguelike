@@ -204,7 +204,7 @@ public class Player : MonoBehaviour //플레이어
 
 
 
-    void GetNewItem() //랜덤 아이템 얻기 - 임시
+    public void GetNewItem() //랜덤 아이템 얻기 - 임시
     {
         //itemNum = (Random.Range(0, 15), Random.Range(0, 15));
         //if (itemNum.Item1 == itemNum.Item2) itemNum.Item2 = -1; //겹치면 그냥 없앰
@@ -237,8 +237,8 @@ public class Player : MonoBehaviour //플레이어
             //rare
             case 1: canRevive = true; break;
             case 2: transform.GetChild(6).gameObject.SetActive(true); break;
-            case 3: maxhp = 1; hp = 1; selfinjury = true; break;
-            case 4: maxshield = 2; shield = 2; break;
+            case 3: maxhp = 1; hp = 1; selfinjury = true; PlayerAttack.playerAtk.mp = 6; break;
+            case 4: maxshield = 2; shield = 2; maxunbeatableTime = 0.6f; break;
             case 5: berserker = true; break;
             case 6: dashdeal = true; dashDist = 12; maxstamina = 5; stamina = 5; break;
 
@@ -382,6 +382,9 @@ public class Player : MonoBehaviour //플레이어
             stamina--;
             ChangeSt();
             Invoke(nameof(RecoverSt), dashdeal ? 2 : 3); //스태미나 충전
+
+            manager.ReadOn(5, 1);
+            manager.ReadOn(6, 1);
         }
 
         //대쉬 도달 위치 표시

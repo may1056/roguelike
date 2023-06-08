@@ -14,7 +14,7 @@ public class GameManager : MonoBehaviour //게임 총괄
     float progressTime = 0; //4초까지 보여줄 거야
     public static bool prgEnd; //알려주는 거 끝났는지
 
-    static int floor = 3; //몇 층
+    static int floor = 1; //몇 층
     static int stage = 1; //몇 스테이지
 
     Transform p_l; //point_line
@@ -25,6 +25,9 @@ public class GameManager : MonoBehaviour //게임 총괄
     //ㅋㅋㅋㅋㅋㅋㅋㅋ
     static float 게임실행시간 = 0;
     public Text 게임실행시간텍스트;
+
+    public bool onTabPage;
+    public Image tabPage;
 
 
 
@@ -170,11 +173,28 @@ public class GameManager : MonoBehaviour //게임 총괄
     public Boss2 boss2;
     public GameObject boss2map;
 
+
+
+
+
+    public Image hpPotion, mpPotion;
+
     public float pstimerhp = 0;//hp postion
     public float pstimermp = 0;//mp postion
 
 
     public AudioSource recover;
+
+
+    public GameObject TutorialMap;
+    public Image Read;
+    public Image skillZ, skillX;
+
+    public Image nowWeapon;
+
+
+
+
 
 
 
@@ -235,6 +255,8 @@ public class GameManager : MonoBehaviour //게임 총괄
 
         player.transform.GetChild(0).GetComponent<Camera>().orthographicSize = 8;
 
+        onTabPage = false;
+
     } //Awake End
 
 
@@ -246,15 +268,28 @@ public class GameManager : MonoBehaviour //게임 총괄
 
         realkilled = 0;
 
+        making = true;
+        nowPhase = 0;
+        phaseTime = 0;
+
+
         //맵 불러오기
         if (stage == 4) map = Instantiate(floor == 2 ? boss1map : boss2map);
+        else if (floor == 1 && stage == 1)
+        {
+            skillZ.gameObject.SetActive(false);
+            skillX.gameObject.SetActive(false);
+            map = Instantiate(TutorialMap);
+            making = false;
+            hpPotion.gameObject.SetActive(false);
+            mpPotion.gameObject.SetActive(false);
+            nowWeapon.transform.GetChild(1).gameObject.SetActive(false);
+            nowWeapon.transform.GetChild(2).gameObject.SetActive(false);
+        }
         else map = Instantiate(maps[mapNum]); //맵을 생성한다
 
         map.transform.SetParent(gameObject.transform); //게임매니저가 맵의 부모가 됨
 
-        making = true;
-        nowPhase = 0;
-        phaseTime = 0;
 
         bossHpLine.gameObject.SetActive(stage == 4);
 
@@ -293,52 +328,62 @@ public class GameManager : MonoBehaviour //게임 총괄
             }
         }
         //상점 열고닫기
+
         pstimerhp += Time.deltaTime;
-        pstimermp += Time.deltaTime;
-        if (15 <= pstimerhp) {
-
-
-            if (Input.GetKeyDown("1"))
+        if (15 <= pstimerhp)
+        {
+            if (Input.GetKeyDown("1")
+                && player.hp < player.maxhp && coins >= 10)
             {
-
-
-                if (coins >= 10)
-                {
-
-                    Player.player.hp += 6;
-                    coins -= 10;
-                    pstimerhp = 0;
-                }
-
+                player.hp += 3;
+                coins -= 10;
+                pstimerhp = 0;
+                ReadOn(4, 0);
             }
-
         }
+        hpPotion.transform.GetChild(0).GetComponent<Image>().fillAmount
+            = (15 - pstimerhp) / 15;
+        hpPotion.transform.GetChild(1).GetComponent<Text>().text
+            = pstimerhp < 15 ? (15 - pstimerhp).ToString("N1") : null;
+
+        pstimermp += Time.deltaTime;
         if (15 <= pstimermp)
         {
-            if (Input.GetKeyDown("2"))
+            if (Input.GetKeyDown("2")
+                && playerAtk.mp < playerAtk.maxmp && coins >= 10)
             {
-
-                if (coins >= 10)
-                {
-                    PlayerAttack.playerAtk.mp += 6;
-                    coins -= 10;
-                    pstimermp = 0;
-                }
+                playerAtk.mp += 3;
+                coins -= 10;
+                pstimermp = 0;
+                ReadOn(4, 1);
             }
-
         }
+        mpPotion.transform.GetChild(0).GetComponent<Image>().fillAmount
+            = (15 - pstimermp) / 15;
+        mpPotion.transform.GetChild(1).GetComponent<Text>().text
+            = pstimermp < 15 ? (15 - pstimermp).ToString("N1") : null;
 
-            ChangeHPMP();
+
+
+
+        ChangeHPMP();
 
 
         게임실행시간 += Time.deltaTime;
-        게임실행시간텍스트.text = 게임실행시간.ToString();
+        게임실행시간텍스트.text = ((int)(게임실행시간 / 60)).ToString() + ":" + ((int)(게임실행시간 % 60)).ToString("D2");
+
+        if (Input.GetKeyDown(KeyCode.Tab) && progressTime > 4)
+        {
+            onTabPage = !onTabPage;
+            ReadOn(3, 1);
+        }
+        tabPage.gameObject.SetActive(onTabPage);
 
 
         stat[0].text = "공격력: 공격력 변수 추가필요" /*+ Player.maxAttackCooltime.ToString()*/;
         stat[1].text = "공격속도: " + PlayerAttack.maxAttackCooltime.ToString();
-        stat[2].text = "이동속도: " + Player.player.speed.ToString();
-        stat[3].text = "점프력: " + Player.player.jumpPower.ToString();
+        stat[2].text = "이동속도: " + player.speed.ToString();
+        stat[3].text = "점프력: " + player.jumpPower.ToString();
 
 
         //메뉴창 표시
@@ -354,6 +399,8 @@ public class GameManager : MonoBehaviour //게임 총괄
                 menuSet.SetActive(true);
                 Time.timeScale = 0;
             }
+
+            ReadOn(3, 0);
         }
 
 
@@ -415,13 +462,21 @@ public class GameManager : MonoBehaviour //게임 총괄
         //전투가 끝났거나 다 잡을 필요 없으면 포탈들 정위치 후 보이기
         if (!making || enemies[mapNum, 0] == -1)
         {
-            Portal1.transform.position = new Vector2(
+            if (floor == 1 && stage == 1)
+            {
+                Portal1.transform.position = new Vector2(153, 13);
+                Portal1.SetActive(true);
+            }
+            else
+            {
+                Portal1.transform.position = new Vector2(
                 portal_position[mapNum, 0, 0], portal_position[mapNum, 0, 1]);
-            Portal1.SetActive(true);
+                Portal1.SetActive(true);
 
-            Portal2.transform.position = new Vector2(
-                portal_position[mapNum, 1, 0], portal_position[mapNum, 1, 1]);
-            Portal2.SetActive(true);
+                Portal2.transform.position = new Vector2(
+                    portal_position[mapNum, 1, 0], portal_position[mapNum, 1, 1]);
+                Portal2.SetActive(true);
+            }
         }
 
         GameObject P1S = Portal1.transform.GetChild(0).gameObject; //포탈1 S 텍스트
@@ -432,10 +487,22 @@ public class GameManager : MonoBehaviour //게임 총괄
         {
             P1S.SetActive(true);
             P2S.SetActive(false);
+
             if (Input.GetKeyDown("s")) //포탈 타기
             {
-                mapNum = portal_mapNum[mapNum, 0];
-                NextStage();
+                if (floor == 1 && stage == 1)
+                {
+                    Read.gameObject.SetActive(true);
+                    hpPotion.gameObject.SetActive(true);
+                    mpPotion.gameObject.SetActive(true);
+                    nowWeapon.transform.GetChild(1).gameObject.SetActive(true);
+                    nowWeapon.transform.GetChild(2).gameObject.SetActive(true);
+                }
+                else
+                {
+                    mapNum = portal_mapNum[mapNum, 0];
+                    NextStage();
+                }
             }
         }
         //포탈2와 가까우면
@@ -462,7 +529,7 @@ public class GameManager : MonoBehaviour //게임 총괄
     } //Update End
 
 
-    void NextStage()
+    public void NextStage()
     {
         player.SaveHP();
         playerAtk.SaveMP();
@@ -574,6 +641,13 @@ public class GameManager : MonoBehaviour //게임 총괄
     }
 
 
+    public void ReadOn(int set, int key)
+    {
+        Image read = Read.transform.GetChild(set).GetChild(key).GetComponent<Image>();
+        read.color = new Color(1, 1, 1, 0.4f);
+        read.transform.GetChild(0).GetComponent<Text>().color = new Color(0, 0, 0, 0.4f);
+    }
+
 
     public void ItemInfo() //현재 무슨 아이템을 가지고 있나
     {
@@ -676,6 +750,9 @@ public class GameManager : MonoBehaviour //게임 총괄
 
         itemGet.gameObject.SetActive(true);
         getto = true;
+
+        player.GetNewItem();
+        ReadOn(1, 0);
     }
     public void Throw()
     {
@@ -699,6 +776,9 @@ public class GameManager : MonoBehaviour //게임 총괄
             ItemInfo();
         }
         else ItemChangeHaseyo();
+
+        player.GetNewItem();
+        ReadOn(1, 0);
     }
 
 

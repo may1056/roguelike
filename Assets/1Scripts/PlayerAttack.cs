@@ -154,9 +154,13 @@ public class PlayerAttack : MonoBehaviour
         //else attacksr.color = new Color(1, 1, 1, 0);
 
 
-        if (Input.GetKeyDown("j") && curAttackCooltime <= 0)
+        if ((Input.GetMouseButtonDown(0) || Input.GetKeyDown("j"))
+            && curAttackCooltime >= maxAttackCooltime)
         {
             //소리
+
+            manager.ReadOn(5, 0);
+            manager.ReadOn(6, 0);
         }
 
 
@@ -191,6 +195,8 @@ public class PlayerAttack : MonoBehaviour
             skillP = new Vector2(transform.position.x + x, transform.position.y);
             player.MakeEffect(skillP, skillSprite, -2, 1);
             player.dontBehaveTime = 0;
+            skillZ.gameObject.SetActive(true);
+            manager.ReadOn(2, 0);
         }
         else skillP = new Vector2(9999, 9999); //저 멀리
 
@@ -220,6 +226,8 @@ public class PlayerAttack : MonoBehaviour
                 manager.ChangeHPMP();
             }
             player.dontBehaveTime = 0;
+            skillX.gameObject.SetActive(true);
+            manager.ReadOn(2, 1);
         }
 
         if (wsAvailable)
@@ -245,7 +253,7 @@ public class PlayerAttack : MonoBehaviour
 
 
 
-        if (Input.GetKeyDown("p") && GameManager.prgEnd) Ismeleechange();
+        if (Input.GetKeyDown("c") && GameManager.prgEnd) Ismeleechange();
 
 
         if (mp > maxmp) mp = maxmp;
