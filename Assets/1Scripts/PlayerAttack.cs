@@ -35,6 +35,12 @@ public class PlayerAttack : MonoBehaviour
     Vector2 mousePosition;
     float weaponangle;
 
+    bool weaponrotated = false;
+    float attackingtime = 0;
+    public TrailRenderer weapontrail;
+
+
+
 
     public int mp;
     public int maxmp;
@@ -115,7 +121,8 @@ public class PlayerAttack : MonoBehaviour
 
     void Update()
     {
-        WeaponAnimation();
+        attackingtime += Time.deltaTime;
+  
 
         attacksr.flipX = player.F;
         //atk.transform.localPosition = new Vector2(player.F ? -2f : 2f, 0);
@@ -141,7 +148,7 @@ public class PlayerAttack : MonoBehaviour
             //Soundmanager.soundmanager.swordsounds[0].Play();
             float x = player.F ? -2 : 2;
             //attackP = new Vector2(transform.position.x + x, transform.position.y);
-            //attacksr.color = new Color(1, 1, 1, 1);
+            //attacksr.color = new Color(1, 1, 1, 1); //WeaponAnimation()에서 무기에 따른 투명도 관리중
             player.dontBehaveTime = 0;
         }
         else if (attackuse) //원거리 공격 쿨타임, 애니메이션?
@@ -174,7 +181,12 @@ public class PlayerAttack : MonoBehaviour
 
             manager.ReadOn(5, 0);
             manager.ReadOn(6, 0);
+            Soundmanager.soundmanager.swordsounds[0].Play();
+            weaponrotated = !weaponrotated;
+            attackingtime = 0;
         }
+
+        WeaponAnimation();
 
 
 
@@ -248,7 +260,6 @@ public class PlayerAttack : MonoBehaviour
             switch (weaponNum.Item1)
             {
                 case 0:
-                    Soundmanager.soundmanager.swordsounds[1].Play();
                     WeaponSkill0(wscount);
                     wsgoing -= 2 * Time.deltaTime;
                     break;
@@ -276,12 +287,28 @@ public class PlayerAttack : MonoBehaviour
 
     void WeaponAnimation() // 무기 위치 고정, 마우스에 따른 회전
     {
+
+        if (attackingtime < 0.25f)
+        {
+            weapontrail.enabled = true;
+        }
+        else weapontrail.enabled = false;
+
         atk.transform.localPosition = new Vector2(0, 0);
         mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         weaponangle = Mathf.Atan2(mousePosition.y - atk.position.y, mousePosition.x - atk.position.x) * Mathf.Rad2Deg;
-        atk.transform.rotation = Quaternion.AngleAxis(weaponangle - 90, Vector3.forward); ;
 
-        if (attackuse) attackani.SetTrigger("attacked");
+        if (GameManager.ismeleeWeapon) 
+        { 
+        if (weaponrotated) atk.transform.rotation = Quaternion.AngleAxis(weaponangle -20, Vector3.forward);
+        else atk.transform.rotation = Quaternion.AngleAxis(weaponangle - 160, Vector3.forward);
+        }
+        else atk.transform.rotation = Quaternion.AngleAxis(weaponangle - 90, Vector3.forward);
+
+
+
+
+
 
         if (GameManager.ismeleeWeapon) attacksr.color = new Color(1, 1, 1, 1);
         else attacksr.color = new Color(1, 1, 1, 0);
@@ -295,6 +322,7 @@ public class PlayerAttack : MonoBehaviour
             wscount--;
             player.MakeEffect(transform.position, ws0sprite, 10, 1);
             //소리
+            Soundmanager.soundmanager.swordsounds[1].Play();
         }
         else wsP = new Vector2(9999, 9999);
     }
