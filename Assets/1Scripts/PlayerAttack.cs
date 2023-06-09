@@ -12,6 +12,9 @@ public class PlayerAttack : MonoBehaviour
     public static PlayerAttack playerAtk;
 
 
+    public static (int, int) weaponNum = (0, 1);
+
+
     Transform atk; //공격 범위
 
     SpriteRenderer attacksr;
@@ -86,7 +89,7 @@ public class PlayerAttack : MonoBehaviour
         skillZcooltimeText = skillZ.transform.GetChild(1).GetComponent<Text>();
         skillXcooltimeText = skillX.transform.GetChild(1).GetComponent<Text>();
 
-        GameManager.ismeleeWeapon = true;
+        GameManager.ismeleeWeapon = GameManager.gameManager.ismelee[weaponNum.Item1];
         attackani.SetBool("IsmeleeWeapon", GameManager.ismeleeWeapon); // IsmeleeWeapon 파라미터도 GameManager.ismeleeWeapon 값따라 변경
 
         mp = savedmp;
@@ -232,7 +235,7 @@ public class PlayerAttack : MonoBehaviour
 
         if (wsAvailable)
         {
-            switch (Player.weaponNum.Item1)
+            switch (weaponNum.Item1)
             {
                 case 0:
                     Soundmanager.soundmanager.swordsounds[1].Play();
@@ -317,11 +320,11 @@ public class PlayerAttack : MonoBehaviour
         else attackbc.enabled = false;
         */ //일단 주석 처리함
 
-        if (Player.weaponNum.Item2 != -1)
+        if (weaponNum.Item2 != -1)
         {
-            int temp = Player.weaponNum.Item1;
-            Player.weaponNum.Item1 = Player.weaponNum.Item2;
-            Player.weaponNum.Item2 = temp;
+            int temp = weaponNum.Item1;
+            weaponNum.Item1 = weaponNum.Item2;
+            weaponNum.Item2 = temp;
         }
     }
 

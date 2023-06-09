@@ -71,7 +71,7 @@ public class Bullet : MonoBehaviour //탄막
 
         if (Mathf.Abs(wsp.y) < 100)
         {
-            switch (Player.weaponNum.Item1)
+            switch (PlayerAttack.weaponNum.Item1)
             {
                 case 0:
                     bool inX = Mathf.Abs(wsp.x - tp.x) < 7.5f

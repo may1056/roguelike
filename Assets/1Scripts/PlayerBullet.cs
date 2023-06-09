@@ -134,7 +134,7 @@ public class PlayerBullet : MonoBehaviour
         }
 
 
-        if (Mathf.Abs(tp.x) > 100 || Mathf.Abs(tp.y) > 100) Destroy(gameObject);
+        //if (Mathf.Abs(tp.x) > 100 || Mathf.Abs(tp.y) > 100) Destroy(gameObject);
 
     } //Update End
 

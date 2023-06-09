@@ -327,7 +327,7 @@ public class Monster : MonoBehaviour //잡몹
 
         if (Mathf.Abs(wsp.y) < 100)
         {
-            switch (Player.weaponNum.Item1)
+            switch (PlayerAttack.weaponNum.Item1)
             {
                 case 0:
                     bool inX = Mathf.Abs(wsp.x - tp.x) < 7.5f
@@ -401,12 +401,12 @@ public class Monster : MonoBehaviour //잡몹
             if (r < 1) Instantiate(mpOrb, tp, Quaternion.identity);
 
             r = Random.Range(0, 10);
-            if (r < 4) Instantiate(coinOrb, tp, Quaternion.identity);
-            if (monsterNum == 20)
+            if (monsterNum >= 20)
             {
-                for (int i = 0; i < 5; i++)
+                for (int i = 0; i < (monsterNum == 20 ? 2 : 1); i++)
                     Instantiate(coinOrb, tp, Quaternion.Euler(0, 0, i * 72));
             }
+            else if (r < 4) Instantiate(coinOrb, tp, Quaternion.identity);
 
             GameManager.killed++; //죽으면서 킬 수 올리고 감
             GameManager.realkilled++;
@@ -582,7 +582,7 @@ public class Monster : MonoBehaviour //잡몹
         GameManager.killed++; //죽으면서 킬 수 올리고 감
         GameManager.realkilled++;
         withPlayer = false;
-        Soundmanager.soundmanager.firesounds[3].Play();
+        Soundmanager.soundmanager.firesounds[2].Play();
         Destroy(gameObject);
     }
 

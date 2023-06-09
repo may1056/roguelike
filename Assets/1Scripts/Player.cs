@@ -19,9 +19,6 @@ public class Player : MonoBehaviour //플레이어
 
 
 
-    public static (int, int) weaponNum;
-    //0채찍,
-
 
     Transform bg; //배경
     Transform td; //대쉬 끝 위치
@@ -170,7 +167,6 @@ public class Player : MonoBehaviour //플레이어
         sr = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
         animm = GetComponent<Animator>();
-        weaponNum = (0, 1); //임시
 
 
         bg = transform.GetChild(2);

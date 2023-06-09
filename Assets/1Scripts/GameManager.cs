@@ -33,7 +33,7 @@ public class GameManager : MonoBehaviour //게임 총괄
 
     //아이템
     readonly string[] Items = { "알파 수정",
-        "부활", "자동 공격", "자해", "쉴드", "버서커", "대쉬 강화",
+        "부활", "자동 공격", "자해", "추가 쉴드", "버서커", "대쉬 강화",
         "붉은 수정", "분홍 수정", "푸른 수정", "초록 수정", "노란 수정", "주황 수정", "보라 수정", "독", };
 
     readonly int[] Items_legendary = { 2,
@@ -55,6 +55,9 @@ public class GameManager : MonoBehaviour //게임 총괄
     public Image itemGet;
     bool getto = false;
     public Image item1Image, item2Image;
+    public Image item1tabImage, item2tabImage;
+    public Button item1tabButton, item2tabButton;
+    public Image item1Info, item2Info, nowWeaponInfo, subWeaponInfo;
 
     readonly string[] Items_explaination =
     {
@@ -63,7 +66,7 @@ public class GameManager : MonoBehaviour //게임 총괄
         "사망 시 체력과 마나가 모두 충전된 상태로 부활합니다. (아이템 소멸)", //부활
         "적을 타겟팅하는 공격자를 소환합니다. 약하지만, 적을 감속시킵니다.", //자동 공격
         "크큭.. 왼손의 흑염룡이 미쳐 날뛰려 하는군.. 흑마법의 힘으로 모두 파.괴.해주겠어", //자해
-        "피격 시 체력 대신 소모되는 방어막을 하나 더 갖습니다. 시간이 지나면 회복됩니다.", //쉴드
+        "피격 시 체력 대신 소모되는 방어막을 하나 더 갖습니다. 그리고 무적 시간이 길어집니다.", //쉴드
         "체력이 2 이하일 때 공격력이 1 증가합니다.", //버서커
         "대쉬 폼 미쳤다 ㄷㄷ", //대쉬 강화
 
@@ -82,12 +85,28 @@ public class GameManager : MonoBehaviour //게임 총괄
     //무기
 
 
-    readonly string[] meleeWeapon = // 근접 무기
-        { "채찍", "검", "창",
-        "열라짱짱 쎈 킹왕짱 울트라 슈퍼 매지컬 치즈스틱 롱치즈 이거 ㄹㅇ실화냐...", "방패" };
+    //readonly string[] meleeWeapon = // 근접 무기
+    //    { "채찍", "검", "창",
+    //    "열라짱짱 쎈 킹왕짱 울트라 슈퍼 매지컬 치즈스틱 롱치즈 이거 ㄹㅇ실화냐...", "방패" };
 
-    readonly string[] rangedWeapon = // 원거리 무기
-        { "활", "총지팡이"};
+    //readonly string[] rangedWeapon = // 원거리 무기
+    //    { "활", "총지팡이"};
+
+    readonly string[] Weapons = // 무기 통합
+        { "검", "불안정한\n총지팡이", "창", "활",
+        "열라짱짱 쎈 킹왕짱 울트라 슈퍼 매지컬 치즈스틱 롱치즈 이거 ㄹㅇ실화냐..." };
+
+    readonly string[] Weapons_explaination =
+    {
+        "짧습니다.",
+        "제어하기 힘듭니다.",
+        "찌릅니다.",
+        "쏩니다.",
+        "ㅇㅁㄴ류ㅓ팧ㅊㅍㄴㅁㄴㅇ치테코윺닏ㄹ먼ㄼㅈㄷ로변ㅇㅎㅁㅅㄴㅇㅊㄱ머나히ㅑㅡㅐ도갸ㅕㄹㄹ나외며ㅑㅈ돞비ㅓ어ㅐ렘ㄴ"
+    };
+
+
+    public Sprite[] weaponSprites;
 
     //무기별 확률
     readonly float[] meleeWeapon_p = { 9.9f, 25, 20, 0.1f, 15 };
@@ -98,28 +117,31 @@ public class GameManager : MonoBehaviour //게임 총괄
 
     public static int rangedWeaponIndex;
 
+    public readonly bool[] ismelee = { true, false, true, false, true };
     public static bool ismeleeWeapon;
     public Text isMWText;
 
 
-    public static int mapNum = 2; //맵 번호
+    public static int mapNum; //맵 번호
     GameObject map; //맵이 들어가는 공간
 
     public GameObject[] maps; //맵 프리팹
     public GameObject[] mons; //맵 내 몬스터 집합 프리팹
 
     //맵별 페이즈 수
-    readonly int[] phases = { 1, 1, 3, 3, 1, 1, 1, 1, };
+    public int[] phases;
 
     //페이즈별 잡아야 할 몬스터 수, -1: 안 잡아도 된다
     readonly int[,] enemies
-        = { { 23, 0, 0, }, { -1, 0, 0, }, { 14, 15, 25, }, { 21, 25, 24, }, { 32, 0, 0, },
+        = { { 14, 15, 25, }, { 21, 25, 24, },
         { 14, 0, 0, }, { 19, 0, 0, }, { 22, 0, 0, }};
 
     public bool making; //진행 중인지
     int nowPhase; //현재 페이즈
     float phaseTime; //페이즈 진행 시간
     bool appeared; //적들 등장했는지
+
+
 
 
 
@@ -273,6 +295,8 @@ public class GameManager : MonoBehaviour //게임 총괄
         phaseTime = 0;
 
 
+        mapNum = Random.Range(0, 5);
+
         //맵 불러오기
         if (stage == 4) map = Instantiate(floor == 2 ? boss1map : boss2map);
         else if (floor == 1 && stage == 1)
@@ -375,8 +399,10 @@ public class GameManager : MonoBehaviour //게임 총괄
         if (Input.GetKeyDown(KeyCode.Tab) && progressTime > 4)
         {
             onTabPage = !onTabPage;
+            ItemInfo();
             ReadOn(3, 1);
         }
+
         tabPage.gameObject.SetActive(onTabPage);
 
 
@@ -462,20 +488,19 @@ public class GameManager : MonoBehaviour //게임 총괄
         //전투가 끝났거나 다 잡을 필요 없으면 포탈들 정위치 후 보이기
         if (!making || enemies[mapNum, 0] == -1)
         {
-            if (floor == 1 && stage == 1)
+            if (floor == 1 && stage == 1) //1-1이 아니라 튜토리얼로 처리하기로 했음!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             {
-                Portal1.transform.position = new Vector2(153, 13);
+                Portal1.transform.position = new Vector2(115.5f, 1);
                 Portal1.SetActive(true);
             }
             else
             {
-                Portal1.transform.position = new Vector2(
-                portal_position[mapNum, 0, 0], portal_position[mapNum, 0, 1]);
+                Portal1.transform.position = Vector2.up;
                 Portal1.SetActive(true);
 
-                Portal2.transform.position = new Vector2(
-                    portal_position[mapNum, 1, 0], portal_position[mapNum, 1, 1]);
-                Portal2.SetActive(true);
+                //Portal2.transform.position = new Vector2(
+                //    portal_position[mapNum, 1, 0], portal_position[mapNum, 1, 1]);
+                //Portal2.SetActive(true);
             }
         }
 
@@ -609,7 +634,7 @@ public class GameManager : MonoBehaviour //게임 총괄
             if (icnum == Player.itemNum.Item1 || icnum == Player.itemNum.Item2)
                 goto newItem; //goto 쓰지 말라고 했던 것 같긴 한데 아무튼, 겹치면 다시 뽑음
 
-            nowItemCube = Instantiate(itemCube, Vector2.zero, Quaternion.identity);
+            nowItemCube = Instantiate(itemCube, 2.5f * Vector2.right, Quaternion.identity);
             nowItemCube.GetComponent<Itemcube>().cubeNum = icnum;
             nowItemCube.GetComponent<SpriteRenderer>().sprite = itemSprites[icnum];
         }
@@ -656,18 +681,38 @@ public class GameManager : MonoBehaviour //게임 총괄
         //itemText.text = "1. " + (i1 == -1 ? "없음" : Items[i1]) +
         //    " 2. " + (i2 == -1 ? "없음" : Items[i2]);
 
-        if (i1 == -1) item1Image.gameObject.SetActive(false);
+        if (i1 == -1)
+        {
+            item1Image.gameObject.SetActive(false);
+
+            item1tabImage.gameObject.SetActive(false);
+            item1tabButton.gameObject.SetActive(false);
+        }
         else
         {
-            item1Image.gameObject.SetActive(true);
             item1Image.sprite = itemSprites[i1];
+            item1Image.gameObject.SetActive(true);
+
+            item1tabImage.sprite = itemSprites[i1];
+            item1tabImage.gameObject.SetActive(true);
+            item1tabButton.gameObject.SetActive(true);
         }
 
-        if (i2 == -1) item2Image.gameObject.SetActive(false);
+        if (i2 == -1)
+        {
+            item2Image.gameObject.SetActive(false);
+
+            item2tabImage.gameObject.SetActive(false);
+            item2tabButton.gameObject.SetActive(false);
+        }
         else
         {
-            item2Image.gameObject.SetActive(true);
             item2Image.sprite = itemSprites[i2];
+            item2Image.gameObject.SetActive(true);
+
+            item2tabImage.sprite = itemSprites[i2];
+            item2tabImage.gameObject.SetActive(true);
+            item2tabButton.gameObject.SetActive(true);
         }
     }
 
@@ -782,10 +827,77 @@ public class GameManager : MonoBehaviour //게임 총괄
     }
 
 
+    public void ItemWeaponSell(int n) //파괴
+    {
+        switch (n)
+        {
+            case 1:
+                coins += (int)Mathf.Pow(Items_legendary[Player.itemNum.Item1] + 1, 2) * 10;
+                Player.itemNum.Item1 = -1;
+                player.GetNewItem();
+                break;
+
+            case 2:
+                coins += (int)Mathf.Pow(Items_legendary[Player.itemNum.Item2] + 1, 2) * 10;
+                Player.itemNum.Item2 = -1;
+                player.GetNewItem();
+                break;
+
+            case 3:
+                coins += 10;
+                PlayerAttack.weaponNum.Item2 = -1;
+                break;
+        }
+    }
+    public void ItemWeaponInfo() // ( i )
+    {
+        int i1 = Player.itemNum.Item1,
+            i2 = Player.itemNum.Item2,
+            w1 = PlayerAttack.weaponNum.Item1,
+            w2 = PlayerAttack.weaponNum.Item2;
+
+        if (i1 != -1)
+        {
+            item1Info.transform.GetChild(0).GetComponent<Image>().sprite
+                = itemSprites[i1];
+            item1Info.transform.GetChild(0).GetChild(0).GetComponent<Text>().text
+                = Items[i1];
+            item1Info.transform.GetChild(1).GetComponent<Text>().text
+                = Items_explaination[i1];
+        }
+
+        if (i2 != -1)
+        {
+            item2Info.transform.GetChild(0).GetComponent<Image>().sprite
+                = itemSprites[i2];
+            item2Info.transform.GetChild(0).GetChild(0).GetComponent<Text>().text
+                = Items[i2];
+            item2Info.transform.GetChild(1).GetComponent<Text>().text
+                = Items_explaination[i2];
+        }
+
+        nowWeaponInfo.transform.GetChild(0).GetComponent<Image>().sprite
+            = weaponSprites[w1];
+        nowWeaponInfo.transform.GetChild(0).GetChild(0).GetComponent<Text>().text
+            = Weapons[w1];
+        nowWeaponInfo.transform.GetChild(1).GetComponent<Text>().text
+            = Weapons_explaination[w1];
+
+        if (w2 != -1)
+        {
+            subWeaponInfo.transform.GetChild(0).GetComponent<Image>().sprite
+                = weaponSprites[w2];
+            subWeaponInfo.transform.GetChild(0).GetChild(0).GetComponent<Text>().text
+                = Weapons[w2];
+            subWeaponInfo.transform.GetChild(1).GetComponent<Text>().text
+                = Weapons_explaination[w2];
+        }
+    }
 
 
 
-    public void GameExit() // 게임 종료 버튼 - 에디터에선 실행안됨
+
+    public void GameExit() // 게임 종료 버튼
     {
         SceneManager.LoadScene(0);
     }
