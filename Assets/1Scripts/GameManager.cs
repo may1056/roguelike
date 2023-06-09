@@ -590,6 +590,7 @@ public class GameManager : MonoBehaviour //게임 총괄
             floor = 1;
             stage = 1;
             shouldplaytutorial = false;
+            Mainmenu.nevertutored = false;
         }
         else if (floor == 1 && stage == 3) //1-3은 없으니 2-1로 가라
         {
@@ -603,7 +604,7 @@ public class GameManager : MonoBehaviour //게임 총괄
         }
         else if (floor == 3 && stage == 5) //3-5는 없... 막보를 죽였군! 잘했다
         {
-            //끝
+            Story.isEnding = true;
         }
 
         SceneManager.LoadScene(1); //PlayGame 재시작

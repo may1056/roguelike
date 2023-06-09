@@ -37,6 +37,8 @@ public class Mainmenu : MonoBehaviour // 게임매니저 사용하려했는데 �
             Player.itemNum = (-1, -1);
             PlayerAttack.weaponNum = (0, -1);
 
+            Story.isEnding = false;
+
             SceneManager.LoadScene(4);
         }
     }

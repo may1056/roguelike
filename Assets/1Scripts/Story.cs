@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class Story : MonoBehaviour
 {
-    public static bool isEnding = false;
+    public static bool isEnding = true;
 
     // 텍스트바 점멸하는 세모
     public Transform textbarTriangle;

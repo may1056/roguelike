@@ -152,7 +152,7 @@ public class Boss2 : MonoBehaviour
             if (t > 120) CancelInvoke(nameof(Craziness));
             if (t > 130)
             {
-                SceneManager.LoadScene(3);
+                GameManager.gameManager.NextStage();
             }
         }
 
