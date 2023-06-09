@@ -35,9 +35,9 @@ public class PlayerAttack : MonoBehaviour
     Vector2 mousePosition;
     float weaponangle;
 
-    bool weaponrotated = false;
-    float attackingtime = 0;
-    public TrailRenderer weapontrail;
+    //bool weaponrotated = false;
+    //float attackingtime = 0;
+    //public TrailRenderer weapontrail;
 
 
 
@@ -121,8 +121,6 @@ public class PlayerAttack : MonoBehaviour
 
     void Update()
     {
-        attackingtime += Time.deltaTime;
-  
 
         attacksr.flipX = player.F;
         //atk.transform.localPosition = new Vector2(player.F ? -2f : 2f, 0);
@@ -182,8 +180,6 @@ public class PlayerAttack : MonoBehaviour
             manager.ReadOn(5, 0);
             manager.ReadOn(6, 0);
             Soundmanager.soundmanager.swordsounds[0].Play();
-            weaponrotated = !weaponrotated;
-            attackingtime = 0;
         }
 
         WeaponAnimation();
@@ -287,26 +283,11 @@ public class PlayerAttack : MonoBehaviour
 
     void WeaponAnimation() // 무기 위치 고정, 마우스에 따른 회전
     {
-
-        if (attackingtime < 0.25f)
-        {
-            weapontrail.enabled = true;
-        }
-        else weapontrail.enabled = false;
-
         atk.transform.localPosition = new Vector2(0, 0);
         mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         weaponangle = Mathf.Atan2(mousePosition.y - atk.position.y, mousePosition.x - atk.position.x) * Mathf.Rad2Deg;
 
-        if (GameManager.ismeleeWeapon) 
-        { 
-        if (weaponrotated) atk.transform.rotation = Quaternion.AngleAxis(weaponangle -20, Vector3.forward);
-        else atk.transform.rotation = Quaternion.AngleAxis(weaponangle - 160, Vector3.forward);
-        }
-        else atk.transform.rotation = Quaternion.AngleAxis(weaponangle - 90, Vector3.forward);
-
-
-
+        atk.transform.rotation = Quaternion.AngleAxis(weaponangle -90, Vector3.forward);
 
 
 
