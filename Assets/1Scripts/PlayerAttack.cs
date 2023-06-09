@@ -97,9 +97,19 @@ public class PlayerAttack : MonoBehaviour
 
         // 초기화
         mp = 6;
-        SaveMP();
+        //SaveMP();
+
+        GetNewWeapon();
 
     } //Start End
+
+
+
+    public void GetNewWeapon()
+    {
+        manager.WeaponInfo();
+    }
+
 
 
 

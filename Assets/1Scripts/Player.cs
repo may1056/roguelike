@@ -181,7 +181,7 @@ public class Player : MonoBehaviour //플레이어
 
         // 초기화
         hp = 6;
-        SaveHP();
+        //SaveHP();
         //itemNum = (-1, -1);
 
     } //Awake End
@@ -200,7 +200,7 @@ public class Player : MonoBehaviour //플레이어
 
 
 
-    public void GetNewItem() //랜덤 아이템 얻기 - 임시
+    public void GetNewItem() //아이템 구성에 변화가 생겼겠다 싶으면 실행
     {
         //itemNum = (Random.Range(0, 15), Random.Range(0, 15));
         //if (itemNum.Item1 == itemNum.Item2) itemNum.Item2 = -1; //겹치면 그냥 없앰

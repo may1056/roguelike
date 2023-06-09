@@ -9,7 +9,6 @@ public class Mainmenu : MonoBehaviour // 게임매니저 사용하려했는데 �
     public GameObject Option;
     AudioSource menusound;
 
-    public Player player;
 
     void Awake()
     {
@@ -23,6 +22,12 @@ public class Mainmenu : MonoBehaviour // 게임매니저 사용하려했는데 �
 
     public void GameStart() // 게임 시작 버튼
     {
+        GameManager.shouldplaytutorial = true;
+        GameManager.killed = 0;
+        GameManager.coins = 0;
+        Player.itemNum = (-1, -1);
+        PlayerAttack.weaponNum = (0, -1);
+
         SceneManager.LoadScene(4);
     }
 

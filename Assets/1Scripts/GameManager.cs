@@ -9,6 +9,8 @@ public class GameManager : MonoBehaviour //게임 총괄
 {
     public static GameManager gameManager;
 
+    public static bool shouldplaytutorial = true;
+
     public GameObject ShopSet;//상점 열고 닫/
     public Image Progress; //처음에 게임 진행 상황 알리기 위해
     float progressTime = 0; //4초까지 보여줄 거야
@@ -46,9 +48,10 @@ public class GameManager : MonoBehaviour //게임 총괄
     //Items_legendary에 상수 곱해서 확률 만들기로 정해짐!!! 기억할 것
 
 
+    GameObject nowCube;
+
     public Text itemText;
     public GameObject itemCube;
-    GameObject nowItemCube;
     public Sprite[] itemSprites;
     int icnum; //아이템 큐브 번호, 즉 새로 들어온 아이템을 뜻함
     public GameObject itemChangeScreen;
@@ -57,7 +60,7 @@ public class GameManager : MonoBehaviour //게임 총괄
     public Image item1Image, item2Image;
     public Image item1tabImage, item2tabImage;
     public Button item1tabButton, item2tabButton;
-    public Image item1Info, item2Info, nowWeaponInfo, subWeaponInfo;
+    public Image item1Info, item2Info;
 
     readonly string[] Items_explaination =
     {
@@ -96,6 +99,18 @@ public class GameManager : MonoBehaviour //게임 총괄
         { "검", "불안정한\n총지팡이", "창", "활",
         "열라짱짱 쎈 킹왕짱 울트라 슈퍼 매지컬 치즈스틱 롱치즈 이거 ㄹㅇ실화냐..." };
 
+
+    public GameObject weaponCube;
+    public Sprite[] weaponSprites;
+    int wcnum;
+    public GameObject weaponChangeScreen;
+    public Image weaponGet;
+    bool getto_w = false;
+    public Image nowWeaponImage, subWeaponImage;
+    public Image nowWeaponTabImage, subWeaponTabImage;
+    public Button subWeaponTabButton;
+    public Image nowWeaponInfo, subWeaponInfo;
+
     readonly string[] Weapons_explaination =
     {
         "짧습니다.",
@@ -104,9 +119,6 @@ public class GameManager : MonoBehaviour //게임 총괄
         "쏩니다.",
         "ㅇㅁㄴ류ㅓ팧ㅊㅍㄴㅁㄴㅇ치테코윺닏ㄹ먼ㄼㅈㄷ로변ㅇㅎㅁㅅㄴㅇㅊㄱ머나히ㅑㅡㅐ도갸ㅕㄹㄹ나외며ㅑㅈ돞비ㅓ어ㅐ렘ㄴ"
     };
-
-
-    public Sprite[] weaponSprites;
 
     //무기별 확률
     readonly float[] meleeWeapon_p = { 9.9f, 25, 20, 0.1f, 15 };
@@ -120,6 +132,8 @@ public class GameManager : MonoBehaviour //게임 총괄
     public readonly bool[] ismelee = { true, false, true, false, true };
     public static bool ismeleeWeapon;
     public Text isMWText;
+
+
 
 
     public static int mapNum; //맵 번호
@@ -299,7 +313,7 @@ public class GameManager : MonoBehaviour //게임 총괄
 
         //맵 불러오기
         if (stage == 4) map = Instantiate(floor == 2 ? boss1map : boss2map);
-        else if (floor == 1 && stage == 1)
+        else if (shouldplaytutorial)
         {
             skillZ.gameObject.SetActive(false);
             skillX.gameObject.SetActive(false);
@@ -309,6 +323,7 @@ public class GameManager : MonoBehaviour //게임 총괄
             mpPotion.gameObject.SetActive(false);
             nowWeapon.transform.GetChild(1).gameObject.SetActive(false);
             nowWeapon.transform.GetChild(2).gameObject.SetActive(false);
+            progressTime = 4.01f;
         }
         else map = Instantiate(maps[mapNum]); //맵을 생성한다
 
@@ -400,6 +415,7 @@ public class GameManager : MonoBehaviour //게임 총괄
         {
             onTabPage = !onTabPage;
             ItemInfo();
+            WeaponInfo();
             ReadOn(3, 1);
         }
 
@@ -437,7 +453,7 @@ public class GameManager : MonoBehaviour //게임 총괄
         coinText.text = coins.ToString();
 
         //빠른 재시작
-        if (Input.GetKeyDown(KeyCode.Backspace) && progressTime > 4) SceneManager.LoadScene(1);
+        //if (Input.GetKeyDown(KeyCode.Backspace) && progressTime > 4) SceneManager.LoadScene(1);
 
         if (ismeleeWeapon) isMWText.text = "원거리로 바꾸기";
         else isMWText.text = "근거리로 바꾸기";
@@ -450,6 +466,10 @@ public class GameManager : MonoBehaviour //게임 총괄
         {
             if (floor == 2 && stage == 4) //보스1
             {
+                if (progressTime > 8)
+                {
+                    boss1.gameObject.SetActive(true);
+                }
             }
             else if (floor == 3 && stage == 4) //보스2
             {
@@ -488,7 +508,7 @@ public class GameManager : MonoBehaviour //게임 총괄
         //전투가 끝났거나 다 잡을 필요 없으면 포탈들 정위치 후 보이기
         if (!making || enemies[mapNum, 0] == -1)
         {
-            if (floor == 1 && stage == 1) //1-1이 아니라 튜토리얼로 처리하기로 했음!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            if (shouldplaytutorial) //1-1이 아니라 튜토리얼로 처리하기로 했음!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             {
                 Portal1.transform.position = new Vector2(115.5f, 1);
                 Portal1.SetActive(true);
@@ -515,7 +535,7 @@ public class GameManager : MonoBehaviour //게임 총괄
 
             if (Input.GetKeyDown("s")) //포탈 타기
             {
-                if (floor == 1 && stage == 1)
+                if (shouldplaytutorial)
                 {
                     Read.gameObject.SetActive(true);
                     hpPotion.gameObject.SetActive(true);
@@ -548,7 +568,11 @@ public class GameManager : MonoBehaviour //게임 총괄
         }
 
 
-        if (getto && Input.GetKeyDown("e")) Equip();
+        if (Input.GetKeyDown("e"))
+        {
+            if (getto) Equip();
+            else if (getto_w) Equip_w();
+        }
 
 
     } //Update End
@@ -561,7 +585,13 @@ public class GameManager : MonoBehaviour //게임 총괄
 
         stage++;
 
-        if (floor == 1 && stage == 3) //1-3은 없으니 2-1로 가라
+        if (shouldplaytutorial)
+        {
+            floor = 1;
+            stage = 1;
+            shouldplaytutorial = false;
+        }
+        else if (floor == 1 && stage == 3) //1-3은 없으니 2-1로 가라
         {
             floor = 2;
             stage = 1;
@@ -630,13 +660,26 @@ public class GameManager : MonoBehaviour //게임 총괄
             making = false;
             player.ClearBG();
 
-        newItem: icnum = Random.Range(0, 15);
-            if (icnum == Player.itemNum.Item1 || icnum == Player.itemNum.Item2)
-                goto newItem; //goto 쓰지 말라고 했던 것 같긴 한데 아무튼, 겹치면 다시 뽑음
+            if (Random.Range(0, 3) > 0) //3분의 2 확률로 아이템큐브
+            {
+            newItem: icnum = Random.Range(0, 15);
+                if (icnum == Player.itemNum.Item1 || icnum == Player.itemNum.Item2)
+                    goto newItem; //겹치면 다시 뽑음
 
-            nowItemCube = Instantiate(itemCube, 2.5f * Vector2.right, Quaternion.identity);
-            nowItemCube.GetComponent<Itemcube>().cubeNum = icnum;
-            nowItemCube.GetComponent<SpriteRenderer>().sprite = itemSprites[icnum];
+                nowCube = Instantiate(itemCube, 2.5f * Vector2.right, Quaternion.identity);
+                nowCube.GetComponent<Itemcube>().cubeNum = icnum;
+                nowCube.GetComponent<SpriteRenderer>().sprite = itemSprites[icnum];
+            }
+            else //3분의 1 확률로 무기큐브
+            {
+            newWeapon: wcnum = Random.Range(0, 4);
+                if (wcnum == PlayerAttack.weaponNum.Item1 || wcnum == PlayerAttack.weaponNum.Item2)
+                    goto newWeapon; //겹치면 다시 뽑음
+
+                nowCube = Instantiate(weaponCube, 2.5f * Vector2.right, Quaternion.identity);
+                nowCube.GetComponent<Weaponcube>().cubeNum = wcnum;
+                nowCube.GetComponent<SpriteRenderer>().sprite = weaponSprites[wcnum];
+            }
         }
 
         //다음 페이즈
@@ -715,6 +758,31 @@ public class GameManager : MonoBehaviour //게임 총괄
             item2tabButton.gameObject.SetActive(true);
         }
     }
+    public void WeaponInfo() //현재 무슨 무기를 가지고 있나
+    {
+        int w1 = PlayerAttack.weaponNum.Item1, w2 = PlayerAttack.weaponNum.Item2;
+
+        nowWeaponImage.sprite = weaponSprites[w1];
+        nowWeaponTabImage.sprite = weaponSprites[w1];
+
+        if (w2 == -1)
+        {
+            subWeaponImage.gameObject.SetActive(false);
+
+            subWeaponTabImage.gameObject.SetActive(false);
+            subWeaponTabButton.gameObject.SetActive(false);
+        }
+        else
+        {
+            subWeaponImage.sprite = weaponSprites[w2];
+            subWeaponImage.gameObject.SetActive(true);
+
+            subWeaponTabImage.sprite = weaponSprites[w2];
+            subWeaponTabImage.gameObject.SetActive(true);
+            subWeaponTabButton.gameObject.SetActive(true);
+        }
+    }
+
 
     public void ItemChangeHaseyo() //인벤토리 꽉 참! 템 버려!
     {
@@ -745,6 +813,37 @@ public class GameManager : MonoBehaviour //게임 총괄
 
         itemChangeScreen.SetActive(true);
     }
+
+    public void WeaponChangeHaseyo() //인벤토리 꽉 참! 무기 버려!
+    {
+        Transform[] bg = new Transform[3]; //background
+        Image[] we = new Image[3]; //weapon
+        Text[] na = new Text[3]; //name
+        Text[] ex = new Text[3]; //explaination
+
+        for (int i = 0; i < 3; i++)
+        {
+            bg[i] = weaponChangeScreen.transform.GetChild(i);
+            we[i] = bg[i].GetChild(0).GetComponent<Image>();
+            na[i] = bg[i].GetChild(0).GetChild(0).GetComponent<Text>();
+            ex[i] = bg[i].GetChild(1).GetComponent<Text>();
+        }
+
+        we[0].sprite = weaponSprites[PlayerAttack.weaponNum.Item1];
+        na[0].text = Weapons[PlayerAttack.weaponNum.Item1];
+        ex[0].text = Weapons_explaination[PlayerAttack.weaponNum.Item1];
+
+        we[1].sprite = weaponSprites[PlayerAttack.weaponNum.Item2];
+        na[1].text = Weapons[PlayerAttack.weaponNum.Item2];
+        ex[1].text = Weapons_explaination[PlayerAttack.weaponNum.Item2];
+
+        we[2].sprite = weaponSprites[wcnum];
+        na[2].text = Weapons[wcnum];
+        ex[2].text = Weapons_explaination[wcnum];
+
+        weaponChangeScreen.SetActive(true);
+    }
+
 
     public void ItemThrow(int code) //1: item1 버리기, 2: item2 버리기, 3: 새로운 아이템 안 먹기
     {
@@ -778,6 +877,38 @@ public class GameManager : MonoBehaviour //게임 총괄
         getto = false;
     }
 
+    public void WeaponThrow(int code)
+    {
+        int deleteNum = wcnum;
+
+        switch (code)
+        {
+            case 1:
+                deleteNum = PlayerAttack.weaponNum.Item1;
+                PlayerAttack.weaponNum.Item1 = wcnum;
+                break;
+
+            case 2:
+                deleteNum = PlayerAttack.weaponNum.Item2;
+                PlayerAttack.weaponNum.Item2 = wcnum;
+                break;
+
+            case 3: deleteNum = wcnum; break;
+        }
+
+        GameObject wc = Instantiate(weaponCube,
+            Player.player.transform.position, Quaternion.identity);
+        wc.GetComponent<Weaponcube>().cubeNum = deleteNum;
+        wc.GetComponent<SpriteRenderer>().sprite = weaponSprites[deleteNum];
+
+        wcnum = deleteNum;
+        weaponChangeScreen.SetActive(false);
+
+        WeaponInfo();
+
+        getto_w = false;
+    }
+
 
     public void ItemGettodaje()
     {
@@ -799,6 +930,29 @@ public class GameManager : MonoBehaviour //게임 총괄
         player.GetNewItem();
         ReadOn(1, 0);
     }
+
+    public void WeaponGettodaje()
+    {
+        Image we; //weapon
+        Text na; //name
+        Text ex; //explaination
+
+        we = weaponGet.transform.GetChild(0).GetComponent<Image>();
+        na = we.transform.GetChild(0).GetComponent<Text>();
+        ex = weaponGet.transform.GetChild(1).GetComponent<Text>();
+
+        we.sprite = weaponSprites[icnum];
+        na.text = Weapons[icnum];
+        ex.text = Weapons_explaination[icnum];
+
+        weaponGet.gameObject.SetActive(true);
+        getto_w = true;
+
+        playerAtk.GetNewWeapon();
+        ReadOn(1, 0);
+    }
+
+
     public void Throw()
     {
         itemGet.gameObject.SetActive(false);
@@ -826,6 +980,28 @@ public class GameManager : MonoBehaviour //게임 총괄
         ReadOn(1, 0);
     }
 
+    public void Throw_w()
+    {
+        weaponGet.gameObject.SetActive(false);
+
+        WeaponThrow(3);
+    }
+    public void Equip_w()
+    {
+        weaponGet.gameObject.SetActive(false);
+        getto_w = false;
+
+        if (PlayerAttack.weaponNum.Item2 == -1)
+        {
+            PlayerAttack.weaponNum.Item2 = wcnum;
+            WeaponInfo();
+        }
+        else ItemChangeHaseyo();
+
+        playerAtk.GetNewWeapon();
+        ReadOn(1, 0);
+    }
+
 
     public void ItemWeaponSell(int n) //파괴
     {
@@ -844,8 +1020,9 @@ public class GameManager : MonoBehaviour //게임 총괄
                 break;
 
             case 3:
-                coins += 10;
+                coins += 40;
                 PlayerAttack.weaponNum.Item2 = -1;
+                playerAtk.GetNewWeapon();
                 break;
         }
     }
