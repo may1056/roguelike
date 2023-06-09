@@ -9,6 +9,9 @@ public class Mainmenu : MonoBehaviour // 게임매니저 사용하려했는데 �
     public GameObject Option;
     AudioSource menusound;
 
+    public static bool nevertutored = true;
+    public Button nButton;
+
 
     void Awake()
     {
@@ -20,19 +23,28 @@ public class Mainmenu : MonoBehaviour // 게임매니저 사용하려했는데 �
         Application.Quit();
     }
 
-    public void GameStart() // 게임 시작 버튼
+    public void GameStart(bool tutorial) // 게임 시작 버튼
     {
-        GameManager.shouldplaytutorial = true;
-        GameManager.killed = 0;
-        GameManager.coins = 0;
-        Player.itemNum = (-1, -1);
-        PlayerAttack.weaponNum = (0, -1);
+        if (nevertutored && !tutorial) //튜토리얼 안 해봤는데 X 누름
+        {
+            nButton.gameObject.SetActive(false);
+        }
+        else
+        {
+            GameManager.shouldplaytutorial = tutorial;
+            GameManager.killed = 0;
+            GameManager.coins = 0;
+            Player.itemNum = (-1, -1);
+            PlayerAttack.weaponNum = (0, -1);
 
-        SceneManager.LoadScene(4);
+            SceneManager.LoadScene(4);
+        }
     }
 
     public void MenuSound()
     {
         menusound.Play();
     }
-}
+
+
+} //Mainmenu End

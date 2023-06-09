@@ -37,7 +37,6 @@ public class Story : MonoBehaviour
     public string[] endtexts;
     public int endtextindex = 0;
     public Sprite[] endbackgroundimages;
-    public Image endbackgroundimage;
     public AudioClip endstoryAudio;
 
 
@@ -51,13 +50,27 @@ public class Story : MonoBehaviour
 
         onOption = false;
 
-        backgroundimage.sprite = backgroundimages[imageindex];
-        textbar.text = texts[textindex];
+        Images_Texts();
 
         storyAudioSource.clip = storyAudio[audioindex];
         storyAudioSource.Play();
 
-        InvokeRepeating("textbarTriangleAnimaition", 0, 1f);
+        InvokeRepeating(nameof(textbarTriangleAnimaition), 0, 1f);
+    }
+
+
+    void Images_Texts()
+    {
+        if (isEnding)
+        {
+            backgroundimage.sprite = endbackgroundimages[imageindex];
+            textbar.text = endtexts[textindex];
+        }
+        else
+        {
+            backgroundimage.sprite = backgroundimages[imageindex];
+            textbar.text = texts[textindex];
+        }
     }
 
 
@@ -65,24 +78,20 @@ public class Story : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space)) Nextscene(); // 스페이스바 입력시 Nextscene 함수 실행
 
-
-        backgroundimage.sprite = backgroundimages[imageindex];
-        textbar.text = texts[textindex];
     }
 
     public void Nextscene() // onclick 용 (배경에 투명버튼 설치해놓아서 옵션 이외에 공간을 클릭하면 이 함수 실행된다.)
     {
-        if(!onOption)
-            {
+        if (!onOption)
+        {
             textindex++;
             imageindex++;
-            }
-
-        if (textindex >= 8) // 텍스트 갯수 증가시 수정필요
-        {
-            SceneManager.LoadScene(1);
         }
 
+        if (!isEnding && textindex >= texts.Length-1) SceneManager.LoadScene(1);
+        else if (isEnding && textindex >= endtexts.Length-1) SceneManager.LoadScene(0);
+
+        Images_Texts();
     }
 
     public void OptionbuttonOn()
