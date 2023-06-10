@@ -597,7 +597,6 @@ public class GameManager : MonoBehaviour //게임 총괄
             else if (getto_w) Equip_w();
         }
 
-
     } //Update End
 
 
@@ -687,7 +686,7 @@ public class GameManager : MonoBehaviour //게임 총괄
             making = false;
             player.ClearBG();
 
-            if (Random.Range(0, 3) >= 0) //3분의 2 확률로 아이템큐브 //일 생각이었는데 무기 제작이 제대로 안 돼서 일단 아이템만
+            if (Random.Range(0, 3) < 0) //3분의 2 확률로 아이템큐브 //일 생각이었는데 무기 제작이 제대로 안 돼서 일단 아이템만 //일 생각이었는데 테스트를 위해 무기만 꺼냄
             {
             newItem: icnum = Random.Range(0, 15);
                 if (icnum == Player.itemNum.Item1 || icnum == Player.itemNum.Item2)
@@ -968,9 +967,9 @@ public class GameManager : MonoBehaviour //게임 총괄
         na = we.transform.GetChild(0).GetComponent<Text>();
         ex = weaponGet.transform.GetChild(1).GetComponent<Text>();
 
-        we.sprite = weaponSprites[icnum];
-        na.text = Weapons[icnum];
-        ex.text = Weapons_explaination[icnum];
+        we.sprite = weaponSprites[wcnum];
+        na.text = Weapons[wcnum];
+        ex.text = Weapons_explaination[wcnum];
 
         weaponGet.gameObject.SetActive(true);
         getto_w = true;
@@ -1023,7 +1022,7 @@ public class GameManager : MonoBehaviour //게임 총괄
             PlayerAttack.weaponNum.Item2 = wcnum;
             WeaponInfo();
         }
-        else ItemChangeHaseyo();
+        else WeaponChangeHaseyo();
 
         playerAtk.GetNewWeapon();
         ReadOn(1, 0);

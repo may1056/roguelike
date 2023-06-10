@@ -13,6 +13,7 @@ public class PlayerAttack : MonoBehaviour
 
 
     public static (int, int) weaponNum = (0, 1);
+    public Sprite[] weaponRealSprites;
 
 
     Transform atk; //공격 범위
@@ -66,7 +67,7 @@ public class PlayerAttack : MonoBehaviour
 
     public Image skillZ, skillX;
     Text skillZcooltimeText, skillXcooltimeText;
-    public Sprite swordX, gunwandX;
+    public Sprite[] skillXSprites;
 
 
 
@@ -113,6 +114,8 @@ public class PlayerAttack : MonoBehaviour
 
     public void GetNewWeapon()
     {
+        skillX.sprite = skillXSprites[weaponNum.Item1];
+
         manager.WeaponInfo();
     }
 
@@ -183,7 +186,7 @@ public class PlayerAttack : MonoBehaviour
         }
 
         WeaponAnimation();
-
+        MeleeCollider();
 
 
         //ㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋㅅㅋ
@@ -271,12 +274,15 @@ public class PlayerAttack : MonoBehaviour
             wsAvailable = wsgoing > 0;
         }
 
-
-
-        if (Input.GetKeyDown("c") && GameManager.prgEnd) Ismeleechange();
-
-
         if (mp > maxmp) mp = maxmp;
+
+
+        if (Input.GetKeyDown("c") && GameManager.prgEnd)
+        {
+            WeaponChange();
+            GameManager.gameManager.WeaponInfo();
+        }
+
 
     } //Update End
 
@@ -289,13 +295,31 @@ public class PlayerAttack : MonoBehaviour
 
         atk.transform.rotation = Quaternion.AngleAxis(weaponangle -90, Vector3.forward);
 
+        attacksr.sprite = weaponRealSprites[weaponNum.Item1];
+    }
+    void MeleeCollider() //근접무기 박스콜라이더 크기, 오프셋 조정
+    {
+        switch (weaponNum.Item1)
+        {
+            case 0: //검
+                attackbc.offset = new Vector2(0, 0.5f);
+                attackbc.size = new Vector2(2, 3);
+                break;
 
+            case 2: //창
+                attackbc.offset = new Vector2(0, 1.5f);
+                attackbc.size = new Vector2(1, 5);
+                break;
 
-        if (GameManager.ismeleeWeapon) attacksr.color = new Color(1, 1, 1, 1);
-        else attacksr.color = new Color(1, 1, 1, 0);
+            case 4: //치즈스틱
+                attackbc.offset = Vector2.zero;
+                attackbc.size = new Vector2(5, 40);
+                break;
+        }
     }
 
-    void WeaponSkill0(int co) //채찍 전용 스킬 발현을 매개해주는 역할 //이었는데 이젠 아님
+
+    void WeaponSkill0(int co) //검 스킬
     {
         if (wsgoing <= co)
         {
@@ -309,7 +333,7 @@ public class PlayerAttack : MonoBehaviour
     }
 
 
-    void WeaponSkill1()
+    void WeaponSkill1() //불안정한 총지팡이 스킬
     {
         for(int i = -2; i <= 2; i++)
         {
@@ -319,6 +343,12 @@ public class PlayerAttack : MonoBehaviour
             ws1.GetComponent<PlayerBullet>().pbType = 1;
             //ws1.GetComponent<SpriteRenderer>().color = colors[i+3];
         }
+    }
+
+
+    void WeaponSkill2() //창 스킬
+    {
+
     }
 
 
@@ -344,17 +374,19 @@ public class PlayerAttack : MonoBehaviour
             int temp = weaponNum.Item1;
             weaponNum.Item1 = weaponNum.Item2;
             weaponNum.Item2 = temp;
+
+            if (GameManager.gameManager.ismelee[weaponNum.Item1]
+                != GameManager.gameManager.ismelee[weaponNum.Item2])
+                Ismeleechange();
         }
+
+        skillX.sprite = skillXSprites[weaponNum.Item1];
     }
 
     public void Ismeleechange() // onclick
     {
         GameManager.ismeleeWeapon = !GameManager.ismeleeWeapon;
         attackani.SetBool("IsmeleeWeapon", GameManager.ismeleeWeapon); // IsmeleeWeapon 파라미터도 GameManager.ismeleeWeapon 값따라 변경
-
-        skillX.sprite = GameManager.ismeleeWeapon ? swordX : gunwandX;
-
-        WeaponChange();
     }
 
 
