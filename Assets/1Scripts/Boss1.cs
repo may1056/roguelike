@@ -232,7 +232,7 @@ public class Boss1 : MonoBehaviour{
                             }
                         }
                         if (Player.player.poison)
-                            Invoke(nameof(AfterDamage), Random.Range(1, 30));
+                            Invoke(nameof(AfterDamage), Random.Range(1, 20));
                     }
                     break;
             }

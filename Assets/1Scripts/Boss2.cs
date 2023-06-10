@@ -253,7 +253,7 @@ public class Boss2 : MonoBehaviour
                                 }
                             }
                             if (Player.player.poison)
-                                Invoke(nameof(AfterDamage), Random.Range(1, 30));
+                                Invoke(nameof(AfterDamage), Random.Range(1, 20));
                         }
                         break;
                 }
@@ -625,7 +625,7 @@ public class Boss2 : MonoBehaviour
     }
     public void RepeatAD() //AfterDamage() 반복
     {
-        Invoke(nameof(AfterDamage), Random.Range(1, 30));
+        Invoke(nameof(AfterDamage), Random.Range(1, 20));
     }
     void AfterDamage() //poison 아이템 - Invoke용
     {

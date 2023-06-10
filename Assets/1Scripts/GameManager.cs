@@ -33,6 +33,9 @@ public class GameManager : MonoBehaviour //게임 총괄
     public Image tabPage;
 
 
+    public Image death;
+
+
 
     //아이템
     readonly string[] Items = { "알파 수정",
@@ -69,14 +72,14 @@ public class GameManager : MonoBehaviour //게임 총괄
 
         "사망 시 체력과 마나가 모두 충전된 상태로 부활합니다. (아이템 소멸)", //부활
         "적을 타겟팅하는 공격자를 소환합니다. 약하지만, 적을 감속시킵니다.", //자동 공격
-        "크큭.. 왼손의 흑염룡이 미쳐 날뛰려 하는군.. 흑마법의 힘으로 모두 파.괴.해주겠어", //자해
+        "크큭.. 왼손의 흑염룡이 미쳐 날뛰려 하는군.. 흑마법의 힘으로 모두 파.괴.해주겠어 체력 1 되고 엄청 강해짐, 적 처치 시 체력 오브 안 나옴", //자해
         "피격 시 체력 대신 소모되는 방어막을 하나 더 갖습니다. 그리고 무적 시간이 길어집니다.", //쉴드
-        "체력이 2 이하일 때 공격력이 1 증가합니다.", //버서커
+        "체력이 2 이하일 때 공격력이 2 증가합니다. 적 처치 시 체력 오브가 등장하지 않습니다.", //버서커
         "대쉬 폼 미쳤다 ㄷㄷ", //대쉬 강화
 
         "무기의 공격력이 1 증가합니다.", //붉은 수정
-        "체력 오브가 나타날 확률이 증가합니다.", //분홍 수정
-        "마나 오브가 나타날 확률이 증가합니다.", //푸른 수정
+        "적 처치 시 체력 오브가 나타날 확률이 증가합니다.", //분홍 수정
+        "적 처치 시 마나 오브가 나타날 확률이 증가합니다.", //푸른 수정
         "이동 속도가 증가합니다.", //초록 수정
         "공격 속도가 증가합니다.", //노란 수정
         "낮은 확률로 공격을 회피합니다.", //주황 수정
@@ -437,7 +440,7 @@ public class GameManager : MonoBehaviour //게임 총괄
 
 
         //메뉴창 표시
-        if (Input.GetButtonDown("Cancel") && progressTime > 4)
+        if (Input.GetButtonDown("Cancel") && progressTime > 4 && !death.gameObject.activeSelf)
         {
             if (menuSet.activeSelf)
             {
@@ -451,6 +454,18 @@ public class GameManager : MonoBehaviour //게임 총괄
             }
 
             ReadOn(3, 0);
+        }
+
+        if (menuSet.activeSelf)
+        {
+            if (Input.GetKeyDown("r"))
+            {
+                SsipBug();
+                menuSet.SetActive(false);
+                Time.timeScale = 1f;
+            }
+
+            if (Input.GetKeyDown("q")) GameExit();
         }
 
 
@@ -559,21 +574,21 @@ public class GameManager : MonoBehaviour //게임 총괄
             }
         }
         //포탈2와 가까우면
-        else if (!making && Vector2.Distance(player.transform.position, Portal2.transform.position) < 2)
-        {
-            P1S.SetActive(false);
-            P2S.SetActive(true);
-            if (Input.GetKeyDown("s")) //포탈 타기
-            {
-                mapNum = portal_mapNum[mapNum, 1];
-                NextStage();
-            }
-        }
-        else //멀리 있다면
-        {
-            P1S.SetActive(false);
-            P2S.SetActive(false);
-        }
+        //else if (!making && Vector2.Distance(player.transform.position, Portal2.transform.position) < 2)
+        //{
+        //    P1S.SetActive(false);
+        //    P2S.SetActive(true);
+        //    if (Input.GetKeyDown("s")) //포탈 타기
+        //    {
+        //        mapNum = portal_mapNum[mapNum, 1];
+        //        NextStage();
+        //    }
+        //}
+        //else //멀리 있다면
+        //{
+        //    P1S.SetActive(false);
+        //    P2S.SetActive(false);
+        //}
 
 
         if (Input.GetKeyDown("e"))

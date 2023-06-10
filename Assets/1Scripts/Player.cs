@@ -217,7 +217,7 @@ public class Player : MonoBehaviour //플레이어
     void ItemDefault() //아이템 설정 기본값으로 되돌리기
     {
         canRevive = false; //1
-        transform.GetChild(6).gameObject.SetActive(false); //2
+        transform.GetChild(6).gameObject.SetActive(false); transform.GetChild(6).transform.GetComponent<AutoAttack>().CancelInvoke(); //2
         maxhp = 6; selfinjury = false; //3
         maxshield = 1; shield = 1; //4
         berserker = false; //5
@@ -264,7 +264,7 @@ public class Player : MonoBehaviour //플레이어
         Vector2 tp = transform.position;
 
 
-        if (berserker && hp < 3) atkPower = red ? 3 : 2;
+        if (berserker && hp < 3) atkPower = red ? 4 : 3;
         else atkPower = red ? 2 : 1;
 
         //animation player

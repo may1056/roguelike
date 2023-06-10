@@ -350,7 +350,7 @@ public class Monster : MonoBehaviour //잡몹
                         }
 
                         if (Player.player.poison)
-                            Invoke(nameof(AfterDamage), Random.Range(1, 30));
+                            Invoke(nameof(AfterDamage), Random.Range(1, 20));
                     }
                 break;
             }
@@ -818,7 +818,7 @@ public class Monster : MonoBehaviour //잡몹
 
     public void RepeatAD() //AfterDamage() 반복
     {
-        Invoke(nameof(AfterDamage), Random.Range(1, 30));
+        Invoke(nameof(AfterDamage), Random.Range(1, 20));
     }
     void AfterDamage() //poison 아이템 - Invoke용
     {

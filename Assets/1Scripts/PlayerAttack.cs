@@ -102,7 +102,7 @@ public class PlayerAttack : MonoBehaviour
         manager.ChangeHPMP();
 
         // 초기화
-        mp = 6;
+        //mp = 6;
         //SaveMP();
 
         GetNewWeapon();
