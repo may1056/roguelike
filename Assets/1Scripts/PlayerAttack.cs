@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using static UnityEngine.GraphicsBuffer;
@@ -35,10 +36,12 @@ public class PlayerAttack : MonoBehaviour
     public static bool attackuse = false;
     Vector2 mousePosition;
     float weaponangle;
+    float weaponrotation;
+    bool isweaponattacked;
 
     //bool weaponrotated = false;
     //float attackingtime = 0;
-    //public TrailRenderer weapontrail;
+    public TrailRenderer weapontrail;
 
 
 
@@ -146,20 +149,18 @@ public class PlayerAttack : MonoBehaviour
         // 근접공격 쿨타임, 애니메이션
         if (attackuse && GameManager.ismeleeWeapon)
         {
-            //Soundmanager.soundmanager.swordsounds[0].Play();
+            isweaponattacked = true;
             float x = player.F ? -2 : 2;
-            //attackP = new Vector2(transform.position.x + x, transform.position.y);
-            //attacksr.color = new Color(1, 1, 1, 1); //WeaponAnimation()에서 무기에 따른 투명도 관리중
             player.dontBehaveTime = 0;
+
         }
         else if (attackuse) //원거리 공격 쿨타임, 애니메이션?
         {
             Soundmanager.soundmanager.magicgunsounds[0].Play();
             float x = player.F ? -2 : 2;
-            //attackP = new Vector2(transform.position.x + x, transform.position.y);
 
             GameObject pb = Instantiate(playerbullet,
-                transform.position, Quaternion.Euler(0, 0, player.F ? 180 : 0));
+                transform.position, Quaternion.AngleAxis(weaponangle, Vector3.forward));
             if (player.selfinjury)
             {
                 pb.GetComponent<PlayerBullet>().bulletSpeed = 30;
@@ -292,11 +293,49 @@ public class PlayerAttack : MonoBehaviour
         atk.transform.localPosition = new Vector2(0, 0);
         mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         weaponangle = Mathf.Atan2(mousePosition.y - atk.position.y, mousePosition.x - atk.position.x) * Mathf.Rad2Deg;
+        Debug.Log(weaponangle);
+        switch (weaponNum.Item1)
+        {
+            case 0:
+                if (!isweaponattacked) weaponrotation = 90f;
+                else
+                {
+                    weaponrotation = 175f;
+                    Invoke(nameof(swordrotating), 0.1f);
+                }
+                break;
+            case 1:
+                if (!isweaponattacked) weaponrotation = 90f;
+                break;
 
-        atk.transform.rotation = Quaternion.AngleAxis(weaponangle -90, Vector3.forward);
+            case 2: if(!isweaponattacked) weaponrotation = 90f;
+                    else
+                    {
+                    atk.transform.position = new Vector2 (0,2);
+                    Invoke(nameof(spearsting), 0.1f);
+                }
+                break;
+
+
+        }
+
+
+        atk.transform.rotation = Quaternion.AngleAxis(weaponangle - weaponrotation, Vector3.forward);
 
         attacksr.sprite = weaponRealSprites[weaponNum.Item1];
     }
+
+    void swordrotating() //Invoke용
+    {
+            weaponrotation = 25f;
+        isweaponattacked = false; 
+    }
+    void spearsting() //Invoke용
+    {
+        atk.transform.position = new Vector2(0, 0);
+        isweaponattacked = false;
+    }
+
     void MeleeCollider() //근접무기 박스콜라이더 크기, 오프셋 조정
     {
         switch (weaponNum.Item1)
