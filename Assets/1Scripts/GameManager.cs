@@ -26,7 +26,7 @@ public class GameManager : MonoBehaviour //게임 총괄
 
 
     //ㅋㅋㅋㅋㅋㅋㅋㅋ
-    static float 게임실행시간 = 0;
+    public static float 게임실행시간 = 0;
     public Text 게임실행시간텍스트;
 
     public bool onTabPage;
@@ -686,7 +686,7 @@ public class GameManager : MonoBehaviour //게임 총괄
             making = false;
             player.ClearBG();
 
-            if (Random.Range(0, 3) < 0) //3분의 2 확률로 아이템큐브 //일 생각이었는데 무기 제작이 제대로 안 돼서 일단 아이템만 //일 생각이었는데 테스트를 위해 무기만 꺼냄
+            if (Random.Range(0, 3) >= 0) //3분의 2 확률로 아이템큐브 //일 생각이었는데 무기 제작이 제대로 안 돼서 일단 아이템만
             {
             newItem: icnum = Random.Range(0, 15);
                 if (icnum == Player.itemNum.Item1 || icnum == Player.itemNum.Item2)

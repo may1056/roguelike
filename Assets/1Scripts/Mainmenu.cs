@@ -35,6 +35,7 @@ public class Mainmenu : MonoBehaviour // 게임매니저 사용하려했는데 �
             GameManager.killed = 0;
             GameManager.coins = 0;
             GameManager.atFirst = true;
+            GameManager.게임실행시간 = 0;
             Player.itemNum = (-1, -1);
             PlayerAttack.weaponNum = (0, 1);
             Story.isEnding = false;

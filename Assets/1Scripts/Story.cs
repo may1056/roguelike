@@ -89,7 +89,7 @@ public class Story : MonoBehaviour
         }
 
         if (!isEnding && textindex >= texts.Length-1) SceneManager.LoadScene(1);
-        else if (isEnding && textindex >= endtexts.Length-1) SceneManager.LoadScene(0);
+        else if (isEnding && textindex >= endtexts.Length-1) SceneManager.LoadScene(3);
 
         Images_Texts();
     }
