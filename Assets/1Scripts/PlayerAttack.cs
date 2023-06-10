@@ -297,6 +297,7 @@ public class PlayerAttack : MonoBehaviour
         switch (weaponNum.Item1)
         {
             case 0:
+                weapontrail.enabled = true;
                 if (!isweaponattacked) weaponrotation = 90f;
                 else
                 {
@@ -305,10 +306,13 @@ public class PlayerAttack : MonoBehaviour
                 }
                 break;
             case 1:
+                weapontrail.enabled = false;
                 if (!isweaponattacked) weaponrotation = 90f;
                 break;
 
-            case 2: if(!isweaponattacked) weaponrotation = 90f;
+            case 2: 
+                weapontrail.enabled = true;
+                if (!isweaponattacked) weaponrotation = 90f;
                     else
                     {
                     atk.transform.position = new Vector2 (0,2);
