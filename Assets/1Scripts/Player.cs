@@ -43,6 +43,9 @@ public class Player : MonoBehaviour //플레이어
     bool protect;
 
 
+    public GameObject death;
+
+
     public int atkPower;
 
 
@@ -537,7 +540,11 @@ public class Player : MonoBehaviour //플레이어
                 reviveImage.gameObject.SetActive(true);
                 Invoke(nameof(AfterRevive), 2);
             }
-            else SceneManager.LoadScene(1);
+            else
+            {
+                death.gameObject.SetActive(true);
+                Time.timeScale = 0;
+            }
         }
 
         reviveImage.color = new Color(1, 1, 1, unbeatableTime * 0.5f);
@@ -900,6 +907,12 @@ public class Player : MonoBehaviour //플레이어
     {
         bgsr.color = Color.white;
         bgtime = 1;
+    }
+
+
+    public void Die()
+    {
+        SceneManager.LoadScene(0);
     }
 
 } //Player End

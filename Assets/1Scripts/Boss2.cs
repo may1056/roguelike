@@ -113,6 +113,8 @@ public class Boss2 : MonoBehaviour
         //ground = GameManager.gameManager.transform.GetChild(0).GetChild(0);
         //block = GameManager.gameManager.transform.GetChild(0).GetChild(1);
 
+        Soundmanager.soundmanager.bossbgm[1].Play();
+
     } //Start End
 
 

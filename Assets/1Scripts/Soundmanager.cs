@@ -19,6 +19,9 @@ public class Soundmanager : MonoBehaviour
 
     public AudioSource basicskillsound;
 
+    public AudioSource[] bossbgm;
+
+
     private void Awake()
     {
         soundmanager = this;

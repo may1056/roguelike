@@ -9,7 +9,8 @@ public class GameManager : MonoBehaviour //게임 총괄
 {
     public static GameManager gameManager;
 
-    public static bool shouldplaytutorial = true;
+    public static bool shouldplaytutorial = false;
+    public static bool atFirst = true;
 
     public GameObject ShopSet;//상점 열고 닫/
     public Image Progress; //처음에 게임 진행 상황 알리기 위해
@@ -237,6 +238,13 @@ public class GameManager : MonoBehaviour //게임 총괄
     void Awake()
     {
         gameManager = this;
+
+        if (atFirst)
+        {
+            floor = 1;
+            stage = 1;
+            atFirst = false;
+        }
 
         //아래는 Canvas의 PROGRESS 오브젝트 관련
 
@@ -591,23 +599,26 @@ public class GameManager : MonoBehaviour //게임 총괄
             stage = 1;
             shouldplaytutorial = false;
             Mainmenu.nevertutored = false;
+            SceneManager.LoadScene(1); //PlayGame 재시작
         }
         else if (floor == 1 && stage == 3) //1-3은 없으니 2-1로 가라
         {
             floor = 2;
             stage = 1;
+            SceneManager.LoadScene(1); //PlayGame 재시작
         }
         else if (floor == 2 && stage == 5) //2-5는 없으니 3-1로 가라
         {
             floor = 3;
             stage = 1;
+            SceneManager.LoadScene(1); //PlayGame 재시작
         }
         else if (floor == 3 && stage == 5) //3-5는 없... 막보를 죽였군! 잘했다
         {
             Story.isEnding = true;
+            SceneManager.LoadScene(4);
         }
-
-        SceneManager.LoadScene(1); //PlayGame 재시작
+        else SceneManager.LoadScene(1);
     }
 
 
@@ -661,7 +672,7 @@ public class GameManager : MonoBehaviour //게임 총괄
             making = false;
             player.ClearBG();
 
-            if (Random.Range(0, 3) > 0) //3분의 2 확률로 아이템큐브
+            if (Random.Range(0, 3) >= 0) //3분의 2 확률로 아이템큐브 //일 생각이었는데 무기 제작이 제대로 안 돼서 일단 아이템만
             {
             newItem: icnum = Random.Range(0, 15);
                 if (icnum == Player.itemNum.Item1 || icnum == Player.itemNum.Item2)

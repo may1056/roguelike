@@ -130,6 +130,13 @@ public class Boss1 : MonoBehaviour{
             transform.position = new Vector2(-10 + i * 2, 0);
         }
     }
+
+
+    void Awake()
+    {
+        gameObject.SetActive(false);
+    }
+
     private void Start()
     {
         player = Player.player;
@@ -151,7 +158,8 @@ public class Boss1 : MonoBehaviour{
 
         if (hp <= 0)
         {
-            Destroy(gameObject);
+            //Destroy(gameObject);
+            GameManager.gameManager.NextStage();
         }
 
         if (withPlayer) withPlayerTime += Time.deltaTime;
