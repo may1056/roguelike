@@ -81,12 +81,15 @@ public class PlayerAttack : MonoBehaviour
         savedmp = mp;
     }
 
-
-    void Start()
+    void Awake()
     {
         playerAtk = this;
 
+        mp = savedmp;
+    }
 
+    void Start()
+    {
         atk = transform.GetChild(1);
         attacksr = atk.GetComponent<SpriteRenderer>();
         attackbc = atk.GetComponent<BoxCollider2D>();
@@ -102,12 +105,7 @@ public class PlayerAttack : MonoBehaviour
         GameManager.ismeleeWeapon = GameManager.gameManager.ismelee[weaponNum.Item1];
         attackani.SetBool("IsmeleeWeapon", GameManager.ismeleeWeapon); // IsmeleeWeapon 파라미터도 GameManager.ismeleeWeapon 값따라 변경
 
-        mp = savedmp;
         manager.ChangeHPMP();
-
-        // 초기화
-        //mp = 6;
-        //SaveMP();
 
         GetNewWeapon();
 
@@ -310,7 +308,7 @@ public class PlayerAttack : MonoBehaviour
                 if (!isweaponattacked) weaponrotation = 90f;
                 break;
 
-            case 2: 
+            case 2:
                 weapontrail.enabled = true;
                 if (!isweaponattacked) weaponrotation = 90f;
                     else
@@ -332,7 +330,7 @@ public class PlayerAttack : MonoBehaviour
     void swordrotating() //Invoke용
     {
             weaponrotation = 25f;
-        isweaponattacked = false; 
+        isweaponattacked = false;
     }
     void spearsting() //Invoke용
     {

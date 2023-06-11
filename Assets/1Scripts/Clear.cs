@@ -60,6 +60,7 @@ public class Clear : MonoBehaviour
 
     public void ToMainmenu()
     {
+        Mainmenu.cleared = true;
         SceneManager.LoadScene(0);
     }
 

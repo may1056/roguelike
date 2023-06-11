@@ -174,15 +174,15 @@ public class GameManager : MonoBehaviour //게임 총괄
     public GameObject Portal1; //쉬움, 보통
     public GameObject Portal2; //어려움, 기믹
 
-    readonly float[,,] portal_position //맵별 포탈 위치
-        = { { { 0, 0 }, { 999, 999 } }, { { 0, 5 }, { 999, 999 } }, { { -2, 1 }, { 2, 1 } }, { { 20, 1 }, { 26, 1 } }, { { -2, 0 }, { 2, 0 } },
-        { { 4.5f, -15 }, { 13.5f, -15 } }, { { 2.5f, -0.5f }, { 7.5f, -0.5f } }, { { 31.5f, 1.5f }, { 36.5f, 1.5f } } };
+    //readonly float[,,] portal_position //맵별 포탈 위치
+    //    = { { { 0, 0 }, { 999, 999 } }, { { 0, 5 }, { 999, 999 } }, { { -2, 1 }, { 2, 1 } }, { { 20, 1 }, { 26, 1 } }, { { -2, 0 }, { 2, 0 } },
+    //    { { 4.5f, -15 }, { 13.5f, -15 } }, { { 2.5f, -0.5f }, { 7.5f, -0.5f } }, { { 31.5f, 1.5f }, { 36.5f, 1.5f } } };
 
-    readonly int[,] portal_mapNum //포탈별 다음 맵 번호, -1은 포탈 X
-        = { { 0, -1 }, { 2, -1 }, { 5, 3 }, { 6, 4 }, { 5, 6 },
-        { 2, 3 }, { 5, 4 }, { 5, 2 } };
+    //readonly int[,] portal_mapNum //포탈별 다음 맵 번호, -1은 포탈 X
+    //    = { { 0, -1 }, { 2, -1 }, { 5, 3 }, { 6, 4 }, { 5, 6 },
+    //    { 2, 3 }, { 5, 4 }, { 5, 2 } };
 
-
+    public Sprite[] portalSprites; //0: Easy, 1: Hard, 2: Boss, 3: Shop
 
 
 
@@ -207,9 +207,12 @@ public class GameManager : MonoBehaviour //게임 총괄
 
 
     public Image bossHpLine;
-    public Image Boss2WowWonderfulShit;
+
+    public Image Boss1WowWonderfulShit;
     public Boss1 boss1;
     public GameObject boss1map;
+
+    public Image Boss2WowWonderfulShit;
     public Boss2 boss2;
     public GameObject boss2map;
 
@@ -342,6 +345,14 @@ public class GameManager : MonoBehaviour //게임 총괄
 
 
         bossHpLine.gameObject.SetActive(stage == 4);
+
+        if (floor == 1 && stage == 1)
+        {
+            player.hp = 6;
+            playerAtk.mp = 6;
+            killed = 0;
+            coins = 0;
+        }
 
     } //Start End
 
@@ -491,8 +502,11 @@ public class GameManager : MonoBehaviour //게임 총괄
             {
                 if (progressTime > 8)
                 {
+                    Boss1WowWonderfulShit.gameObject.SetActive(false);
                     boss1.gameObject.SetActive(true);
                 }
+                else Boss1WowWonderfulShit.gameObject.SetActive(true);
+
             }
             else if (floor == 3 && stage == 4) //보스2
             {
@@ -531,14 +545,17 @@ public class GameManager : MonoBehaviour //게임 총괄
         //전투가 끝났거나 다 잡을 필요 없으면 포탈들 정위치 후 보이기
         if (!making || enemies[mapNum, 0] == -1)
         {
+            SpriteRenderer portalsr = Portal1.GetComponent<SpriteRenderer>();
             if (shouldplaytutorial) //1-1이 아니라 튜토리얼로 처리하기로 했음!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             {
                 Portal1.transform.position = new Vector2(115.5f, 1);
+                portalsr.sprite = portalSprites[0];
                 Portal1.SetActive(true);
             }
             else
             {
                 Portal1.transform.position = Vector2.up;
+                portalsr.sprite = portalSprites[stage == 3 ? 2 : 0];
                 Portal1.SetActive(true);
 
                 //Portal2.transform.position = new Vector2(
@@ -548,13 +565,13 @@ public class GameManager : MonoBehaviour //게임 총괄
         }
 
         GameObject P1S = Portal1.transform.GetChild(0).gameObject; //포탈1 S 텍스트
-        GameObject P2S = Portal2.transform.GetChild(0).gameObject; //포탈2 S 텍스트
+        //GameObject P2S = Portal2.transform.GetChild(0).gameObject; //포탈2 S 텍스트
 
         //포탈1과 가까우면
         if (!making && Vector2.Distance(player.transform.position, Portal1.transform.position) < 2)
         {
             P1S.SetActive(true);
-            P2S.SetActive(false);
+            //P2S.SetActive(false);
 
             if (Input.GetKeyDown("s")) //포탈 타기
             {
@@ -568,11 +585,13 @@ public class GameManager : MonoBehaviour //게임 총괄
                 }
                 else
                 {
-                    mapNum = portal_mapNum[mapNum, 0];
+                    //mapNum = portal_mapNum[mapNum, 0];
                     NextStage();
                 }
             }
         }
+        else P1S.SetActive(false);
+
         //포탈2와 가까우면
         //else if (!making && Vector2.Distance(player.transform.position, Portal2.transform.position) < 2)
         //{

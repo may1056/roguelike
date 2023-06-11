@@ -83,18 +83,18 @@ public class Player : MonoBehaviour //플레이어
 
 
     bool onceDashed = false; //공중에서 대쉬를 이미 했는지
-    public Sprite dashSprite;
+    public Sprite dashSpriteIdle, dashSpriteWalk;
     public float dashDist; //가능한 대쉬 거리
     public LayerMask lg; //Ground
     Animator animm;
 
     //save position
     public Text posText;
-    float posCool = 0;
+    //float posCool = 0;
     Vector2 pos = Vector2.zero;
-    bool posSaved = false;
+    //bool posSaved = false;
     public Sprite posSprite;
-    float postime = 0;
+    //float postime = 0;
     public static Vector2[] posP =
         { new Vector2(9999, 9999) , new Vector2(9999, 9999) };
 
@@ -132,7 +132,7 @@ public class Player : MonoBehaviour //플레이어
     public bool berserker;
     //6. 강한 대쉬
     public bool dashdeal;
-    public Sprite dashdealEff, dashupgradeEff;
+    public Sprite dashdealEff, dashupgradeEffIdle, dashupgradeEffWalk;
     //7. ~ 13. 빨핑파초노주보 수정
     public bool red, pink, blue, green, yellow, orange, purple;
     //14. 독
@@ -180,12 +180,7 @@ public class Player : MonoBehaviour //플레이어
 
         bgsr = bg.GetComponent<SpriteRenderer>();
 
-        canRevive = false;
-
-        // 초기화
-        hp = 6;
-        //SaveHP();
-        //itemNum = (-1, -1);
+        hp = savedhp;
 
     } //Awake End
 
@@ -193,8 +188,6 @@ public class Player : MonoBehaviour //플레이어
 
     void Start()
     {
-        hp = savedhp;
-
         GetNewItem();
 
         manager.ChangeHPMP();
@@ -369,8 +362,13 @@ public class Player : MonoBehaviour //플레이어
             {
                 GameObject dash = Instantiate(fadeEffect,
                     new Vector2(tp.x - tpx * i * 0.1f, tp.y), Quaternion.identity);
-                if (dashdeal) //대쉬 이펙트
-                    dash.GetComponent<SpriteRenderer>().sprite = dashupgradeEff;
+
+                SpriteRenderer dashsr = dash.GetComponent<SpriteRenderer>();
+                dashsr.flipX = F;
+
+                if (Input.GetButton("Horizontal") && !isJumping)
+                    dashsr.sprite = dashdeal ? dashupgradeEffWalk : dashSpriteWalk;
+                else dashsr.sprite = dashdeal ? dashupgradeEffIdle : dashSpriteIdle;
             }
 
             if (dashdeal) DashDamage(tp.x, tp.x - tpx, tp.y);
@@ -785,19 +783,19 @@ public class Player : MonoBehaviour //플레이어
 
 
 
-    void SavePos()
-    {
-        pos = transform.position;
-        po.transform.position = pos;
-        posSaved = true;
-        postime = 99;
-        MakeEffect(pos, posSprite, 8, 0.2f);
-    }
-    void DamagePos(int i, Vector2 v)
-    {
-        posP[i] = v;
-        MakeEffect(v, posSprite, 10, 1);
-    }
+    //void SavePos()
+    //{
+    //    pos = transform.position;
+    //    po.transform.position = pos;
+    //    posSaved = true;
+    //    postime = 99;
+    //    MakeEffect(pos, posSprite, 8, 0.2f);
+    //}
+    //void DamagePos(int i, Vector2 v)
+    //{
+    //    posP[i] = v;
+    //    MakeEffect(v, posSprite, 10, 1);
+    //}
 
 
     void RecoverSt()

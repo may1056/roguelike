@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class Mainmenu : MonoBehaviour // 게임매니저 사용하려했는데 씬 달라서 오브젝트 없다고 오류띄우길래 만듬
 {
@@ -12,15 +13,27 @@ public class Mainmenu : MonoBehaviour // 게임매니저 사용하려했는데 �
     public static bool nevertutored = true;
     public Button nButton;
 
+    public static bool cleared = false;
+    public TextMeshProUGUI clearText;
+
 
     void Awake()
     {
         menusound = transform.GetChild(0).GetComponent<AudioSource>();
     }
 
-    public void GameExit() // 게임 종료 버튼 - 에디터에선 실행안됨
+    void Start()
     {
-        Application.Quit();
+        //clearText.gameObject.SetActive(cleared); //버그 왜 나는지 모르겠네
+    }
+
+    public void GameExit() // 게임 종료 버튼
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+                Application.Quit();
+#endif
     }
 
     public void GameStart(bool tutorial) // 게임 시작 버튼
