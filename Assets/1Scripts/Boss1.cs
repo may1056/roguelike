@@ -6,8 +6,8 @@ using UnityEngine.SceneManagement;
 using static UnityEngine.RuleTile.TilingRuleOutput;
 
 public class Boss1 : MonoBehaviour{
-    //두 번째 보스 - 자연의 섭리
-    public static Boss2 boss2;
+    //첫번째 보스 체스 퀸
+    public static Boss1 boss1;
 
     Rigidbody2D rigid;
     BoxCollider2D col;
@@ -143,6 +143,7 @@ public class Boss1 : MonoBehaviour{
     }
     void Awake()
     {
+        boss1 = this;
         gameObject.SetActive(false);
     }
 
@@ -288,7 +289,10 @@ public class Boss1 : MonoBehaviour{
     }//update end
 
 
-
+    public void RepeatAD() //AfterDamage() 반복
+    {
+        Invoke(nameof(AfterDamage), Random.Range(1, 20));
+    }
     void AfterDamage() //poison 아이템 - Invoke용
     {
         if (hp > 0)

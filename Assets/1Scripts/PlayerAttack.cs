@@ -147,7 +147,6 @@ public class PlayerAttack : MonoBehaviour
         // 근접공격 쿨타임, 애니메이션
         if (attackuse && GameManager.ismeleeWeapon)
         {
-            isweaponattacked = true;
             float x = player.F ? -2 : 2;
             player.dontBehaveTime = 0;
 
@@ -177,6 +176,7 @@ public class PlayerAttack : MonoBehaviour
         if ((Input.GetMouseButtonDown(0) || Input.GetKeyDown("j"))
             && curAttackCooltime >= maxAttackCooltime)
         {
+            isweaponattacked = true;
             //소리
 
             manager.ReadOn(5, 0);
@@ -291,7 +291,6 @@ public class PlayerAttack : MonoBehaviour
         atk.transform.localPosition = new Vector2(0, 0);
         mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         weaponangle = Mathf.Atan2(mousePosition.y - atk.position.y, mousePosition.x - atk.position.x) * Mathf.Rad2Deg;
-        Debug.Log(weaponangle);
         switch (weaponNum.Item1)
         {
             case 0:

@@ -26,9 +26,8 @@ public class Story : MonoBehaviour
     public int imageindex = 0;
 
     //배경음악
-    public AudioClip[] storyAudio;
+    public AudioClip storyAudio;
     public AudioSource storyAudioSource;
-    public int audioindex = 0;
 
     AudioSource menusound;
 
@@ -52,7 +51,9 @@ public class Story : MonoBehaviour
 
         Images_Texts();
 
-        storyAudioSource.clip = storyAudio[audioindex];
+        storyAudioSource.clip = storyAudio;
+        if (!isEnding) storyAudioSource.clip = storyAudio;
+        else storyAudioSource.clip = endstoryAudio;
         storyAudioSource.Play();
 
         InvokeRepeating(nameof(textbarTriangleAnimaition), 0, 1f);
@@ -106,12 +107,6 @@ public class Story : MonoBehaviour
         MenuSound();
     }
 
-    public void audiotest()
-    {
-        audioindex++;
-        storyAudioSource.clip = storyAudio[audioindex];
-        storyAudioSource.Play();
-    }
     void textbarTriangleAnimaition() // 단순하게 깜빡거리는게 전부인 개선의 여지가 많아 보이는 코드,, 그냥 애니메이션으로 대체할 예정
     {
         triangleenable = !triangleenable;

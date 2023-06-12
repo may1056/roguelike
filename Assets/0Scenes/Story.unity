@@ -2022,7 +2022,12 @@ MonoBehaviour:
   trianglesr: {fileID: 0}
   textbar: {fileID: 1750835197}
   texts:
-  - "\uC5EC\uAE30\uB294 \uC624\uB958\uB098\uC11C \uBE44\uC6CC\uC57C \uD574\uC694"
+  - "\uAE4A\uC740 \uC0B0\uC18D \uC5B4\uB518\uAC00."
+  - "\uB2F9\uC2E0\uC740 \uBB34\uC5B8\uAC00\uB97C \uCC3E\uC544 \uD5E4\uB9F5\uB2C8\uB2E4."
+  - "\uAC77\uACE0, \uAC77\uC790,  \uB2F9\uC2E0\uC758 \uC55E\uC5D4 \uB3CC\uB85C \uB41C
+    \uC785\uAD6C\uAC00 \uB098\uD0C0\uB0AC\uC2B5\uB2C8\uB2E4."
+  - "\uC65C\uC778\uC9C0 \uBAA8\uB974\uACA0\uC9C0\uB9CC \uADF8 \uC548\uC744 \uC0B4\uD3B4\uBCF4\uACE0\uC790\uD558\uB294
+    \uCDA9\uB3D9\uC774 \uC5C4\uC2B5\uD569"
   - "\uC2A4\uD1A0\uB9AC \uADF8\uB0E5 \uAC08\uC544\uC5CE\uC74D\uC2DC\uB2E4~"
   - "\uB9DD\uD1A0\uB97C \uAC10\uC740 \uC6A9\uC0AC\uAC00 \uC788\uC5C8\uB2E4. (??)"
   - "\uC720\uC801\uC5D0 \uC65C \uB4E4\uC5B4\uAC00\uB294\uB370"
@@ -2031,7 +2036,7 @@ MonoBehaviour:
   - "\uD68C\uC0C9 \uD558\uD2B8 - \uC274\uB4DC"
   - "\uBB34\uAE30 \uBD80\uC218\uC9C0 \uB9C8\uC138\uC694!!!! \uD30C\uAD34 \u3134\u3134"
   - "\uBB34\uAE30 \uACF5\uACA9 \uBC94\uC704 \uB9C8\uC6B0\uC2A4 \uB530\uB77C\uC11C
-    \uAC11\uB2C8\uB2E4 (\uC885\uD658 \uC81C\uC791)"
+    \uAC11\uB2C8\uB2E4"
   - "\uD50C\uB808\uC774\uC5B4 \uC704\uC5D0 \uD558\uC580 \uC810\uB4E4\uC740 \uB300\uC26C
     \uC2A4\uD0DC\uBBF8\uB098\uC785\uB2C8\uB2E4"
   - "\uC2A4\uD0DC\uBBF8\uB098\uAC00 \uB2E4 \uB2F3\uC73C\uBA74 \uB300\uC26C\uB97C
@@ -2042,27 +2047,27 @@ MonoBehaviour:
   textindex: 0
   onOption: 0
   backgroundimages:
+  - {fileID: 21300000, guid: 96d9a274612d0b34c9138594163d37cb, type: 3}
+  - {fileID: 21300000, guid: 96d9a274612d0b34c9138594163d37cb, type: 3}
   - {fileID: 21300000, guid: 7f52d3fbbf967d34f8c1cd0564ad0220, type: 3}
   - {fileID: 21300000, guid: 7f52d3fbbf967d34f8c1cd0564ad0220, type: 3}
+  - {fileID: -1180148333, guid: 777456c1ff488754a9a8d929f721ed39, type: 3}
+  - {fileID: 21300000, guid: 96d9a274612d0b34c9138594163d37cb, type: 3}
   - {fileID: 21300000, guid: 7f52d3fbbf967d34f8c1cd0564ad0220, type: 3}
-  - {fileID: 21300000, guid: 7f52d3fbbf967d34f8c1cd0564ad0220, type: 3}
-  - {fileID: 21300000, guid: 7f52d3fbbf967d34f8c1cd0564ad0220, type: 3}
-  - {fileID: 21300000, guid: 7f52d3fbbf967d34f8c1cd0564ad0220, type: 3}
-  - {fileID: 21300000, guid: 7f52d3fbbf967d34f8c1cd0564ad0220, type: 3}
+  - {fileID: 21300000, guid: 8b9ed7181949ff347b4cb0ee29574e3d, type: 3}
+  - {fileID: 21300000, guid: 228b4a0482d3b1147b83a33210e9cead, type: 3}
+  - {fileID: 21300000, guid: 5ea43da5863bf5747964f0b77e459967, type: 3}
   - {fileID: 21300000, guid: 85f893a9a9e458a4181fd8b7f20cae7e, type: 3}
   - {fileID: 21300000, guid: 85f893a9a9e458a4181fd8b7f20cae7e, type: 3}
   - {fileID: 21300000, guid: 85f893a9a9e458a4181fd8b7f20cae7e, type: 3}
-  - {fileID: 21300000, guid: 85f893a9a9e458a4181fd8b7f20cae7e, type: 3}
-  - {fileID: 21300000, guid: 85f893a9a9e458a4181fd8b7f20cae7e, type: 3}
-  - {fileID: 21300000, guid: 85f893a9a9e458a4181fd8b7f20cae7e, type: 3}
-  - {fileID: 21300000, guid: 85f893a9a9e458a4181fd8b7f20cae7e, type: 3}
+  - {fileID: 21300000, guid: bf9994b32e6281a419747cdbcb3cc11d, type: 3}
+  - {fileID: 21300000, guid: 691e4b9eb4d07f7408a723d461cc1683, type: 3}
+  - {fileID: 21300000, guid: 92d25d29b6e7af44ea05e5a4074a85b5, type: 3}
+  - {fileID: 21300000, guid: ffe851574e91c584299e58a890f5d47f, type: 3}
   backgroundimage: {fileID: 72333254}
   imageindex: 0
-  storyAudio:
-  - {fileID: 8300000, guid: 718bf07902aef6743861bde24b1f4b48, type: 3}
-  - {fileID: 8300000, guid: 6d30c58ae0d3cd04799d86c85a8a4f1f, type: 3}
+  storyAudio: {fileID: 8300000, guid: 89ee56d88a844274caddd03906a4da70, type: 3}
   storyAudioSource: {fileID: 0}
-  audioindex: 0
   endtexts:
   - "\uC774\uAC78 \uAE68\uB124"
   - "\uC138\uC0C1\uC740 \uBD95\uAD34\uD558\uAE30 \uC2DC\uC791\uD55C\uB2E4."
@@ -2074,7 +2079,7 @@ MonoBehaviour:
   - "\uADF8\uAC83\uB3C4 \uB0B4\uAC00 \uC190\uB300\uC57C \uB9CC\uB4E4\uC5B4\uC9C0\uB098?"
   - "\uBB34\uAE30\uB294.. \uB354 \uBABB \uB9CC\uB4E4\uACA0\uB2E4"
   - "\uC2A4\uD1A0\uB9AC\uC52C \uC54C\uC544\uC11C \uC218\uC815\uD574\uC8FC\uC138\uC694"
-  - "\uC124\uB9C8 \uC774\uB300\uB85C \uB0C5\uB450\uACA0\uC5B4~"
+  - "\uC124\uB9C8 \uC774\uB300\uB85C \uB0C5\uB450\uACA0\uC5B4~ ( \uC218\uC815\uD588\uC74D\uB2C8\uB2E4_\uC9C4\uC9DC\uBC15\uC9C0\uC6C5\uC784)"
   - "\uC5F0\uBCF4\uB77C\uC0C9 \uB9DD\uD1A0 \uB4A4\uC9D1\uC5B4\uC4F4 \uC560\uB294
     \uB300\uCCB4 \uC815\uCCB4\uAC00 \uBB50\uC784"
   - "\uD50C\uB808\uC774\uC5B4 \uADF8\uB9B0 \uC9C0\uC6C5 \uC528 \uCEE8\uC149 \uC124\uBA85
@@ -2094,7 +2099,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 96d9a274612d0b34c9138594163d37cb, type: 3}
   - {fileID: 21300000, guid: 96d9a274612d0b34c9138594163d37cb, type: 3}
   - {fileID: 21300000, guid: 96d9a274612d0b34c9138594163d37cb, type: 3}
-  endstoryAudio: {fileID: 8300000, guid: 6d30c58ae0d3cd04799d86c85a8a4f1f, type: 3}
+  endstoryAudio: {fileID: 8300000, guid: deb075170fda70442baa2b7ca39a1437, type: 3}
 --- !u!114 &2116061004
 MonoBehaviour:
   m_ObjectHideFlags: 0
