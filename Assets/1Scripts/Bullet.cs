@@ -49,7 +49,7 @@ public class Bullet : MonoBehaviour //탄막
 
         transform.Translate(bulletSpeed * Time.deltaTime * Vector2.right);
 
-        if (Mathf.Abs(tp.x) > 100 || Mathf.Abs(tp.y) > 100)
+        if (Mathf.Abs(tp.x) > 200 || Mathf.Abs(tp.y) > 200)
         {
             Destroy(gameObject);
             Debug.Log("밖");
@@ -57,7 +57,7 @@ public class Bullet : MonoBehaviour //탄막
 
 
         //스킬 범위 내에 있음
-        if (Mathf.Abs(PlayerAttack.skillP.y) < 100 &&
+        if (Mathf.Abs(PlayerAttack.skillP.y) < 200 &&
             Vector2.Distance(tp, PlayerAttack.skillP) < 5.5f)
         {
             Destroy(gameObject);
@@ -69,7 +69,7 @@ public class Bullet : MonoBehaviour //탄막
         //무기 파생 스킬 범위 내에 있음
         Vector2 wsp = PlayerAttack.wsP;
 
-        if (Mathf.Abs(wsp.y) < 100)
+        if (Mathf.Abs(wsp.y) < 200)
         {
             switch (PlayerAttack.weaponNum.Item1)
             {

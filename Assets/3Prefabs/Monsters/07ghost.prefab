@@ -136,8 +136,8 @@ MonoBehaviour:
   monsterNum: 7
   fadeEffect: {fileID: 8326106217213998104, guid: c32a19154cf10874f974978490ab09ef, type: 3}
   doubleCircle: {fileID: 21300000, guid: bc8cdb377d76208459a0ccc268b24045, type: 3}
-  hp: 3
-  maxhp: 3
+  hp: 2
+  maxhp: 2
   hc:
   - {fileID: -508144027, guid: 5e38e6b0e5266ec44ab65d691d41382f, type: 3}
   - {fileID: 921054833, guid: 5e38e6b0e5266ec44ab65d691d41382f, type: 3}

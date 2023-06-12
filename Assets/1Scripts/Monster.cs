@@ -166,6 +166,8 @@ public class Monster : MonoBehaviour //잡몹
                 pol.localScale = new Vector2(0.2f, 0.2f); break;
         }*/
 
+        if (monsterNum == 3) bulletTime = 2;
+
     } //Start End
 
 
