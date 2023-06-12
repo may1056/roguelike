@@ -271,7 +271,8 @@ public class Monster : MonoBehaviour //잡몹
 
 
         //가깝거나 딜을 입으면 hp 표시
-        C.gameObject.SetActive(dist < 5 || hp < maxhp);
+        if (monsterNum < 10 && monsterNum > 15)
+            C.gameObject.SetActive(dist < 5 || hp < maxhp);
 
 
         ModifyHp();
@@ -803,16 +804,24 @@ public class Monster : MonoBehaviour //잡몹
 
     void ModifyHp() //hp circle 최신화
     {
-        if (hp > 0 && hp <= 5)
+        if (monsterNum < 10 && monsterNum > 15) //일반몹 체력구슬
         {
-            C.transform.GetComponent<SpriteRenderer>().sprite = hc[hp - 1];
-            if (C.childCount == 1) Destroy(C.GetChild(0).gameObject);
+            if (hp > 0 && hp <= 5)
+            {
+                C.transform.GetComponent<SpriteRenderer>().sprite = hc[hp - 1];
+                if (C.childCount == 1) Destroy(C.GetChild(0).gameObject);
+            }
+            else if (hp > 5 && hp <= 10)
+            {
+                C.transform.GetComponent<SpriteRenderer>().sprite = hc[hp - 6];
+                C.transform.GetChild(0).
+                    transform.GetComponent<SpriteRenderer>().sprite = hc[4];
+            }
         }
-        else if (hp > 5 && hp <= 10)
+
+        else //체스말 체력바
         {
-            C.transform.GetComponent<SpriteRenderer>().sprite = hc[hp - 6];
-            C.transform.GetChild(0).
-                transform.GetComponent<SpriteRenderer>().sprite = hc[4];
+            C.transform.localScale = new Vector2(hp, 1);
         }
     }
 
