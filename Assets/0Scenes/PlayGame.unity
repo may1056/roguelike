@@ -718,7 +718,7 @@ MonoBehaviour:
   - {fileID: 7985396889005880093, guid: 13e6d60d361f5aa4fabc74e25b9e562b, type: 3}
   - {fileID: 8997750637173455457, guid: 7237011ae36045c4e89799ab07e90d9c, type: 3}
   - {fileID: 9146475225477526196, guid: 358fb6a681bd78d459e5a6e03ba694d6, type: 3}
-  - {fileID: 0}
+  - {fileID: 9146475225477526196, guid: b5897390bc8ec964c9c9ecb73b035511, type: 3}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
@@ -733,7 +733,7 @@ MonoBehaviour:
   - {fileID: 957078474417799112, guid: ec96f5fd662d00c42a5de16082c8ab48, type: 3}
   - {fileID: 4869487111303141664, guid: eabf638861768024b99c93a0f6b14bbe, type: 3}
   - {fileID: 4703661679873030182, guid: 9dc4092d99642c3459916641f29481c0, type: 3}
-  - {fileID: 0}
+  - {fileID: 5662023301557811757, guid: 7606b32654f62db43acdb792623343c0, type: 3}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
@@ -20580,7 +20580,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!50 &1016312443
 Rigidbody2D:
   serializedVersion: 4
