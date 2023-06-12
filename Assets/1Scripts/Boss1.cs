@@ -164,7 +164,7 @@ public class Boss1 : MonoBehaviour{
 
         Targeting();
 
-        if (hp <= 80 && hp >=80)
+        if (hp <= 80 && hp >60)
         {
             
             if (spons == true)
@@ -176,7 +176,7 @@ public class Boss1 : MonoBehaviour{
 
                 
         }
-        else if(hp <= 60 && hp >= 40)
+        else if(hp <= 60 && hp > 40)
         {
             if (spons == true)
             {
@@ -186,7 +186,16 @@ public class Boss1 : MonoBehaviour{
             }
             
         }
-                
+        else if (hp <= 40 && hp > 20)
+        {
+            if (spons == true)
+            {
+                GameObject looksss = Instantiate(look, transform.position, Quaternion.identity);
+                transform.position = new Vector2(0, 0);
+                spons = false;
+            }
+
+        }
 
         if (hp <= 0)
         {
