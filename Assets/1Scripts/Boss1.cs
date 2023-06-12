@@ -24,6 +24,8 @@ public class Boss1 : MonoBehaviour{
 
 
     bool moving = false;
+    bool spons = true;
+    bool leezzang = true;
     public bool phase2 = false;
 
 
@@ -123,15 +125,22 @@ public class Boss1 : MonoBehaviour{
     }
     private void Ponspon()
     {
-        for(int i = 0; i < 8; i++)
+        if (leezzang == true)
         {
-            GameObject ponsss = Instantiate(pon, transform.position, Quaternion.identity);
-            GameObject knightsss = Instantiate(knight, transform.position, Quaternion.identity);
-            transform.position = new Vector2(-10 + i * 2, 0);
+            for (int i = 0; i < 5; i++)
+            {
+                GameObject ponsss = Instantiate(pon, transform.position, Quaternion.identity);
+
+                transform.position = new Vector2(-10 + i * 3, 0);
+
+
+            }
+            transform.position = new Vector2(0, 0);
+
+
         }
+
     }
-
-
     void Awake()
     {
         gameObject.SetActive(false);
@@ -141,7 +150,7 @@ public class Boss1 : MonoBehaviour{
     {
         player = Player.player;
         sr = GetComponent<SpriteRenderer>();
-        InvokeRepeating(nameof(Ponspon), 3, 19);
+        InvokeRepeating(nameof(Ponspon), 3, 19); //ponspon end
 
     }
     private void Update()
@@ -155,6 +164,29 @@ public class Boss1 : MonoBehaviour{
 
         Targeting();
 
+        if (hp <= 80 && hp >=80)
+        {
+            
+            if (spons == true)
+            {
+                GameObject knightsss = Instantiate(knight, transform.position, Quaternion.identity);
+                transform.position = new Vector2(0,0);
+                spons = false;
+            }
+
+                
+        }
+        else if(hp <= 60 && hp >= 40)
+        {
+            if (spons == true)
+            {
+                GameObject bishopsss = Instantiate(bishop, transform.position, Quaternion.identity);
+                transform.position = new Vector2(0, 0);
+                spons = false;
+            }
+            
+        }
+                
 
         if (hp <= 0)
         {
