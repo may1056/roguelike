@@ -152,7 +152,7 @@ public class GameManager : MonoBehaviour //게임 총괄
     //페이즈별 잡아야 할 몬스터 수, -1: 안 잡아도 된다
     readonly int[,] enemies
         = { { 14, 15, 25, }, { 21, 25, 24, },
-        { 14, 0, 0, }, { 19, 0, 0, }, { 22, 0, 0, },{ 15, 0, 0, },{ 10, 23, 0, },{ 8, 0, 0, },{ 3, 0, 0, }};
+        { 14, 0, 0, }, { 19, 0, 0, }, { 22, 0, 0, },{ 15, 0, 0, },{ 10, 23, 0, },{ 8, 0, 0, },{ 3, 0, 0, },{ 16, 12, 0, },{ 72, 0, 0, },};
 
     public bool making; //진행 중인지
     int nowPhase; //현재 페이즈
@@ -323,7 +323,8 @@ public class GameManager : MonoBehaviour //게임 총괄
         phaseTime = 0;
 
 
-        mapNum = Random.Range(0, 9);
+        //mapNum = Random.Range(0, 10);
+        mapNum = 10;
 
         //맵 불러오기
         if (stage == 4) map = Instantiate(floor == 2 ? boss1map : boss2map);
@@ -460,6 +461,8 @@ public class GameManager : MonoBehaviour //게임 총괄
             }
             else
             {
+                menuSet.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text
+                    = shouldplaytutorial ? "Tutorial" : floor.ToString() + " - " + stage.ToString();
                 menuSet.SetActive(true);
                 Time.timeScale = 0;
             }
