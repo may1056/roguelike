@@ -255,7 +255,28 @@ public class Monster : MonoBehaviour //잡몹
                 Targeting();
                 if (dist < 0.5f) Pokbal();
                 break;
-            case 10: //spider
+            case 10: //pon
+                //플레이어를 향해 이동 방향을 변경한다 (아프면 빨라짐)
+                if (tp.x > pp.x) H = hp == maxhp ? -2 : -4;
+                else H = hp == maxhp ? 2 : 4;
+
+                Targeting();
+                break;
+            case 11: //knight
+                //플레이어를 향해 이동 방향을 변경한다 (아프면 빨라짐)
+                if (tp.x > pp.x) H = hp == maxhp ? -2 : -4;
+                else H = hp == maxhp ? 2 : 4;
+
+                Targeting();
+                break;
+            case 12: //bishop
+                //플레이어를 향해 이동 방향을 변경한다 (아프면 빨라짐)
+                if (tp.x > pp.x) H = hp == maxhp ? -2 : -4;
+                else H = hp == maxhp ? 2 : 4;
+
+                Targeting();
+                break;
+            case 13: //look
                 //플레이어를 향해 이동 방향을 변경한다 (아프면 빨라짐)
                 if (tp.x > pp.x) H = hp == maxhp ? -2 : -4;
                 else H = hp == maxhp ? 2 : 4;
@@ -682,7 +703,49 @@ public class Monster : MonoBehaviour //잡몹
                 if (moving) transform.Translate(H * (1 - pollution) * Time.deltaTime
                     * new Vector2(pp.x - tp.x, pp.y - tp.y).normalized);
                 break;
-            case 10: //spider
+            case 10: //pon
+                if (moving)
+                {
+                    transform.Translate(H * (1 - pollution) *
+                        Time.deltaTime * Vector2.right);
+
+                    //벽에 막혀 안 움직이면 점프
+
+
+
+
+
+                }
+                break;
+            case 11: //knight
+                if (moving)
+                {
+                    transform.Translate(H * (1 - pollution) *
+                        Time.deltaTime * Vector2.right);
+
+                    //벽에 막혀 안 움직이면 점프
+
+
+
+
+
+                }
+                break;
+            case 12: //bishop
+                if (moving)
+                {
+                    transform.Translate(H * (1 - pollution) *
+                        Time.deltaTime * Vector2.right);
+
+                    //벽에 막혀 안 움직이면 점프
+
+
+
+
+
+                }
+                break;
+            case 13: //look
                 if (moving)
                 {
                     transform.Translate(H * (1 - pollution) *
@@ -732,6 +795,15 @@ public class Monster : MonoBehaviour //잡몹
                 MakeEffect(new Vector2(tp.x, tp.y + 0.1f), c, 1.5f);
                 break;
             case 10: //pon
+                MakeEffect(new Vector2(tp.x, tp.y - 0.9f), c, 3.1f);
+                break;
+            case 11: //knight
+                MakeEffect(new Vector2(tp.x, tp.y - 0.9f), c, 3.1f);
+                break;
+            case 12: //bishop
+                MakeEffect(new Vector2(tp.x, tp.y - 0.9f), c, 3.1f);
+                break;
+            case 13: //look
                 MakeEffect(new Vector2(tp.x, tp.y - 0.9f), c, 3.1f);
                 break;
         }
