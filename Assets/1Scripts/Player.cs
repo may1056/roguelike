@@ -910,6 +910,7 @@ public class Player : MonoBehaviour //플레이어
 
     public void Die()
     {
+        NewWonderfulLeejonghwanShitWow.savedcoin += GameManager.coins;
         SceneManager.LoadScene(0);
     }
 

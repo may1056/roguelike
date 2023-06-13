@@ -10,14 +10,14 @@ public class GameManager : MonoBehaviour //게임 총괄
     public static GameManager gameManager;
 
     public static bool shouldplaytutorial = false;
-    public static bool atFirst = false;
+    public static bool atFirst = true;
 
     public GameObject ShopSet;//상점 열고 닫/
     public Image Progress; //처음에 게임 진행 상황 알리기 위해
     float progressTime = 0; //4초까지 보여줄 거야
     public static bool prgEnd; //알려주는 거 끝났는지
 
-    static int floor = 3; //몇 층
+    static int floor = 1; //몇 층
     static int stage = 1; //몇 스테이지
 
     Transform p_l; //point_line
@@ -237,6 +237,7 @@ public class GameManager : MonoBehaviour //게임 총괄
 
     public Image nowWeapon;
 
+    public static (int, int) savedItem;
 
 
 
@@ -252,6 +253,8 @@ public class GameManager : MonoBehaviour //게임 총괄
             floor = 1;
             stage = 1;
             atFirst = false;
+            Player.itemNum = savedItem;
+            exceptionCount = 0;
         }
 
         //아래는 Canvas의 PROGRESS 오브젝트 관련
@@ -947,12 +950,16 @@ public class GameManager : MonoBehaviour //게임 총괄
             case 3: deleteNum = icnum; break;
         }
 
-        GameObject ic = Instantiate(itemCube,
+        if (deleteNum != -1)
+        {
+            GameObject ic = Instantiate(itemCube,
             Player.player.transform.position, Quaternion.identity);
-        ic.GetComponent<Itemcube>().cubeNum = deleteNum;
-        ic.GetComponent<SpriteRenderer>().sprite = itemSprites[deleteNum];
+            ic.GetComponent<Itemcube>().cubeNum = deleteNum;
+            ic.GetComponent<SpriteRenderer>().sprite = itemSprites[deleteNum];
 
-        icnum = deleteNum;
+            icnum = deleteNum;
+        }
+
         itemChangeScreen.SetActive(false);
 
         ItemInfo();

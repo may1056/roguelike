@@ -280,6 +280,7 @@ public class PlayerAttack : MonoBehaviour
         {
             WeaponChange();
             GameManager.gameManager.WeaponInfo();
+            GameManager.gameManager.ReadOn(2, 2);
         }
 
 

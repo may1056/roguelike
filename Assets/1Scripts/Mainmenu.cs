@@ -27,6 +27,7 @@ public class Mainmenu : MonoBehaviour // 게임매니저 사용하려했는데 �
         //clearText.gameObject.SetActive(cleared); //버그 왜 나는지 모르겠네
     }
 
+
     public void GameExit() // 게임 종료 버튼
     {
 #if UNITY_EDITOR
@@ -61,6 +62,7 @@ public class Mainmenu : MonoBehaviour // 게임매니저 사용하려했는데 �
     {
         menusound.Play();
     }
+
 
 
 } //Mainmenu End
