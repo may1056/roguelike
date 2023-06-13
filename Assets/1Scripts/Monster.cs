@@ -271,7 +271,7 @@ public class Monster : MonoBehaviour //잡몹
 
 
         //가깝거나 딜을 입으면 hp 표시
-        if (monsterNum < 10 && monsterNum > 15)
+        if (monsterNum < 10 || monsterNum > 15)
             C.gameObject.SetActive(dist < 5 || hp < maxhp);
 
 
@@ -804,7 +804,7 @@ public class Monster : MonoBehaviour //잡몹
 
     void ModifyHp() //hp circle 최신화
     {
-        if (monsterNum < 10 && monsterNum > 15) //일반몹 체력구슬
+        if (monsterNum < 10 || monsterNum > 15) //일반몹 체력구슬
         {
             if (hp > 0 && hp <= 5)
             {

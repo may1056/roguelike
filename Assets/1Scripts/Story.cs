@@ -116,4 +116,11 @@ public class Story : MonoBehaviour
     {
         menusound.Play();
     }
-}
+
+    public void Skip()
+    {
+        if (!isEnding) SceneManager.LoadScene(1);
+        else SceneManager.LoadScene(3);
+    }
+
+} //Story End

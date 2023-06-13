@@ -100,9 +100,9 @@ public class Boss1 : MonoBehaviour{
         if (hp > 0) hpBAR.rectTransform.sizeDelta = new Vector2(hp * 4, 70);
         else hpBAR.gameObject.SetActive(false);
 
-        if (t > 100 && t < 120)
-            hpCASE.rectTransform.sizeDelta = new Vector2(16 * (120 - t), 70);
-        else if (t >= 120) hpCASE.gameObject.SetActive(false);
+        //if (t > 100 && t < 120)
+        //    hpCASE.rectTransform.sizeDelta = new Vector2(16 * (120 - t), 70);
+        //else if (t >= 120) hpCASE.gameObject.SetActive(false);
     }
 
     public void Apa(Color c)
@@ -125,11 +125,11 @@ public class Boss1 : MonoBehaviour{
     }
     private void Ponspon()
     {
-        if (leezzang == true)
+        if (leezzang)
         {
             for (int i = 0; i < 5; i++)
             {
-                GameObject ponsss = Instantiate(pon, transform.position, Quaternion.identity);
+                Instantiate(pon, transform.position, Quaternion.identity);
 
                 transform.position = new Vector2(-10 + i * 3, 0);
 
@@ -153,6 +153,7 @@ public class Boss1 : MonoBehaviour{
         sr = GetComponent<SpriteRenderer>();
         InvokeRepeating(nameof(Ponspon), 3, 19); //ponspon end
 
+        firstP = transform.position;
     }
     private void Update()
     {
@@ -167,29 +168,29 @@ public class Boss1 : MonoBehaviour{
 
         if (hp <= 80 && hp >60)
         {
-            
-            if (spons == true)
+
+            if (spons)
             {
                 GameObject knightsss = Instantiate(knight, transform.position, Quaternion.identity);
                 transform.position = new Vector2(0,0);
                 spons = false;
             }
 
-                
+
         }
         else if(hp <= 60 && hp > 40)
         {
-            if (spons == true)
+            if (!spons)
             {
                 GameObject bishopsss = Instantiate(bishop, transform.position, Quaternion.identity);
                 transform.position = new Vector2(0, 0);
-                spons = false;
+                spons = true;
             }
-            
+
         }
         else if (hp <= 40 && hp > 20)
         {
-            if (spons == true)
+            if (spons)
             {
                 GameObject looksss = Instantiate(look, transform.position, Quaternion.identity);
                 transform.position = new Vector2(0, 0);
@@ -339,8 +340,8 @@ public class Boss1 : MonoBehaviour{
 
 
 
-            }
-
         }
 
-    } //Boss1 End
+    }
+
+} //Boss1 End

@@ -153,7 +153,7 @@ MonoBehaviour:
   pollution: 0
   polluted: 0
   NoticeSprite: {fileID: 21300000, guid: 37ef1c2e4d4df2f46b3b16a28fad0ed0, type: 3}
-  noticeDist: 12
+  noticeDist: 50
   pf:
     serializedVersion: 2
     m_Bits: 0
