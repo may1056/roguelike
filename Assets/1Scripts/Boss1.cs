@@ -127,7 +127,7 @@ public class Boss1 : MonoBehaviour{
     {
         if (leezzang)
         {
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 2; i++)
             {
                 Instantiate(pon, transform.position, Quaternion.identity);
 
@@ -151,7 +151,7 @@ public class Boss1 : MonoBehaviour{
     {
         player = Player.player;
         sr = GetComponent<SpriteRenderer>();
-        InvokeRepeating(nameof(Ponspon), 3, 19); //ponspon end
+        InvokeRepeating(nameof(Ponspon), 3, 13); //ponspon end
 
         firstP = transform.position;
     }
