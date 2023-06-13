@@ -513,7 +513,7 @@ public class Player : MonoBehaviour //플레이어
 
         if (inEnemies == 0) hurted = false;
 
-        if (hurtTime >= 0) Hurt(); //아플 때
+        if (hurtTime > 0) Hurt(); //아플 때
         else sr.color = Color.white; //기본
 
         if (hp > maxhp) hp = maxhp;

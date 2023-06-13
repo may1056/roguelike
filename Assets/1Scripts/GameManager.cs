@@ -10,14 +10,14 @@ public class GameManager : MonoBehaviour //게임 총괄
     public static GameManager gameManager;
 
     public static bool shouldplaytutorial = false;
-    public static bool atFirst = true;
+    public static bool atFirst = false;
 
     public GameObject ShopSet;//상점 열고 닫/
     public Image Progress; //처음에 게임 진행 상황 알리기 위해
     float progressTime = 0; //4초까지 보여줄 거야
     public static bool prgEnd; //알려주는 거 끝났는지
 
-    static int floor = 1; //몇 층
+    static int floor = 3; //몇 층
     static int stage = 1; //몇 스테이지
 
     Transform p_l; //point_line
@@ -151,8 +151,9 @@ public class GameManager : MonoBehaviour //게임 총괄
 
     //페이즈별 잡아야 할 몬스터 수, -1: 안 잡아도 된다
     readonly int[,] enemies
-        = { { 14, 15, 25, }, { 21, 25, 24, },
-        { 14, 0, 0, }, { 19, 0, 0, }, { 22, 0, 0, },{ 15, 0, 0, },{ 10, 23, 0, },{ 8, 0, 0, },{ 3, 0, 0, },{ 16, 12, 0, },{ 72, 0, 0, },};
+        = { { 14, 0, 0, }, { 19, 0, 0, }, { 11, 0, 0, },{ 16, 0, 0, },{ 14, 15, 25, },
+        { 21, 25, 24, },{ 22, 0, 0, },{ 19, 0, 0, },{ 13, 0, 0, },{ 15, 0, 0, },
+        { 10, 23, 0, },{ 8, 0, 0, },{ 3, 0, 0, },{ 16, 12, 0, },{ 21, 0, 0, }};
 
     public bool making; //진행 중인지
     int nowPhase; //현재 페이즈
@@ -160,7 +161,8 @@ public class GameManager : MonoBehaviour //게임 총괄
     bool appeared; //적들 등장했는지
 
 
-
+    static int[] exceptionMaps = new int[8]; //이미 나온 맵 번호
+    static int exceptionCount = 0;
 
 
     public static bool mapouterror; //맵뚫 오류가 발생한 것 같다!
@@ -323,8 +325,36 @@ public class GameManager : MonoBehaviour //게임 총괄
         phaseTime = 0;
 
 
+        bool mn = true;
+        while (mn)
+        {
+            switch (floor)
+            {
+                case 1:
+                    mapNum = Random.Range(0, 4); // 0~3
+                    break;
+                case 2:
+                    mapNum = Random.Range(4, 9); // 4~8
+                    break;
+                case 3:
+                    mapNum = Random.Range(9, 15); // 9~14
+                    break;
+            }
+            if (exceptionCount == 0) mn = false;
+            else
+            {
+                bool ex = false;
+                for (int i = 0; i < exceptionCount; i++)
+                {
+                    if (exceptionMaps[i] == mapNum) ex = true;
+                }
+                mn = ex;
+            }
+        }
+        Debug.Log(mapNum);
         //mapNum = Random.Range(0, 10);
-        mapNum = 10;
+        //mapNum += 1;
+
 
         //맵 불러오기
         if (stage == 4) map = Instantiate(floor == 2 ? boss1map : boss2map);
@@ -340,7 +370,12 @@ public class GameManager : MonoBehaviour //게임 총괄
             nowWeapon.transform.GetChild(2).gameObject.SetActive(false);
             progressTime = 4.01f;
         }
-        else map = Instantiate(maps[mapNum]); //맵을 생성한다
+        else
+        {
+            map = Instantiate(maps[mapNum]);
+            exceptionMaps[exceptionCount] = mapNum;
+            exceptionCount++;
+        }
 
         map.transform.SetParent(gameObject.transform); //게임매니저가 맵의 부모가 됨
 

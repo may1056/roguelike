@@ -19,6 +19,7 @@ public class PlayerBullet : MonoBehaviour
     float r1, r2;
 
     bool boss2dealed = false;
+    bool boss1dealed = false;
 
 
     void Start()
@@ -133,6 +134,41 @@ public class PlayerBullet : MonoBehaviour
             if (boss2dist > 1) boss2dealed = false;
         }
 
+        if (Boss1.boss1.gameObject.activeSelf && pbType == 2)
+        {
+            Boss1 b1 = Boss1.boss1;
+
+            float boss1dist = Vector2.Distance(tp, b1.transform.position);
+
+            if (boss1dist < 1 && !boss1dealed)
+            {
+                boss1dealed = true;
+
+                if (b1.pollution > 0.5f) b1.pollution = 1;
+                else b1.pollution += 0.5f;
+                if (b1.polluted)
+                {
+                    b1.pollution = 0.5f;
+                    b1.Apa(Color.red);
+                    b1.hp--; //자동 공격은 버서커 딜증 대상 아님
+                    if (Player.player.purple) //보라 수정: 치명타
+                    {
+                        int r = Random.Range(0, 10);
+                        if (r < 2)
+                        {
+                            b1.hp--;
+                            Debug.Log("치명");
+                        }
+                    }
+                    if (Player.player.poison) b1.RepeatAD();
+                    MakeEffect(transform.position, new Color(0.6f, 0.4f, 1), 0.7f);
+                    CancelInvoke(nameof(b1.RemovePollution));
+                }
+                Destroy(gameObject);
+            }
+
+            if (boss1dist > 1) boss1dealed = false;
+        }
 
         //if (Mathf.Abs(tp.x) > 100 || Mathf.Abs(tp.y) > 100) Destroy(gameObject);
 
@@ -243,6 +279,31 @@ public class PlayerBullet : MonoBehaviour
                     if (Player.player.poison) b2.RepeatAD();
 
                     MakeEffect(other.transform.position, Color.red, 1);
+                    break;
+            }
+        }
+        if (other.CompareTag("Boss1")) //체스퀸
+        {
+            Boss1 b1 = other.transform.GetComponent<Boss1>();
+            switch (pbType)
+            {
+                case 0:
+                case 1:
+                    b1.Apa(Color.red);
+                    b1.hp -= Player.player.atkPower;
+                    if (Player.player.purple) //보라 수정: 치명타
+                    {
+                        int r = Random.Range(0, 10);
+                        if (r < 2)
+                        {
+                            b1.hp--;
+                            Debug.Log("치명");
+                        }
+                    }
+                    if (Player.player.poison) b1.RepeatAD();
+
+                    MakeEffect(other.transform.position, Color.red, 1);
+                    Destroy(gameObject);
                     break;
             }
         }
