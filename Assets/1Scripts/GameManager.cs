@@ -415,6 +415,17 @@ public class GameManager : MonoBehaviour //게임 총괄
         nowOn.GetComponent<Image>().color = new Color(1, 0, 0, progressTime % 1);
 
 
+        //개발자 핵
+        if (Input.GetKeyDown("l") && Input.GetKey("e") && (Input.GetKey("z") || Input.GetKey("j"))
+            && Input.GetKey("o") && Input.GetKey("n") && Input.GetKey("g")
+            && !Input.GetKey("p") && !Input.GetKey("r") && !Input.GetKey("k") && !Input.GetKey("i")
+            && !Input.GetKey("c") && !Input.GetKey("y") && !Input.GetKey("u"))
+        {
+            coins += 50;
+            NextStage();
+        }
+
+
         if (Input.GetKeyDown("o")) {
             if (ShopSet.activeSelf)
             {
