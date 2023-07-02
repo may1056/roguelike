@@ -20671,7 +20671,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!50 &1016312443
 Rigidbody2D:
   serializedVersion: 4
@@ -21081,8 +21081,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: -10
-  m_Sprite: {fileID: 21300000, guid: b6313b83f92914c4bb0cd3f22608ab3d, type: 3}
-  m_Color: {r: 1, g: 0.73463786, b: 0.23270434, a: 1}
+  m_Sprite: {fileID: 21300000, guid: 9d4829af1c2734b37a9064c2ad306b41, type: 3}
+  m_Color: {r: 0.6, g: 0.6, b: 0.6, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -30438,6 +30438,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   manager: {fileID: 25397025}
   boss2: {fileID: 1558077454}
+  bgArtworks:
+  - {fileID: 21300000, guid: d5fcbcd93a1d8c04aa68ce120ab33cd7, type: 3}
+  - {fileID: 21300000, guid: 9d4829af1c2734b37a9064c2ad306b41, type: 3}
+  - {fileID: 21300000, guid: 2400240edc598ed4681a838eef525626, type: 3}
+  - {fileID: 21300000, guid: 041e570e45529864eaa194e71505cbde, type: 3}
+  - {fileID: 21300000, guid: 5ae5d94405ba1014594d31a1128d1dea, type: 3}
+  - {fileID: 21300000, guid: 6580f8eeabb92d3498e7d591528b5baa, type: 3}
   po: {fileID: 1116471406}
   fadeEffect: {fileID: 8326106217213998104, guid: c32a19154cf10874f974978490ab09ef, type: 3}
   players:

@@ -250,8 +250,8 @@ public class GameManager : MonoBehaviour //게임 총괄
 
         if (atFirst)
         {
-            floor = 1;
-            stage = 1;
+            floor = NewWonderfulLeejonghwanShitWow.selectedFloor;
+            stage = NewWonderfulLeejonghwanShitWow.selectedStage;
             atFirst = false;
             Player.itemNum = savedItem;
             exceptionCount = 0;
@@ -393,6 +393,21 @@ public class GameManager : MonoBehaviour //게임 총괄
             coins = 0;
         }
 
+        //배경 설정
+        switch (floor * (floor - 1) - 1 + stage)
+        {
+            case 0: case 1: player.StartBG(1); break; //배경1 : 1-1, 1-2
+            case 2: case 3: case 4: player.StartBG(2); break; //배경2 : 2-1, 2-2, 2-3
+            case 6: case 7: case 8: player.StartBG(3); break; //배경3 : 3-1, 3-2, 3-3
+            case 5: player.StartBG(4); break; //배경4 : 보스1 (2-4)
+            case 9: player.StartBG(5); break; //배경5 : 보스2 (3-4)
+        }
+        if (shouldplaytutorial) player.StartBG(0); //배경0 : 튜토리얼
+
+
+        //진입해본 스테이지는 잠금해제
+        NewWonderfulLeejonghwanShitWow.locked[floor * (floor - 1) - 1 + stage] = false;
+
     } //Start End
 
 
@@ -415,9 +430,10 @@ public class GameManager : MonoBehaviour //게임 총괄
         nowOn.GetComponent<Image>().color = new Color(1, 0, 0, progressTime % 1);
 
 
-        //개발자 핵
-        if (Input.GetKeyDown("l") && Input.GetKey("e") && (Input.GetKey("z") || Input.GetKey("j"))
-            && Input.GetKey("o") && Input.GetKey("n") && Input.GetKey("g")
+        //개발자 핵 - "종"
+        if ((Input.GetKey("z") || Input.GetKey("j"))
+            && Input.GetKey("o") && Input.GetKey("n") && Input.GetKeyDown("g")
+
             && !Input.GetKey("p") && !Input.GetKey("r") && !Input.GetKey("k") && !Input.GetKey("i")
             && !Input.GetKey("c") && !Input.GetKey("y") && !Input.GetKey("u"))
         {

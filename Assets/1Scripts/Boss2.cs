@@ -95,7 +95,7 @@ public class Boss2 : MonoBehaviour
 
         cam.GetComponent<Camera>().orthographicSize = 12;
 
-        player.transform.GetChild(2).gameObject.SetActive(false); //background
+        //player.transform.GetChild(2).gameObject.SetActive(false); //background
 
         Invoke(nameof(DashAttack), 1);
 

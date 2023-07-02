@@ -21,6 +21,10 @@ public class Player : MonoBehaviour //플레이어
 
 
     Transform bg; //배경
+    SpriteRenderer bgsr; //배경 스프라이트렌더러
+    public Sprite[] bgArtworks; //배경 이미지
+    float bgtime = 0;
+
     Transform td; //대쉬 끝 위치
     public Transform po; //저장된 위치 표시 오브젝트
     Transform cs; //슬라이드 가능 알림 화살표
@@ -103,12 +107,6 @@ public class Player : MonoBehaviour //플레이어
     bool isSliding; //플랫폼 내려가는 중인지
     Vector2 slideP;
     public LayerMask lb; //Block
-
-
-
-    SpriteRenderer bgsr; //배경 스프라이트렌더러
-    float bgtime = 0;
-    Color cloud = new(0.7f, 0.8f, 0.9f); //구름 약간 어두움
 
 
     public bool F;
@@ -627,9 +625,9 @@ public class Player : MonoBehaviour //플레이어
 
         if (bgtime > 0)
         {
-            //배경 흰색으로 갔다가 돌아온다 - 다른 배경에도 일반화하려고 복잡하게 썼음
-            bgsr.color = new Color(cloud.r + bgtime * (1 - cloud.r),
-                cloud.g + bgtime * (1 - cloud.g), cloud.b + bgtime * (1 - cloud.b));
+            //배경 흰색으로 갔다가 돌아온다
+            float ㄱ = bgtime * 0.3f + 0.7f;
+            bgsr.color = new Color(ㄱ, ㄱ, ㄱ);
             bgtime -= Time.deltaTime;
         }
 
@@ -900,7 +898,11 @@ public class Player : MonoBehaviour //플레이어
 
 
 
-
+    public void StartBG(int num) //시작 시 배경 선정
+    {
+        bgsr.sprite = bgArtworks[num];
+        bgsr.color = new Color(0.7f, 0.7f, 0.7f);
+    }
     public void ClearBG() //클리어 시 배경 색상 변동
     {
         bgsr.color = Color.white;

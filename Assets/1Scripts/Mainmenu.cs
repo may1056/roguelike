@@ -8,10 +8,14 @@ using TMPro;
 public class Mainmenu : MonoBehaviour // 게임매니저 사용하려했는데 씬 달라서 오브젝트 없다고 오류띄우길래 만듬
 {
     public GameObject Option;
+    public Button[] Switches;
+    public Sprite switchOn, switchOff;
+
     AudioSource menusound;
 
-    public static bool nevertutored = true;
-    public Button nButton;
+    public static bool
+        nevertutored = true, //옵션0 - 튜토리얼 보는가?
+        viewstory = true; //옵션1 - 스토리 보는가?
 
     public static bool cleared = false;
     public TextMeshProUGUI clearText;
@@ -24,7 +28,7 @@ public class Mainmenu : MonoBehaviour // 게임매니저 사용하려했는데 �
 
     void Start()
     {
-        //clearText.gameObject.SetActive(cleared); //버그 왜 나는지 모르겠네
+        Time.timeScale = 1;
     }
 
 
@@ -37,25 +41,18 @@ public class Mainmenu : MonoBehaviour // 게임매니저 사용하려했는데 �
 #endif
     }
 
-    public void GameStart(bool tutorial) // 게임 시작 버튼
+    public void GameStart() // 게임 시작 버튼
     {
-        if (nevertutored && !tutorial) //튜토리얼 안 해봤는데 X 누름
-        {
-            nButton.gameObject.SetActive(false);
-        }
-        else
-        {
-            GameManager.shouldplaytutorial = tutorial;
-            GameManager.killed = 0;
-            GameManager.coins = 0;
-            GameManager.atFirst = true;
-            GameManager.게임실행시간 = 0;
-            Player.itemNum = (-1, -1);
-            PlayerAttack.weaponNum = (0, 1);
-            Story.isEnding = false;
+        GameManager.shouldplaytutorial = nevertutored;
+        GameManager.killed = 0;
+        GameManager.coins = 0;
+        GameManager.atFirst = true;
+        GameManager.게임실행시간 = 0;
+        Player.itemNum = (-1, -1);
+        PlayerAttack.weaponNum = (0, 1);
+        Story.isEnding = false;
 
-            SceneManager.LoadScene(4);
-        }
+        SceneManager.LoadScene(viewstory ? 4 : 1);
     }
 
     public void MenuSound()
@@ -63,6 +60,28 @@ public class Mainmenu : MonoBehaviour // 게임매니저 사용하려했는데 �
         menusound.Play();
     }
 
+
+
+    public void Cleared________________________________________()
+    {
+        clearText.gameObject.SetActive(cleared);
+    }
+
+
+
+    //옵션
+
+    public void Option_Tutorial()
+    {
+        nevertutored = !nevertutored;
+        Switches[0].image.sprite = nevertutored ? switchOn : switchOff;
+    }
+
+    public void Option_Story()
+    {
+        viewstory = !viewstory;
+        Switches[1].image.sprite = viewstory ? switchOn : switchOff;
+    }
 
 
 } //Mainmenu End

@@ -23,6 +23,8 @@ public class Clear : MonoBehaviour
 
     void Start()
     {
+        Time.timeScale = 1;
+
         time.text = ((int)(GameManager.게임실행시간 / 60)).ToString() + ":" + ((int)(GameManager.게임실행시간 % 60)).ToString("D2");
         kill.text = GameManager.killed.ToString();
 
@@ -60,6 +62,7 @@ public class Clear : MonoBehaviour
 
     public void ToMainmenu()
     {
+        NewWonderfulLeejonghwanShitWow.savedcoin += GameManager.coins;
         Mainmenu.cleared = true;
         SceneManager.LoadScene(0);
     }
