@@ -243,6 +243,26 @@ public class GameManager : MonoBehaviour //게임 총괄
 
 
 
+    readonly string[] tips =
+    {
+        "분홍 하트는 체력, 푸른 하트는 마나입니다.",
+        "회색 하트는 쉴드를 뜻합니다. 안 맞고 안 때리면 찹니다.",
+        "플레이어 위의 흰 점들은 스태미나입니다. 대쉬할 때마다 소모됩니다.",
+        "설정에서 튜토리얼 또는 스토리를 끌 수 있습니다.",
+        "TAB키로 인벤토리를 열 수 있습니다.",
+        "아이템 파괴 시 코인을 일정량 획득합니다.",
+        "무기의 공격 범위는 마우스 방향에 따라 회전합니다.",
+        "스킬로 탄막을 제거할 수 있습니다.",
+        "적을 처치하면 체력 오브, 마나 오브, 코인이 확률적으로 등장합니다.",
+        "끼임탈출은 Esc(일시정지) - R(원위치)",
+    };
+    public Text tipText;
+
+
+
+
+
+
 
     void Awake()
     {
@@ -252,15 +272,16 @@ public class GameManager : MonoBehaviour //게임 총괄
         {
             floor = NewWonderfulLeejonghwanShitWow.selectedFloor;
             stage = NewWonderfulLeejonghwanShitWow.selectedStage;
-            atFirst = false;
             Player.itemNum = savedItem;
             exceptionCount = 0;
-
-            player.hp = 6;
-            playerAtk.mp = 6;
             killed = 0;
             coins = 0;
         }
+
+        player.transform.GetChild(0).GetComponent<Camera>().orthographicSize = 8;
+
+        onTabPage = false;
+
 
         //아래는 Canvas의 PROGRESS 오브젝트 관련
 
@@ -312,10 +333,7 @@ public class GameManager : MonoBehaviour //게임 총괄
         if (stage == 4) nort.sizeDelta = new Vector2(50, 50);
         else nort.sizeDelta = new Vector2(35, 35);
 
-
-        player.transform.GetChild(0).GetComponent<Camera>().orthographicSize = 8;
-
-        onTabPage = false;
+        tipText.text = tips[Random.Range(0, tips.Length)]; //팁도 같이 띄움
 
     } //Awake End
 
@@ -323,6 +341,13 @@ public class GameManager : MonoBehaviour //게임 총괄
 
     void Start()
     {
+        if (atFirst)
+        {
+            atFirst = false;
+            player.hp = 6;
+            playerAtk.mp = 6;
+        }
+
         if (transform.childCount != 0)
             Destroy(transform.GetChild(0).gameObject); //맵 남아있으면 삭제
 
@@ -715,7 +740,7 @@ public class GameManager : MonoBehaviour //게임 총괄
         else if (floor == 3 && stage == 5) //3-5는 없... 막보를 죽였군! 잘했다
         {
             Story.isEnding = true;
-            SceneManager.LoadScene(4);
+            SceneManager.LoadScene(Mainmenu.viewstory ? 4 : 3);
         }
         else SceneManager.LoadScene(1);
     }

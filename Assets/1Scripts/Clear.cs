@@ -25,12 +25,33 @@ public class Clear : MonoBehaviour
     {
         Time.timeScale = 1;
 
+
+        //기록
+        NewWonderfulLeejonghwanShitWow.clearCount++;
+
+        int min = (int)(GameManager.게임실행시간 / 60);
+        int sec = (int)(GameManager.게임실행시간 % 60);
+        if (min < NewWonderfulLeejonghwanShitWow.shortestTime.Item1 ||
+            (min == NewWonderfulLeejonghwanShitWow.shortestTime.Item1
+            && sec < NewWonderfulLeejonghwanShitWow.shortestTime.Item2))
+            NewWonderfulLeejonghwanShitWow.shortestTime = (min, sec);
+
+        if (GameManager.killed > NewWonderfulLeejonghwanShitWow.maxKill)
+            NewWonderfulLeejonghwanShitWow.maxKill = GameManager.killed;
+
+        if (GameManager.coins > NewWonderfulLeejonghwanShitWow.maxCoin)
+            NewWonderfulLeejonghwanShitWow.maxCoin = GameManager.coins;
+
+
+        //표시
         time.text = NewWonderfulLeejonghwanShitWow.selectedFloor == 1 && NewWonderfulLeejonghwanShitWow.selectedStage == 1
             ? ((int)(GameManager.게임실행시간 / 60)).ToString() + ":" + ((int)(GameManager.게임실행시간 % 60)).ToString("D2")
             : "-- : --";
         kill.text = GameManager.killed.ToString();
         coin.text = "+" + GameManager.coins.ToString();
 
+
+        //사용 아이템과 무기
         goods[0].sprite = items[Player.itemNum.Item1 + 1];
         goods[1].sprite = items[Player.itemNum.Item2 + 1];
         goods[2].sprite = weapons[PlayerAttack.weaponNum.Item1 + 1];

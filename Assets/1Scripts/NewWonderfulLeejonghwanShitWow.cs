@@ -25,6 +25,11 @@ public class NewWonderfulLeejonghwanShitWow : MonoBehaviour //메인메뉴 보�
     public Sprite[] itemSprites;
     public Image owningItem1, owningItem2;
 
+    public GameObject start;
+
+    public static (int, int) shortestTime = (9999, 59); //최단 시간 (분, 초)
+    public static int clearCount = 0, maxKill = -1, maxCoin = -1; //클리어 횟수, 최다 킬수, 코인 최대 획득
+
 
 
     void Start()
@@ -44,6 +49,8 @@ public class NewWonderfulLeejonghwanShitWow : MonoBehaviour //메인메뉴 보�
         Player.itemNum = (-1, -1);
         GameManager.savedItem = (-1, -1);
         ItemModify();
+
+        start.SetActive(false);
 
     } //Start End
 

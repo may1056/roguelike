@@ -205,9 +205,6 @@ public class Player : MonoBehaviour //플레이어
         ItemDefault();
         ItemActive(itemNum.Item1);
         ItemActive(itemNum.Item2);
-
-        if (itemNum.Item1 != -1) NewWonderfulLeejonghwanShitWow.itemOpen[itemNum.Item1] = true;
-        if (itemNum.Item2 != -1) NewWonderfulLeejonghwanShitWow.itemOpen[itemNum.Item2] = true;
     }
     void ItemDefault() //아이템 설정 기본값으로 되돌리기
     {
@@ -625,9 +622,12 @@ public class Player : MonoBehaviour //플레이어
 
 
 
-        //ㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱ
-
         bg.transform.localPosition = -0.1f * tp; //배경 이동
+
+
+
+        if (itemNum.Item1 != -1) NewWonderfulLeejonghwanShitWow.itemOpen[itemNum.Item1] = true;
+        if (itemNum.Item2 != -1) NewWonderfulLeejonghwanShitWow.itemOpen[itemNum.Item2] = true;
 
     } //Update End
 
