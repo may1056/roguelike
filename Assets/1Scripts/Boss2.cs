@@ -123,6 +123,7 @@ public class Boss2 : MonoBehaviour
     void Update()
     {
         cam.transform.position = -10 * Vector3.forward;
+        player.transform.GetChild(2).transform.position = Vector2.zero;
 
         tp = transform.position;
 

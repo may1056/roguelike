@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
 
 public class Player : MonoBehaviour //플레이어
 {
@@ -23,7 +24,7 @@ public class Player : MonoBehaviour //플레이어
     Transform bg; //배경
     SpriteRenderer bgsr; //배경 스프라이트렌더러
     public Sprite[] bgArtworks; //배경 이미지
-    float bgtime = 0;
+
 
     Transform td; //대쉬 끝 위치
     public Transform po; //저장된 위치 표시 오브젝트
@@ -204,6 +205,9 @@ public class Player : MonoBehaviour //플레이어
         ItemDefault();
         ItemActive(itemNum.Item1);
         ItemActive(itemNum.Item2);
+
+        if (itemNum.Item1 != -1) NewWonderfulLeejonghwanShitWow.itemOpen[itemNum.Item1] = true;
+        if (itemNum.Item2 != -1) NewWonderfulLeejonghwanShitWow.itemOpen[itemNum.Item2] = true;
     }
     void ItemDefault() //아이템 설정 기본값으로 되돌리기
     {
@@ -538,7 +542,9 @@ public class Player : MonoBehaviour //플레이어
             }
             else
             {
-                death.gameObject.SetActive(true);
+                death.SetActive(true);
+                death.transform.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>().text
+                    = "+" + GameManager.coins.ToString();
                 Time.timeScale = 0;
             }
         }
@@ -622,14 +628,6 @@ public class Player : MonoBehaviour //플레이어
         //ㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱㅂㄱ
 
         bg.transform.localPosition = -0.1f * tp; //배경 이동
-
-        if (bgtime > 0)
-        {
-            //배경 흰색으로 갔다가 돌아온다
-            float ㄱ = bgtime * 0.3f + 0.7f;
-            bgsr.color = new Color(ㄱ, ㄱ, ㄱ);
-            bgtime -= Time.deltaTime;
-        }
 
     } //Update End
 
@@ -906,7 +904,6 @@ public class Player : MonoBehaviour //플레이어
     public void ClearBG() //클리어 시 배경 색상 변동
     {
         bgsr.color = Color.white;
-        bgtime = 1;
     }
 
 

@@ -255,6 +255,11 @@ public class GameManager : MonoBehaviour //게임 총괄
             atFirst = false;
             Player.itemNum = savedItem;
             exceptionCount = 0;
+
+            player.hp = 6;
+            playerAtk.mp = 6;
+            killed = 0;
+            coins = 0;
         }
 
         //아래는 Canvas의 PROGRESS 오브젝트 관련
@@ -385,13 +390,6 @@ public class GameManager : MonoBehaviour //게임 총괄
 
         bossHpLine.gameObject.SetActive(stage == 4);
 
-        if (floor == 1 && stage == 1)
-        {
-            player.hp = 6;
-            playerAtk.mp = 6;
-            killed = 0;
-            coins = 0;
-        }
 
         //배경 설정
         switch (floor * (floor - 1) - 1 + stage)
@@ -696,10 +694,10 @@ public class GameManager : MonoBehaviour //게임 총괄
 
         if (shouldplaytutorial)
         {
-            floor = 1;
-            stage = 1;
+            floor = NewWonderfulLeejonghwanShitWow.selectedFloor;
+            stage = NewWonderfulLeejonghwanShitWow.selectedStage;
             shouldplaytutorial = false;
-            Mainmenu.nevertutored = false;
+            //Mainmenu.nevertutored = false;
             SceneManager.LoadScene(1); //PlayGame 재시작
         }
         else if (floor == 1 && stage == 3) //1-3은 없으니 2-1로 가라

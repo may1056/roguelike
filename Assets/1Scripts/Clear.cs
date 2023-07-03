@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 
 public class Clear : MonoBehaviour
 {
-    public TextMeshProUGUI time, kill;
+    public TextMeshProUGUI time, kill, coin;
 
     public Image[] goods;
     public Sprite[] items, weapons;
@@ -25,8 +25,11 @@ public class Clear : MonoBehaviour
     {
         Time.timeScale = 1;
 
-        time.text = ((int)(GameManager.게임실행시간 / 60)).ToString() + ":" + ((int)(GameManager.게임실행시간 % 60)).ToString("D2");
+        time.text = NewWonderfulLeejonghwanShitWow.selectedFloor == 1 && NewWonderfulLeejonghwanShitWow.selectedStage == 1
+            ? ((int)(GameManager.게임실행시간 / 60)).ToString() + ":" + ((int)(GameManager.게임실행시간 % 60)).ToString("D2")
+            : "-- : --";
         kill.text = GameManager.killed.ToString();
+        coin.text = "+" + GameManager.coins.ToString();
 
         goods[0].sprite = items[Player.itemNum.Item1 + 1];
         goods[1].sprite = items[Player.itemNum.Item2 + 1];

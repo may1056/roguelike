@@ -77,7 +77,7 @@ public class Story : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space)) Nextscene(); // 스페이스바 입력시 Nextscene 함수 실행
+        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return)) Nextscene(); // 스페이스바나 엔터키 입력시 Nextscene 함수 실행
 
     }
 
