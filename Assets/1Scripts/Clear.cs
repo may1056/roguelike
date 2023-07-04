@@ -29,11 +29,15 @@ public class Clear : MonoBehaviour
         //기록
         NewWonderfulLeejonghwanShitWow.clearCount++;
 
+        bool playedfromscratch = NewWonderfulLeejonghwanShitWow.selectedFloor == 1 && NewWonderfulLeejonghwanShitWow.selectedStage == 1;
+
         int min = (int)(GameManager.게임실행시간 / 60);
         int sec = (int)(GameManager.게임실행시간 % 60);
-        if (min < NewWonderfulLeejonghwanShitWow.shortestTime.Item1 ||
+
+        if (playedfromscratch && //처음부터 시작했고
+            (min < NewWonderfulLeejonghwanShitWow.shortestTime.Item1 || //분이 작거나
             (min == NewWonderfulLeejonghwanShitWow.shortestTime.Item1
-            && sec < NewWonderfulLeejonghwanShitWow.shortestTime.Item2))
+            && sec < NewWonderfulLeejonghwanShitWow.shortestTime.Item2))) //분이 같으면서 초가 작으면
             NewWonderfulLeejonghwanShitWow.shortestTime = (min, sec);
 
         if (GameManager.killed > NewWonderfulLeejonghwanShitWow.maxKill)
@@ -43,8 +47,23 @@ public class Clear : MonoBehaviour
             NewWonderfulLeejonghwanShitWow.maxCoin = GameManager.coins;
 
 
+        //저장
+        PlayerPrefs.SetInt("ClearCount",
+            NewWonderfulLeejonghwanShitWow.clearCount);
+        PlayerPrefs.SetInt("ShortestTimeMinute",
+            NewWonderfulLeejonghwanShitWow.shortestTime.Item1);
+        PlayerPrefs.SetInt("ShortestTimeSecond",
+            NewWonderfulLeejonghwanShitWow.shortestTime.Item2);
+        PlayerPrefs.SetInt("MaxKill",
+            NewWonderfulLeejonghwanShitWow.maxKill);
+        PlayerPrefs.SetInt("MaxCoin",
+            NewWonderfulLeejonghwanShitWow.maxCoin);
+
+        NewWonderfulLeejonghwanShitWow.SaveWhenGameEnds();
+
+
         //표시
-        time.text = NewWonderfulLeejonghwanShitWow.selectedFloor == 1 && NewWonderfulLeejonghwanShitWow.selectedStage == 1
+        time.text = playedfromscratch
             ? ((int)(GameManager.게임실행시간 / 60)).ToString() + ":" + ((int)(GameManager.게임실행시간 % 60)).ToString("D2")
             : "-- : --";
         kill.text = GameManager.killed.ToString();
@@ -87,7 +106,6 @@ public class Clear : MonoBehaviour
     public void ToMainmenu()
     {
         NewWonderfulLeejonghwanShitWow.savedcoin += GameManager.coins;
-        Mainmenu.cleared = true;
         SceneManager.LoadScene(0);
     }
 

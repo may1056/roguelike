@@ -429,7 +429,8 @@ public class GameManager : MonoBehaviour //게임 총괄
 
 
         //진입해본 스테이지는 잠금해제
-        NewWonderfulLeejonghwanShitWow.locked[floor * (floor - 1) - 1 + stage] = false;
+        if (NewWonderfulLeejonghwanShitWow.maxReachStage < floor * (floor - 1) - 1 + stage)
+            NewWonderfulLeejonghwanShitWow.maxReachStage = floor * (floor - 1) - 1 + stage;
 
     } //Start End
 
@@ -1216,6 +1217,7 @@ public class GameManager : MonoBehaviour //게임 총괄
 
     public void GameExit() // 게임 종료 버튼
     {
+        NewWonderfulLeejonghwanShitWow.SaveWhenGameEnds();
         SceneManager.LoadScene(0);
     }
 

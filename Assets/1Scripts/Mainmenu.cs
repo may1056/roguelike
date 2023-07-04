@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
-using TMPro;
 
 public class Mainmenu : MonoBehaviour // 게임매니저 사용하려했는데 씬 달라서 오브젝트 없다고 오류띄우길래 만듬
 {
@@ -14,11 +13,8 @@ public class Mainmenu : MonoBehaviour // 게임매니저 사용하려했는데 �
     AudioSource menusound;
 
     public static bool
-        nevertutored = true, //옵션0 - 튜토리얼 보는가?
-        viewstory = true; //옵션1 - 스토리 보는가?
-
-    public static bool cleared = false;
-    public TextMeshProUGUI clearText;
+        nevertutored, //옵션0 - 튜토리얼 보는가?
+        viewstory; //옵션1 - 스토리 보는가?
 
 
     void Awake()
@@ -62,25 +58,20 @@ public class Mainmenu : MonoBehaviour // 게임매니저 사용하려했는데 �
 
 
 
-    public void Cleared________________________________________()
-    {
-        clearText.gameObject.SetActive(cleared);
-    }
-
-
-
     //옵션
 
     public void Option_Tutorial()
     {
         nevertutored = !nevertutored;
         Switches[0].image.sprite = nevertutored ? switchOn : switchOff;
+        PlayerPrefs.SetInt("int_NeverTutored", PlayerPrefs.GetInt("int_NeverTutored", 1) == 1 ? 0 : 1);
     }
 
     public void Option_Story()
     {
         viewstory = !viewstory;
         Switches[1].image.sprite = viewstory ? switchOn : switchOff;
+        PlayerPrefs.SetInt("int_ViewStory", PlayerPrefs.GetInt("int_ViewStory", 1) == 1 ? 0 : 1);
     }
 
 
