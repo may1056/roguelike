@@ -230,6 +230,7 @@ public class Boss1 : MonoBehaviour{
                 {
                     hp--;
                     Debug.Log("치명");
+                    Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
                 }
             }
             PlayerAttack.curAttackCooltime = 0;
@@ -247,6 +248,7 @@ public class Boss1 : MonoBehaviour{
                 {
                     hp--;
                     Debug.Log("치명");
+                    Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
                 }
             }
         }
@@ -272,6 +274,7 @@ public class Boss1 : MonoBehaviour{
                             {
                                 hp -= 2;
                                 Debug.Log("치명");
+                                Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
                             }
                         }
                         if (Player.player.poison)
@@ -308,6 +311,7 @@ public class Boss1 : MonoBehaviour{
                 {
                     hp--;
                     Debug.Log("치명");
+                    Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
                 }
             }
         }

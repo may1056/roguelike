@@ -56,7 +56,7 @@ public class Boss2 : MonoBehaviour
     public Sprite bigpx;
     int[] x = new int[12];
     int[] y = new int[12];
-    int thenumberofsquares = 6;
+    int thenumberofsquares;
     public Sprite redfrom;
 
 
@@ -73,6 +73,10 @@ public class Boss2 : MonoBehaviour
     bool inAttackArea; //플레이어의 공격 범위 내에 있는지
     public float pollution = 0; //오염 정도
     public bool polluted = false; //오염되었는지
+
+
+    bool hm;
+    public GameObject worldEnder;
 
 
 
@@ -97,6 +101,8 @@ public class Boss2 : MonoBehaviour
 
         //player.transform.GetChild(2).gameObject.SetActive(false); //background
 
+        thenumberofsquares = hm ? 6 : 3;
+
         Invoke(nameof(DashAttack), 1);
 
         hp = 80; //임시
@@ -115,6 +121,8 @@ public class Boss2 : MonoBehaviour
 
         Soundmanager.soundmanager.bossbgm[1].Play();
 
+        hm = GameManager.hardmode;
+
     } //Start End
 
 
@@ -122,7 +130,7 @@ public class Boss2 : MonoBehaviour
 
     void Update()
     {
-        cam.transform.position = -10 * Vector3.forward;
+        if (t < 130) cam.transform.position = -10 * Vector3.forward;
         player.transform.GetChild(2).transform.position = Vector2.zero;
 
         tp = transform.position;
@@ -153,10 +161,7 @@ public class Boss2 : MonoBehaviour
 
             t += Time.deltaTime;
             if (t > 120) CancelInvoke(nameof(Craziness));
-            if (t > 130)
-            {
-                GameManager.gameManager.NextStage();
-            }
+            if (t > 130) worldEnder.SetActive(true); //권한 위임
         }
 
 
@@ -165,7 +170,7 @@ public class Boss2 : MonoBehaviour
             if (hp <= 30 && !phase2)
             {
                 phase2 = true;
-                thenumberofsquares = 8;
+                thenumberofsquares = hm ? 12 : 6;
                 hpText.color = new Color(1, 0, 0, 0.3f);
                 //ground.GetComponent<SpriteRenderer>().color = new Color(1, 0.5f, 0.5f);
                 //block.GetComponent<SpriteRenderer>().color = new Color(1, 0.5f, 0.5f);
@@ -209,6 +214,7 @@ public class Boss2 : MonoBehaviour
                     {
                         hp--;
                         Debug.Log("치명");
+                        player.MakeEffect(new Vector2(tp.x, tp.y + 2), player.critical, 5, 1);
                     }
                 }
                 PlayerAttack.curAttackCooltime = 0;
@@ -226,6 +232,7 @@ public class Boss2 : MonoBehaviour
                     {
                         hp--;
                         Debug.Log("치명");
+                        player.MakeEffect(new Vector2(tp.x, tp.y + 2), player.critical, 5, 1);
                     }
                 }
             }
@@ -251,6 +258,7 @@ public class Boss2 : MonoBehaviour
                                 {
                                     hp -= 2;
                                     Debug.Log("치명");
+                                    player.MakeEffect(new Vector2(tp.x, tp.y + 2), player.critical, 5, 1);
                                 }
                             }
                             if (Player.player.poison)
@@ -276,7 +284,7 @@ public class Boss2 : MonoBehaviour
 
     void Craziness() //발광
     {
-        for (int i = 0; i < (t < 110 ? 10 : 25); i++)
+        for (int i = 0; i < (t < 110 ? (hm ? 10 : 5) : (hm ? 25 : 15)); i++)
         {
             GameObject b = Instantiate(pxb1, tp,
                 Quaternion.Euler(0, 0, 10 * i + hp));
@@ -302,18 +310,18 @@ public class Boss2 : MonoBehaviour
             ___b.GetComponent<Bullet>().bulletSpeed = Random.Range(5, 7);
             ___b.transform.localScale = 0.1f * Random.Range(5, 21) * Vector2.one;
         }
-        hp -= 10 + Random.Range(0, 3);
+        hp -= 10 + Random.Range(0, 3); //발광 때부터 체력의 의미가 랜덤으로 감소하는 숫자로 변질됨.
     }
 
 
 
     void DashAttack() //패턴0-A. 반짝거리면서 플레이어에게 빠르게 달려든다
     {
-        if (jjabs[1] != null) //
+        if (jjabs[1] != null)
         {
             for (int i = 0; i < 4; i++)
             {
-                Instantiate(Random.Range(0, 3) == 0 ? mpOrb : hpOrb,
+                if (!hm || i < 2) Instantiate(Random.Range(0, 3) == 0 ? mpOrb : hpOrb,
                     jjabs[i].transform.position, Quaternion.identity);
                 Destroy(jjabs[i].gameObject);
             }
@@ -325,10 +333,10 @@ public class Boss2 : MonoBehaviour
         dashy = Player.player.transform.position.y - tp.y;
 
         rigid.AddForce((10 + 0.2f * (100 - hp) * (1 - pollution)) //자동 공격 오염 받음. 무려
-            * new Vector2(dashx, dashy).normalized, ForceMode2D.Impulse); //가속. 플레이어한테.
+            * (hm ? 1 : 0.5f) * new Vector2(dashx, dashy).normalized, ForceMode2D.Impulse); //가속. 플레이어한테.
 
-        for (int i = 0; i < (phase2 ? 19 : 9); i++)
-            Invoke(nameof(DashBullet), i * (phase2 ? 0.05f : 0.1f)); //뒤로 탄막 뿌림
+        for (int i = 0; i < (phase2 ? (hm ? 18 : 12) : (hm ? 9 : 6)); i++)
+            Invoke(nameof(DashBullet), i * (0.9f / (phase2 ? (hm ? 18 : 12) : (hm ? 9 : 6)))); //뒤로 탄막 뿌림
 
         if (!IsInvoking(nameof(HideMyself))) Invoke(nameof(HideMyself), 1);
     }
@@ -340,7 +348,7 @@ public class Boss2 : MonoBehaviour
         GameObject db = Instantiate(pxb1, tp, Quaternion.Euler( //pixel bullet 1px
             0, 0, 180 + Mathf.Rad2Deg * Mathf.Atan2(dashy, dashx))); //dashbullet
         db.transform.GetComponent<SpriteRenderer>().color = sr.color;
-        db.transform.GetComponent<Bullet>().bulletSpeed = 0.5f;
+        db.transform.GetComponent<Bullet>().bulletSpeed = 0.7f;
 
         MakeEffect(bulletborder, sr.color);
     }
@@ -364,23 +372,22 @@ public class Boss2 : MonoBehaviour
         orbitRotating = true; //궤도를 돌기 시작
 
         hide = true; //숨는다
-        InvokeRepeating(nameof(JjabBullet), 0, phase2 ? 1 : 3);
+        InvokeRepeating(nameof(JjabBullet), 0, phase2 ? 1 : (hm ? 0.5f : 0.8f));
     }
     void JjabBullet() //패턴0-C. 발각되기 전까지는 초록 탄막 발사
     {
-        Color Green = new(Random.Range(0, 5) * 0.1f,
-                Random.Range(7, 11) * 0.1f, Random.Range(0, 5) * 0.1f); //다양한 초록색
+        Color Green = new(Random.Range(0, 6) * 0.1f,
+                Random.Range(6, 11) * 0.1f, Random.Range(0, 6) * 0.1f); //다양한 초록색
         int Speed = Random.Range(1, 6); //1~5 속도 랜덤
-        if (phase2) Speed += 2; //2페이즈는 더 빠름
+        if (phase2) Speed += 1; //2페이즈는 더 빠름
 
         for (int i = 0; i < 4; i++) //작은 i
         {
-            for (int j = 0; j < (phase2 ? 1 : 4); j++) //한 번에 탄막을 몇 번 쏘느냐?
+            for (int j = 0; j < (phase2 ? (hm ? 12 : 6) : (hm ? 8 : 4)); j++) //한 번에 탄막을 몇 번 쏘느냐?
             {
                 Vector2 jtp = jjabs[i].transform.position; //분신의 위치
                 GameObject jjabB = Instantiate(pxb1, jtp, Quaternion.Euler(0, 0, //jjabBullet
-                    phase2 ? Mathf.Rad2Deg * Mathf.Atan2(player.transform.position.y
-                    - jtp.y, player.transform.position.x - jtp.x) : t * 360 + j * 90)); //t는 시간에 따라 요상하게 변하는 변수, j*90 (0<=j<=3)
+                    t * 360 + j * (360 / (phase2 ? (hm ? 12 : 6) : (hm ? 8 : 4))))); //t는 시간에 따라 요상하게 변하는 변수, j*90 (0<=j<=3)
                 jjabB.GetComponent<SpriteRenderer>().color = Green;
                 jjabB.GetComponent<Bullet>().bulletSpeed = Speed;
 
@@ -415,8 +422,8 @@ public class Boss2 : MonoBehaviour
 
     void Rain() //패턴1. 1px 비가 내린다
     {
-        for (int i = 0; i < 15; i++)
-            Invoke(nameof(RainMaker), i * 0.13f);
+        for (int i = 0; i < (hm ? 20 : 10); i++)
+            Invoke(nameof(RainMaker), i * (hm ? 0.09f : 0.19f));
 
         MakeRainFrom(true, false, 0.3f);
         if (phase2) MakeRainFrom(false, false, 0.3f);
@@ -454,13 +461,12 @@ public class Boss2 : MonoBehaviour
 
     void LetBullet() //패턴2. 3px 탄막이 2px 탄막을 뿌리고 2px 탄막이 1px 탄막을 뿌림
     {
-        for (int i = 0; i < (phase2 ? 6 : 3); i++)
-            Invoke(nameof(ReleaseBullet), phase2 ? i * 0.15f : i * 0.3f);
+        for (int i = 0; i < (phase2 ? (hm ? 8 : 4) : (hm ? 4 : 2)); i++)
+            Invoke(nameof(ReleaseBullet), i * (0.9f / (phase2 ? (hm ? 9 : 6) : (hm ? 5 : 3))));
     }
     void ReleaseBullet()
     {
-        Instantiate(pxb3,
-            transform.position, Quaternion.Euler(0, 0, Random.Range(0, 360)));
+        Instantiate(pxb3, transform.position, Quaternion.Euler(0, 0, Random.Range(0, 360)));
 
         MakeEffect(bulletborder, new Color(1, 0.4f, 0));
     }
@@ -642,6 +648,7 @@ public class Boss2 : MonoBehaviour
                 {
                     hp--;
                     Debug.Log("치명");
+                    player.MakeEffect(new Vector2(tp.x, tp.y + 2), player.critical, 5, 1);
                 }
             }
         }

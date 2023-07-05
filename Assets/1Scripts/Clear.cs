@@ -27,37 +27,47 @@ public class Clear : MonoBehaviour
 
 
         //기록
-        NewWonderfulLeejonghwanShitWow.clearCount++;
-
         bool playedfromscratch = NewWonderfulLeejonghwanShitWow.selectedFloor == 1 && NewWonderfulLeejonghwanShitWow.selectedStage == 1;
 
         int min = (int)(GameManager.게임실행시간 / 60);
         int sec = (int)(GameManager.게임실행시간 % 60);
 
-        if (playedfromscratch && //처음부터 시작했고
-            (min < NewWonderfulLeejonghwanShitWow.shortestTime.Item1 || //분이 작거나
-            (min == NewWonderfulLeejonghwanShitWow.shortestTime.Item1
-            && sec < NewWonderfulLeejonghwanShitWow.shortestTime.Item2))) //분이 같으면서 초가 작으면
-            NewWonderfulLeejonghwanShitWow.shortestTime = (min, sec);
+        if (GameManager.hardmode) //하드모드
+        {
+            NewWonderfulLeejonghwanShitWow.clearCount_hard++;
 
-        if (GameManager.killed > NewWonderfulLeejonghwanShitWow.maxKill)
-            NewWonderfulLeejonghwanShitWow.maxKill = GameManager.killed;
+            if (playedfromscratch &&
+            (min < NewWonderfulLeejonghwanShitWow.shortestTime_hard.Item1 ||
+            (min == NewWonderfulLeejonghwanShitWow.shortestTime_hard.Item1 && sec < NewWonderfulLeejonghwanShitWow.shortestTime_hard.Item2)))
+                NewWonderfulLeejonghwanShitWow.shortestTime_hard = (min, sec);
 
-        if (GameManager.coins > NewWonderfulLeejonghwanShitWow.maxCoin)
-            NewWonderfulLeejonghwanShitWow.maxCoin = GameManager.coins;
+            if (GameManager.killed > NewWonderfulLeejonghwanShitWow.maxKill_hard)
+                NewWonderfulLeejonghwanShitWow.maxKill_hard = GameManager.killed;
 
+            //저장
+            PlayerPrefs.SetInt("ClearCount_hard", NewWonderfulLeejonghwanShitWow.clearCount_hard);
+            PlayerPrefs.SetInt("ShortestTimeMinute_hard", NewWonderfulLeejonghwanShitWow.shortestTime_hard.Item1);
+            PlayerPrefs.SetInt("ShortestTimeSecond_hard", NewWonderfulLeejonghwanShitWow.shortestTime_hard.Item2);
+            PlayerPrefs.SetInt("MaxKill_hard", NewWonderfulLeejonghwanShitWow.maxKill_hard);
+        }
+        else //이지모드
+        {
+            NewWonderfulLeejonghwanShitWow.clearCount_easy++;
 
-        //저장
-        PlayerPrefs.SetInt("ClearCount",
-            NewWonderfulLeejonghwanShitWow.clearCount);
-        PlayerPrefs.SetInt("ShortestTimeMinute",
-            NewWonderfulLeejonghwanShitWow.shortestTime.Item1);
-        PlayerPrefs.SetInt("ShortestTimeSecond",
-            NewWonderfulLeejonghwanShitWow.shortestTime.Item2);
-        PlayerPrefs.SetInt("MaxKill",
-            NewWonderfulLeejonghwanShitWow.maxKill);
-        PlayerPrefs.SetInt("MaxCoin",
-            NewWonderfulLeejonghwanShitWow.maxCoin);
+            if (playedfromscratch &&
+            (min < NewWonderfulLeejonghwanShitWow.shortestTime_easy.Item1 ||
+            (min == NewWonderfulLeejonghwanShitWow.shortestTime_easy.Item1 && sec < NewWonderfulLeejonghwanShitWow.shortestTime_easy.Item2)))
+                NewWonderfulLeejonghwanShitWow.shortestTime_easy = (min, sec);
+
+            if (GameManager.killed > NewWonderfulLeejonghwanShitWow.maxKill_easy)
+                NewWonderfulLeejonghwanShitWow.maxKill_easy = GameManager.killed;
+
+            //저장
+            PlayerPrefs.SetInt("ClearCount_easy", NewWonderfulLeejonghwanShitWow.clearCount_easy);
+            PlayerPrefs.SetInt("ShortestTimeMinute_easy", NewWonderfulLeejonghwanShitWow.shortestTime_easy.Item1);
+            PlayerPrefs.SetInt("ShortestTimeSecond_easy", NewWonderfulLeejonghwanShitWow.shortestTime_easy.Item2);
+            PlayerPrefs.SetInt("MaxKill_easy", NewWonderfulLeejonghwanShitWow.maxKill_easy);
+        }
 
         NewWonderfulLeejonghwanShitWow.SaveWhenGameEnds();
 
@@ -106,6 +116,7 @@ public class Clear : MonoBehaviour
     public void ToMainmenu()
     {
         NewWonderfulLeejonghwanShitWow.savedcoin += GameManager.coins;
+        PlayerPrefs.SetInt("SavedCoin", NewWonderfulLeejonghwanShitWow.savedcoin);
         SceneManager.LoadScene(0);
     }
 

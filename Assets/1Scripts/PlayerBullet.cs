@@ -122,6 +122,7 @@ public class PlayerBullet : MonoBehaviour
                         {
                             b2.hp--;
                             Debug.Log("치명");
+                            Player.player.MakeEffect(new Vector2(b2.transform.position.x, b2.transform.position.y + 2), Player.player.critical, 5, 1);
                         }
                     }
                     if (Player.player.poison) b2.RepeatAD();
@@ -158,6 +159,7 @@ public class PlayerBullet : MonoBehaviour
                         {
                             b1.hp--;
                             Debug.Log("치명");
+                            Player.player.MakeEffect(new Vector2(b1.transform.position.x, b1.transform.position.y + 2), Player.player.critical, 5, 1);
                         }
                     }
                     if (Player.player.poison) b1.RepeatAD();
@@ -190,6 +192,7 @@ public class PlayerBullet : MonoBehaviour
                 {
                     m.hp--;
                     Debug.Log("치명");
+                    Player.player.MakeEffect(new Vector2(collision.transform.position.x, collision.transform.position.y + 2), Player.player.critical, 5, 1);
                 }
             }
             if (Player.player.poison) m.RepeatAD();
@@ -223,6 +226,7 @@ public class PlayerBullet : MonoBehaviour
                         {
                             m.hp--;
                             Debug.Log("치명");
+                            Player.player.MakeEffect(new Vector2(other.transform.position.x, other.transform.position.y + 2), Player.player.critical, 5, 1);
                         }
                     }
                     if (Player.player.poison) m.RepeatAD();
@@ -245,6 +249,7 @@ public class PlayerBullet : MonoBehaviour
                             {
                                 m.hp--;
                                 Debug.Log("치명");
+                                Player.player.MakeEffect(new Vector2(other.transform.position.x, other.transform.position.y + 2), Player.player.critical, 5, 1);
                             }
                         }
                         if (Player.player.poison) m.RepeatAD();
@@ -274,6 +279,7 @@ public class PlayerBullet : MonoBehaviour
                         {
                             b2.hp--;
                             Debug.Log("치명");
+                            Player.player.MakeEffect(new Vector2(other.transform.position.x, other.transform.position.y + 2), Player.player.critical, 5, 1);
                         }
                     }
                     if (Player.player.poison) b2.RepeatAD();
@@ -298,6 +304,7 @@ public class PlayerBullet : MonoBehaviour
                         {
                             b1.hp--;
                             Debug.Log("치명");
+                            Player.player.MakeEffect(new Vector2(other.transform.position.x, other.transform.position.y + 2), Player.player.critical, 5, 1);
                         }
                     }
                     if (Player.player.poison) b1.RepeatAD();

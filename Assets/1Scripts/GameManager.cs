@@ -9,6 +9,8 @@ public class GameManager : MonoBehaviour //게임 총괄
 {
     public static GameManager gameManager;
 
+    public static bool hardmode;
+
     public static bool shouldplaytutorial = false;
     public static bool atFirst = true;
 
@@ -65,6 +67,7 @@ public class GameManager : MonoBehaviour //게임 총괄
     public Image item1tabImage, item2tabImage;
     public Button item1tabButton, item2tabButton;
     public Image item1Info, item2Info;
+    public Text item1destroyCoin, item2destroyCoin;
 
     readonly string[] Items_explaination =
     {
@@ -259,6 +262,7 @@ public class GameManager : MonoBehaviour //게임 총괄
     public Text tipText;
 
 
+    public Image[] keys;
 
 
 
@@ -431,6 +435,11 @@ public class GameManager : MonoBehaviour //게임 총괄
         //진입해본 스테이지는 잠금해제
         if (NewWonderfulLeejonghwanShitWow.maxReachStage < floor * (floor - 1) - 1 + stage)
             NewWonderfulLeejonghwanShitWow.maxReachStage = floor * (floor - 1) - 1 + stage;
+
+
+        //키 관련
+        for (int i = 0; i < keys.Length; i++) keys[i].gameObject.SetActive(Mainmenu.markkey);
+        InvokeRepeating(nameof(KeyHighlight), 0, 0.3f);
 
     } //Start End
 
@@ -708,6 +717,12 @@ public class GameManager : MonoBehaviour //게임 총괄
             else if (getto_w) Equip_w();
         }
 
+
+
+        //아이템이 3개면 파괴 좀 하라고 TAB키 하이라이트
+        keys[5].transform.GetChild(0).GetComponent<Image>().color = new Color(1, 0, 0,
+            Player.itemNum.Item1 != -1 && Player.itemNum.Item2 != -1 && nowCube != null ? 1 : 0);
+
     } //Update End
 
 
@@ -876,6 +891,8 @@ public class GameManager : MonoBehaviour //게임 총괄
             item1tabImage.sprite = itemSprites[i1];
             item1tabImage.gameObject.SetActive(true);
             item1tabButton.gameObject.SetActive(true);
+
+            item1destroyCoin.text = "+" + ((Items_legendary[i1] + 1) * (Items_legendary[i1] + 1) * 5).ToString();
         }
 
         if (i2 == -1)
@@ -893,6 +910,8 @@ public class GameManager : MonoBehaviour //게임 총괄
             item2tabImage.sprite = itemSprites[i2];
             item2tabImage.gameObject.SetActive(true);
             item2tabButton.gameObject.SetActive(true);
+
+            item2destroyCoin.text = "+" + ((Items_legendary[i2] + 1) * (Items_legendary[i2] + 1) * 5).ToString();
         }
     }
     public void WeaponInfo() //현재 무슨 무기를 가지고 있나
@@ -927,6 +946,7 @@ public class GameManager : MonoBehaviour //게임 총괄
         Image[] it = new Image[3]; //item
         Text[] na = new Text[3]; //name
         Text[] ex = new Text[3]; //explaination
+        Text[] le = new Text[3]; //legendary
 
         for (int i = 0; i < 3; i++)
         {
@@ -934,19 +954,28 @@ public class GameManager : MonoBehaviour //게임 총괄
             it[i] = bg[i].GetChild(0).GetComponent<Image>();
             na[i] = bg[i].GetChild(0).GetChild(0).GetComponent<Text>();
             ex[i] = bg[i].GetChild(1).GetComponent<Text>();
+            le[i] = bg[i].GetChild(2).GetComponent<Text>();
         }
 
-        it[0].sprite = itemSprites[Player.itemNum.Item1];
-        na[0].text = Items[Player.itemNum.Item1];
-        ex[0].text = Items_explaination[Player.itemNum.Item1];
+        int i1 = Player.itemNum.Item1;
+        it[0].sprite = itemSprites[i1];
+        na[0].text = Items[i1];
+        ex[0].text = Items_explaination[i1];
+        le[0].text = Items_legendary[i1] == 2 ? "전설" : (Items_legendary[i1] == 1 ? "희귀" : "일반");
+        le[0].color = Items_legendary[i1] == 2 ? new Color(1, 0.7f, 0) : (Items_legendary[i1] == 1 ? new Color(0.5f, 0.4f, 1) : new Color(0.8f, 0.3f, 0));
 
-        it[1].sprite = itemSprites[Player.itemNum.Item2];
-        na[1].text = Items[Player.itemNum.Item2];
-        ex[1].text = Items_explaination[Player.itemNum.Item2];
+        int i2 = Player.itemNum.Item2;
+        it[1].sprite = itemSprites[i2];
+        na[1].text = Items[i2];
+        ex[1].text = Items_explaination[i2];
+        le[1].text = Items_legendary[i2] == 2 ? "전설" : (Items_legendary[i2] == 1 ? "희귀" : "일반");
+        le[1].color = Items_legendary[i2] == 2 ? new Color(1, 0.7f, 0) : (Items_legendary[i2] == 1 ? new Color(0.5f, 0.4f, 1) : new Color(0.8f, 0.3f, 0));
 
         it[2].sprite = itemSprites[icnum];
         na[2].text = Items[icnum];
         ex[2].text = Items_explaination[icnum];
+        le[2].text = Items_legendary[icnum] == 2 ? "전설" : (Items_legendary[icnum] == 1 ? "희귀" : "일반");
+        le[2].color = Items_legendary[icnum] == 2 ? new Color(1, 0.7f, 0) : (Items_legendary[icnum] == 1 ? new Color(0.5f, 0.4f, 1) : new Color(0.8f, 0.3f, 0));
 
         itemChangeScreen.SetActive(true);
     }
@@ -1003,10 +1032,9 @@ public class GameManager : MonoBehaviour //게임 총괄
 
         if (deleteNum != -1)
         {
-            GameObject ic = Instantiate(itemCube,
-            Player.player.transform.position, Quaternion.identity);
-            ic.GetComponent<Itemcube>().cubeNum = deleteNum;
-            ic.GetComponent<SpriteRenderer>().sprite = itemSprites[deleteNum];
+            nowCube = Instantiate(itemCube, Player.player.transform.position, Quaternion.identity);
+            nowCube.GetComponent<Itemcube>().cubeNum = deleteNum;
+            nowCube.GetComponent<SpriteRenderer>().sprite = itemSprites[deleteNum];
 
             icnum = deleteNum;
         }
@@ -1056,14 +1084,18 @@ public class GameManager : MonoBehaviour //게임 총괄
         Image it; //item
         Text na; //name
         Text ex; //explaination
+        Text le; //legendary
 
         it = itemGet.transform.GetChild(0).GetComponent<Image>();
         na = it.transform.GetChild(0).GetComponent<Text>();
         ex = itemGet.transform.GetChild(1).GetComponent<Text>();
+        le = itemGet.transform.GetChild(2).GetComponent<Text>();
 
         it.sprite = itemSprites[icnum];
         na.text = Items[icnum];
         ex.text = Items_explaination[icnum];
+        le.text = Items_legendary[icnum] == 2 ? "전설" : (Items_legendary[icnum] == 1 ? "희귀" : "일반");
+        le.color = Items_legendary[icnum] == 2 ? new Color(1, 0.7f, 0) : (Items_legendary[icnum] == 1 ? new Color(0.5f, 0.4f, 1) : new Color(0.8f, 0.3f, 0));
 
         itemGet.gameObject.SetActive(true);
         getto = true;
@@ -1149,13 +1181,13 @@ public class GameManager : MonoBehaviour //게임 총괄
         switch (n)
         {
             case 1:
-                coins += (int)Mathf.Pow(Items_legendary[Player.itemNum.Item1] + 1, 2) * 10;
+                coins += (int)Mathf.Pow(Items_legendary[Player.itemNum.Item1] + 1, 2) * 5;
                 Player.itemNum.Item1 = -1;
                 player.GetNewItem();
                 break;
 
             case 2:
-                coins += (int)Mathf.Pow(Items_legendary[Player.itemNum.Item2] + 1, 2) * 10;
+                coins += (int)Mathf.Pow(Items_legendary[Player.itemNum.Item2] + 1, 2) * 5;
                 Player.itemNum.Item2 = -1;
                 player.GetNewItem();
                 break;
@@ -1182,6 +1214,10 @@ public class GameManager : MonoBehaviour //게임 총괄
                 = Items[i1];
             item1Info.transform.GetChild(1).GetComponent<Text>().text
                 = Items_explaination[i1];
+            item1Info.transform.GetChild(2).GetComponent<Text>().text
+                = Items_legendary[i1] == 2 ? "전설" : (Items_legendary[i1] == 1 ? "희귀" : "일반");
+            item1Info.transform.GetChild(2).GetComponent<Text>().color
+                = Items_legendary[i1] == 2 ? new Color(1, 0.7f, 0) : (Items_legendary[i1] == 1 ? new Color(0.5f, 0.4f, 1) : new Color(0.8f, 0.3f, 0));
         }
 
         if (i2 != -1)
@@ -1192,6 +1228,10 @@ public class GameManager : MonoBehaviour //게임 총괄
                 = Items[i2];
             item2Info.transform.GetChild(1).GetComponent<Text>().text
                 = Items_explaination[i2];
+            item2Info.transform.GetChild(2).GetComponent<Text>().text
+                = Items_legendary[i2] == 2 ? "전설" : (Items_legendary[i2] == 1 ? "희귀" : "일반");
+            item2Info.transform.GetChild(2).GetComponent<Text>().color
+                = Items_legendary[i2] == 2 ? new Color(1, 0.7f, 0) : (Items_legendary[i2] == 1 ? new Color(0.5f, 0.4f, 1) : new Color(0.8f, 0.3f, 0));
         }
 
         nowWeaponInfo.transform.GetChild(0).GetComponent<Image>().sprite
@@ -1212,6 +1252,12 @@ public class GameManager : MonoBehaviour //게임 총괄
         }
     }
 
+
+
+    void KeyHighlight()
+    {
+        keys[5].transform.GetChild(0).gameObject.SetActive(!keys[5].transform.GetChild(0).gameObject.activeSelf);
+    }
 
 
 

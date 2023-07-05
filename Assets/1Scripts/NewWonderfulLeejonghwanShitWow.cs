@@ -27,11 +27,15 @@ public class NewWonderfulLeejonghwanShitWow : MonoBehaviour //메인메뉴 보�
 
     public GameObject start;
 
-    public static (int, int) shortestTime; //최단 시간 (분, 초)
-    public static int clearCount, maxKill, maxCoin; //클리어 횟수, 최다 킬수, 코인 최대 획득
+    public static int clearCount_easy, clearCount_hard;
+    public static (int, int) shortestTime_easy, shortestTime_hard; //최단 시간 (분, 초)
+    public static int maxKill_easy, maxKill_hard, maxCoin; //클리어 횟수, 최다 킬수, 코인 최대 획득
 
-    public TextMeshProUGUI clearText;
+    public TextMeshProUGUI gamename, difficultyMarker;
     public Image recordWindow;
+    public TextMeshProUGUI[] recordTexts;
+
+    public ParticleSystem ps; //배경 효과
 
 
 
@@ -39,9 +43,6 @@ public class NewWonderfulLeejonghwanShitWow : MonoBehaviour //메인메뉴 보�
     {
         //메인메뉴와 상호작용을 위해 끌고 오기
         mainmenu = GetComponent<Mainmenu>();
-
-        //클리어 시 인증 띄우기
-        clearText.gameObject.SetActive(clearCount >= 1);
 
         //기록 불러오기
         LoadData();
@@ -157,6 +158,7 @@ public class NewWonderfulLeejonghwanShitWow : MonoBehaviour //메인메뉴 보�
 
 
 
+
     public static void SaveWhenGameEnds()
     {
         PlayerPrefs.SetInt("SavedCoin", savedcoin);
@@ -171,15 +173,19 @@ public class NewWonderfulLeejonghwanShitWow : MonoBehaviour //메인메뉴 보�
         PlayerPrefs.SetInt("ItemOpen_btd", itemOpen_BinaryToDecimal);
     }
 
+
     public void LoadData()
     {
         //기록 불러오기
         savedcoin = PlayerPrefs.GetInt("SavedCoin", 0);
 
-        clearCount = PlayerPrefs.GetInt("ClearCount", 0);
-        shortestTime = (PlayerPrefs.GetInt("ShortestTimeMinute", 9999), PlayerPrefs.GetInt("ShortestTimeSecond", 59));
-        maxKill = PlayerPrefs.GetInt("MaxKill", -1);
-        maxCoin = PlayerPrefs.GetInt("MaxCoin", -1);
+        clearCount_easy = PlayerPrefs.GetInt("ClearCount_easy", 0);
+        shortestTime_easy = (PlayerPrefs.GetInt("ShortestTimeMinute_easy", 9999), PlayerPrefs.GetInt("ShortestTimeSecond_easy", 59));
+        maxKill_easy = PlayerPrefs.GetInt("MaxKill_easy", -1);
+
+        clearCount_hard = PlayerPrefs.GetInt("ClearCount_hard", 0);
+        shortestTime_hard = (PlayerPrefs.GetInt("ShortestTimeMinute_hard", 9999), PlayerPrefs.GetInt("ShortestTimeSecond_hard", 59));
+        maxKill_hard = PlayerPrefs.GetInt("MaxKill_hard", -1);
 
         maxReachStage = PlayerPrefs.GetInt("MaxReachStage", 0);
         for (int i = 9; i >= 0; i--) locked[i] = maxReachStage < i;
@@ -199,6 +205,9 @@ public class NewWonderfulLeejonghwanShitWow : MonoBehaviour //메인메뉴 보�
 
         Mainmenu.nevertutored = PlayerPrefs.GetInt("int_NeverTutored", 1) == 1;
         Mainmenu.viewstory = PlayerPrefs.GetInt("int_ViewStory", 1) == 1;
+        Mainmenu.markkey = PlayerPrefs.GetInt("int_MarkKey", 1) == 1;
+
+        GameManager.hardmode = PlayerPrefs.GetInt("int_HardMode", 0) == 1;
 
 
         //스테이지 바로가기 버튼들의 하위 개체 관리
@@ -208,21 +217,26 @@ public class NewWonderfulLeejonghwanShitWow : MonoBehaviour //메인메뉴 보�
             stageButtons[i].transform.GetChild(2).gameObject.SetActive(!locked[i]); //비용 보이기 여부
         }
 
-
         //아이템 완전 초기화
         Player.itemNum = (-1, -1);
         GameManager.savedItem = (-1, -1);
         ItemModify();
-
 
         //옵션 변수가 스위치 상태랑 따로 노는 것을 방지
         for (int i = 0; i < 2; i++)
         {
             mainmenu.Option_Tutorial();
             mainmenu.Option_Story();
+            mainmenu.Option_Key();
+
+            ChangeDifficulty();
         }
 
+        //클리어 인증 띄우기
+        gamename.transform.GetChild(0).gameObject.SetActive(GameManager.hardmode ? clearCount_hard >= 1 : clearCount_easy >= 1);
+
     } //LoadData End
+
 
     public void ResetData()
     {
@@ -234,14 +248,48 @@ public class NewWonderfulLeejonghwanShitWow : MonoBehaviour //메인메뉴 보�
 
 
 
+
     public void ClearRecordWindowOnOff() //클리어 기록 보기 창
     {
         recordWindow.gameObject.SetActive(!recordWindow.gameObject.activeSelf);
 
-        recordWindow.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = clearCount.ToString();
-        recordWindow.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text
-            = shortestTime.Item1 == 9999 & shortestTime.Item2 == 59 ? "-- : --" : shortestTime.Item1.ToString() + " : " + shortestTime.Item2.ToString();
-        recordWindow.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = maxKill.ToString();
+        recordTexts[0].text = clearCount_easy == 0 ? "-" : clearCount_easy.ToString();
+        recordTexts[1].text = shortestTime_easy.Item1 == 9999 && shortestTime_easy.Item2 == 59 ? "-- : --"
+            : shortestTime_easy.Item1.ToString() + " : " + shortestTime_easy.Item2.ToString("D2");
+        recordTexts[2].text = maxKill_easy < 0 ? "-" : maxKill_easy.ToString();
+
+        recordTexts[3].text = clearCount_hard == 0 ? "-" : clearCount_hard.ToString();
+        recordTexts[4].text = shortestTime_hard.Item1 == 9999 && shortestTime_hard.Item2 == 59 ? "-- : --"
+            : shortestTime_hard.Item1.ToString() + " : " + shortestTime_hard.Item2.ToString("D2");
+        recordTexts[5].text = maxKill_hard < 0 ? "-" : maxKill_hard.ToString();
+    }
+
+
+
+    public void ChangeDifficulty()
+    {
+        //난이도 변경
+        GameManager.hardmode = !GameManager.hardmode;
+        PlayerPrefs.SetInt("int_HardMode", GameManager.hardmode ? 1 : 0);
+
+
+        //기타 정보 변경
+        ParticleSystem.MainModule ps_main = ps.main;
+
+        if (GameManager.hardmode) //하드모드
+        {
+            difficultyMarker.text = "HARD";
+            difficultyMarker.color = new Color(1, 0.6f, 0.6f);
+
+            ps_main.startColor = new ParticleSystem.MinMaxGradient(new Color(1, 0.6f, 0.6f), new Color(0.5f, 0.3f, 0.3f));
+        }
+        else //이지모드
+        {
+            difficultyMarker.text = "EASY";
+            difficultyMarker.color = new Color(0.6f, 0.7f, 1);
+
+            ps_main.startColor = new ParticleSystem.MinMaxGradient(new Color(0.6f, 0.7f, 1), new Color(0.3f, 0.35f, 0.5f));
+        }
     }
 
 

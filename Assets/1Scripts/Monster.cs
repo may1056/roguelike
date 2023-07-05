@@ -111,6 +111,10 @@ public class Monster : MonoBehaviour //잡몹
 
     public Sprite explosion;
 
+
+
+
+
     void Awake()
     {
         tp = transform.position;
@@ -131,7 +135,7 @@ public class Monster : MonoBehaviour //잡몹
         rigid = GetComponent<Rigidbody2D>();
         nowPosition = new Vector2(999,999);
 
-        hp = maxhp;
+        hp = GameManager.hardmode ? maxhp : (maxhp + 1) / 2;
         C = transform.GetChild(0);
         ModifyHp();
 
@@ -142,29 +146,6 @@ public class Monster : MonoBehaviour //잡몹
         K = monsterNum == 5;
 
         pol = transform.GetChild(1);
-        /*switch (monsterNum)
-        {
-            case 0:
-                pol.localPosition = new Vector2(0, -0.3f);
-                pol.localScale = new Vector2(0.2f, 0.2f); break;
-            case 1:
-                pol.localPosition = Vector2.zero;
-                pol.localScale = new Vector2(0.3f, 0.3f); break;
-            case 2:
-                pol.localPosition = Vector2.zero;
-                pol.localScale = new Vector2(0.2f, 0.2f); break;
-            case 3:
-                pol.localPosition = Vector2.zero;
-                pol.localScale = new Vector2(0.25f, 0.25f); break;
-            case 4:
-            case 6:
-                pol.localPosition = Vector2.zero;
-                pol.localScale = new Vector2(0.3f, 0.3f);
-                break;
-            case 5:
-                pol.localPosition = Vector2.zero;
-                pol.localScale = new Vector2(0.2f, 0.2f); break;
-        }*/
 
         if (monsterNum == 3) bulletTime = 2;
 
@@ -314,6 +295,7 @@ public class Monster : MonoBehaviour //잡몹
                 {
                     hp--;
                     Debug.Log("치명");
+                    Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
                 }
             }
 
@@ -340,6 +322,7 @@ public class Monster : MonoBehaviour //잡몹
                 {
                     hp--;
                     Debug.Log("치명");
+                    Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
                 }
             }
         }
@@ -370,6 +353,7 @@ public class Monster : MonoBehaviour //잡몹
                             {
                                 hp -= 2;
                                 Debug.Log("치명");
+                                Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
                             }
                         }
 
@@ -915,6 +899,7 @@ public class Monster : MonoBehaviour //잡몹
             {
                 hp--;
                 Debug.Log("치명");
+                Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
             }
         }
     }

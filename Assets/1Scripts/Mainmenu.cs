@@ -14,7 +14,9 @@ public class Mainmenu : MonoBehaviour // 게임매니저 사용하려했는데 �
 
     public static bool
         nevertutored, //옵션0 - 튜토리얼 보는가?
-        viewstory; //옵션1 - 스토리 보는가?
+        viewstory, //옵션1 - 스토리 보는가?
+        markkey //옵션2 - 키 표시하는가?
+    ;
 
 
     void Awake()
@@ -72,6 +74,13 @@ public class Mainmenu : MonoBehaviour // 게임매니저 사용하려했는데 �
         viewstory = !viewstory;
         Switches[1].image.sprite = viewstory ? switchOn : switchOff;
         PlayerPrefs.SetInt("int_ViewStory", PlayerPrefs.GetInt("int_ViewStory", 1) == 1 ? 0 : 1);
+    }
+
+    public void Option_Key()
+    {
+        markkey = !markkey;
+        Switches[2].image.sprite = markkey ? switchOn : switchOff;
+        PlayerPrefs.SetInt("int_MarkKey", PlayerPrefs.GetInt("int_MarkKey", 1) == 1 ? 0 : 1);
     }
 
 

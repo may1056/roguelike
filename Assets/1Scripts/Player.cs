@@ -134,6 +134,7 @@ public class Player : MonoBehaviour //플레이어
     public Sprite dashdealEff, dashupgradeEffIdle, dashupgradeEffWalk;
     //7. ~ 13. 빨핑파초노주보 수정
     public bool red, pink, blue, green, yellow, orange, purple;
+    public Sprite avoid, critical;
     //14. 독
     public bool poison;
 
@@ -499,7 +500,7 @@ public class Player : MonoBehaviour //플레이어
             {
                 //회피
                 dodge.Play();
-                Debug.Log("회피");
+                MakeEffect(new Vector2(tp.x, tp.y + 2), avoid, 5, 1);
             }
             else
             {
@@ -761,10 +762,6 @@ public class Player : MonoBehaviour //플레이어
 
 
 
-
-
-
-
     //******position, sprite, layer, scale******
     public void MakeEffect(Vector2 p, Sprite s, int l, float sc) //Fade 스크립트가 붙은 오브젝트 생성
     {
@@ -848,6 +845,7 @@ public class Player : MonoBehaviour //플레이어
                                 {
                                     c0ijm.hp--;
                                     Debug.Log("치명");
+                                    MakeEffect(new Vector2(mv.x, mv.y + 2), critical, 5, 1);
                                 }
                             }
                             if (poison) c0ijm.RepeatAD();
@@ -878,6 +876,7 @@ public class Player : MonoBehaviour //플레이어
                     {
                         boss2.hp--;
                         Debug.Log("치명");
+                        MakeEffect(new Vector2(b2p.x, b2p.y + 2), critical, 5, 1);
                     }
                 }
                 if (poison) boss2.RepeatAD();
@@ -910,6 +909,7 @@ public class Player : MonoBehaviour //플레이어
     public void Die()
     {
         NewWonderfulLeejonghwanShitWow.savedcoin += GameManager.coins;
+        PlayerPrefs.SetInt("SavedCoin", NewWonderfulLeejonghwanShitWow.savedcoin);
         NewWonderfulLeejonghwanShitWow.SaveWhenGameEnds();
         SceneManager.LoadScene(0);
     }
