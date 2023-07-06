@@ -96,28 +96,25 @@ public class NewWonderfulLeejonghwanShitWow : MonoBehaviour //메인메뉴 보�
 
     void ItemModify() //아이템 진열 상태 최신화
     {
-        //아이템 이미지
-        itemSet[0].transform.GetChild(0).GetComponent<Image>().sprite
-            = itemSprites[itemIndex[0] + itemAmount[1] + itemAmount[2]];
-        itemSet[1].transform.GetChild(0).GetComponent<Image>().sprite
-            = itemSprites[itemIndex[1] + itemAmount[2]];
-        itemSet[2].transform.GetChild(0).GetComponent<Image>().sprite
-            = itemSprites[itemIndex[2]];
+        int[] num = { itemIndex[0] + itemAmount[1] + itemAmount[2], itemIndex[1] + itemAmount[2], itemIndex[2] };
 
-        //아이템 번호
         for (int i = 0; i < 3; i++)
         {
+            //아이템 이미지
+            itemSet[i].transform.GetChild(0).GetComponent<Image>().sprite = itemSprites[num[i]];
+
+            //아이템 번호
             itemSet[i].transform.GetChild(1).GetComponent<Text>().text
                 = (itemIndex[i] + 1).ToString() + " / " + itemAmount[i].ToString();
-        }
 
-        //아이템 잠김 여부
-        itemSet[0].transform.GetChild(2).gameObject.SetActive
-            (!itemOpen[itemIndex[0] + itemAmount[1] + itemAmount[2]]);
-        itemSet[1].transform.GetChild(2).gameObject.SetActive
-            (!itemOpen[itemIndex[1] + itemAmount[2]]);
-        itemSet[2].transform.GetChild(2).gameObject.SetActive
-            (!itemOpen[itemIndex[2]]);
+            //아이템 잠김 여부
+            itemSet[i].transform.GetChild(2).gameObject.SetActive(!itemOpen[num[i]]);
+
+            //아이템 구매 가능 여부
+            itemSet[i].transform.GetChild(3).GetComponent<Button>().image.color =
+                savedcoin >= 10 && itemOpen[num[i]] && GameManager.savedItem.Item1 != num[i] && GameManager.savedItem.Item2 == -1 ?
+                Color.white : Color.gray;
+        }
     }
     public void ItemListPrev(int legendary) //진열된 아이템을 이전 것으로 변경
     {
@@ -154,6 +151,8 @@ public class NewWonderfulLeejonghwanShitWow : MonoBehaviour //메인메뉴 보�
             if (GameManager.savedItem.Item1 == -1) GameManager.savedItem.Item1 = num;
             else GameManager.savedItem.Item2 = num;
         }
+
+        ItemModify();
     }
 
 

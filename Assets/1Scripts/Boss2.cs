@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.Tilemaps;
 
 public class Boss2 : MonoBehaviour
 {
@@ -22,6 +23,7 @@ public class Boss2 : MonoBehaviour
 
     Player player;
     public GameObject cam;
+    SpriteRenderer bgsr;
 
 
     public bool phase2 = false;
@@ -62,7 +64,7 @@ public class Boss2 : MonoBehaviour
 
     public Sprite Iamboss;
 
-    Transform ground, block;
+    Tilemap ground, block;
 
 
     public Sprite Empty;
@@ -76,6 +78,7 @@ public class Boss2 : MonoBehaviour
 
 
     bool hm;
+    Color hardc = new(1, 0.6f, 0.6f), easyc = new(0.6f, 0.7f, 1);
     public GameObject worldEnder;
 
 
@@ -96,10 +99,10 @@ public class Boss2 : MonoBehaviour
         t = 0;
 
         player = Player.player;
-
         cam.GetComponent<Camera>().orthographicSize = 12;
+        bgsr = player.transform.GetChild(2).GetComponent<SpriteRenderer>();
 
-        //player.transform.GetChild(2).gameObject.SetActive(false); //background
+        hm = GameManager.hardmode;
 
         thenumberofsquares = hm ? 6 : 3;
 
@@ -116,12 +119,10 @@ public class Boss2 : MonoBehaviour
         iab.GetComponent<SpriteRenderer>().sprite = Iamboss;
         iab.GetComponent<Fade>().k = 0.02f;
 
-        //ground = GameManager.gameManager.transform.GetChild(0).GetChild(0);
-        //block = GameManager.gameManager.transform.GetChild(0).GetChild(1);
+        ground = GameManager.gameManager.transform.GetChild(0).GetChild(0).GetComponent<Tilemap>();
+        block = GameManager.gameManager.transform.GetChild(0).GetChild(1).GetComponent<Tilemap>();
 
         Soundmanager.soundmanager.bossbgm[1].Play();
-
-        hm = GameManager.hardmode;
 
     } //Start End
 
@@ -130,7 +131,7 @@ public class Boss2 : MonoBehaviour
 
     void Update()
     {
-        if (t < 130) cam.transform.position = -10 * Vector3.forward;
+        cam.transform.position = -10 * Vector3.forward;
         player.transform.GetChild(2).transform.position = Vector2.zero;
 
         tp = transform.position;
@@ -155,11 +156,19 @@ public class Boss2 : MonoBehaviour
                 }
                 col.isTrigger = true;
                 MakeEffect(doubleCircle, Color.white);
-                //ground.GetComponent<SpriteRenderer>().color = Color.white;
-                //block.GetComponent<SpriteRenderer>().color = Color.white;
+
+                hpCASE.transform.GetChild(1).gameObject.SetActive(false);
+
+                ground.color = Color.white;
+                block.gameObject.SetActive(false);
+
+                transform.GetChild(2).gameObject.SetActive(true);
+
+                bgsr.color = Color.white;
             }
 
             t += Time.deltaTime;
+            Soundmanager.soundmanager.bossbgm[1].volume = t < 120 ? (120 - t) / 20 : 0;
             if (t > 120) CancelInvoke(nameof(Craziness));
             if (t > 130) worldEnder.SetActive(true); //권한 위임
         }
@@ -172,9 +181,25 @@ public class Boss2 : MonoBehaviour
                 phase2 = true;
                 thenumberofsquares = hm ? 12 : 6;
                 hpText.color = new Color(1, 0, 0, 0.3f);
-                //ground.GetComponent<SpriteRenderer>().color = new Color(1, 0.5f, 0.5f);
-                //block.GetComponent<SpriteRenderer>().color = new Color(1, 0.5f, 0.5f);
+
+                ground.color = GameManager.hardmode ? hardc : easyc;
+                block.color = GameManager.hardmode ? hardc : easyc;
+                for (int i = 0; i < 20; i++)
+                {
+                    ParticleSystem.MainModule p2main =
+                        ground.transform.GetChild(0).GetChild(i).GetComponent<ParticleSystem>().main;
+                    p2main.startColor = hm ? hardc : easyc;
+                }
+                ground.transform.GetChild(0).gameObject.SetActive(true);
+
+                ParticleSystem.MainModule p2centermain =
+                    transform.GetChild(1).GetComponent<ParticleSystem>().main;
+                p2centermain.startColor = hm ? hardc : easyc;
+                transform.GetChild(1).gameObject.SetActive(true);
+
+                bgsr.color = hm ? hardc : easyc;
             }
+
 
             if (hide) sr.color = Color.white;
 
@@ -372,7 +397,7 @@ public class Boss2 : MonoBehaviour
         orbitRotating = true; //궤도를 돌기 시작
 
         hide = true; //숨는다
-        InvokeRepeating(nameof(JjabBullet), 0, phase2 ? 1 : (hm ? 0.5f : 0.8f));
+        InvokeRepeating(nameof(JjabBullet), 0, phase2 ? (hm ? 0.75f : 1.5f) : (hm ? 1 : 2));
     }
     void JjabBullet() //패턴0-C. 발각되기 전까지는 초록 탄막 발사
     {
@@ -473,7 +498,7 @@ public class Boss2 : MonoBehaviour
 
 
 
-    void Square() //패턴3. 배경을 18분할하여 그중 6 or 8개 랜덤 선정 데미지
+    void Square() //패턴3. 배경을 18분할하여 랜덤 선정 데미지
     {
         //x좌표는 -15, -9, -3, 3, 9, 15 중 하나, y좌표는 -6, 0, 6 중 하나
         for (int i = 0; i < thenumberofsquares; i++)

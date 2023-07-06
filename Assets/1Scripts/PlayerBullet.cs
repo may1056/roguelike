@@ -38,6 +38,7 @@ public class PlayerBullet : MonoBehaviour
                 r2 = Random.Range(3, 8) * 0.2f;
                 GetComponent<CircleCollider2D>().isTrigger = false;
                 transform.localScale = 2f * Vector2.one;
+                transform.GetChild(0).localScale = 2f * Vector2.one;
                 break;
 
             case 2: r1 = 1; r2 = 1; break;
@@ -66,15 +67,14 @@ public class PlayerBullet : MonoBehaviour
                 //transform.Translate(10 * Vector2.up);
                 for (int i = 0; i < 8; i++) //8방향으로 심각하지 않은 탄알 날리기
                 {
-                    GameObject pb = Instantiate(this.gameObject,
-                        transform.position, Quaternion.Euler(0, 0, 45 * i));
+                    GameObject pb = Instantiate(this.gameObject, transform.position, Quaternion.Euler(0, 0, 45 * i));
                     pb.transform.localScale = Vector2.one;
+                    pb.transform.GetChild(0).localScale = Vector2.one;
                     pb.GetComponent<PlayerBullet>().pbType = 0;
                     pb.GetComponent<CircleCollider2D>().isTrigger = true;
                     pb.transform.GetChild(0).gameObject.SetActive(false);
                     float rand = 0.1f * Random.Range(0, 10);
-                    pb.GetComponent<SpriteRenderer>().color
-                        = new Color(rand, rand, rand); //무채색 랜덤
+                    pb.GetComponent<SpriteRenderer>().color = new Color(rand, rand, rand); //무채색 랜덤
                 }
                 Destroy(gameObject);
             }

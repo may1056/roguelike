@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 
 public class Clear : MonoBehaviour
 {
-    public TextMeshProUGUI time, kill, coin;
+    public TextMeshProUGUI time, kill, coin, difficulty;
 
     public Image[] goods;
     public Sprite[] items, weapons;
@@ -19,10 +19,13 @@ public class Clear : MonoBehaviour
     int[] spd = new int[3]; //속도
     float[] ang = new float[3]; //회전각
 
+    public Image dark;
+
 
 
     void Start()
     {
+        dark.gameObject.SetActive(true);
         Time.timeScale = 1;
 
 
@@ -72,12 +75,17 @@ public class Clear : MonoBehaviour
         NewWonderfulLeejonghwanShitWow.SaveWhenGameEnds();
 
 
+
         //표시
         time.text = playedfromscratch
             ? ((int)(GameManager.게임실행시간 / 60)).ToString() + ":" + ((int)(GameManager.게임실행시간 % 60)).ToString("D2")
             : "-- : --";
         kill.text = GameManager.killed.ToString();
         coin.text = "+" + GameManager.coins.ToString();
+
+        difficulty.text = GameManager.hardmode ? "HARD" : "EASY";
+        difficulty.color = GameManager.hardmode ? new Color(1, 0.6f, 0.6f) : new Color(0.6f, 0.7f, 1);
+
 
 
         //사용 아이템과 무기
@@ -104,6 +112,9 @@ public class Clear : MonoBehaviour
 
     void Update()
     {
+        if (dark.color.a < 0.01f) dark.gameObject.SetActive(false);
+        else dark.color = new Color(dark.color.r, dark.color.g, dark.color.b, dark.color.a - Time.deltaTime);
+
         for (int i = 0; i < 3; i++)
         {
             ang[i] += (dir[i] ? 1 : -1) * spd[i] * 30 * Time.deltaTime;

@@ -529,7 +529,7 @@ public class GameManager : MonoBehaviour //게임 총괄
         ChangeHPMP();
 
 
-        게임실행시간 += Time.deltaTime;
+        if (!boss2.worldEnder.activeSelf) 게임실행시간 += Time.deltaTime;
         게임실행시간텍스트.text = ((int)(게임실행시간 / 60)).ToString() + ":" + ((int)(게임실행시간 % 60)).ToString("D2");
 
         if (Input.GetKeyDown(KeyCode.Tab) && progressTime > 4)
@@ -550,7 +550,7 @@ public class GameManager : MonoBehaviour //게임 총괄
 
 
         //메뉴창 표시
-        if (Input.GetButtonDown("Cancel") && progressTime > 4 && !death.gameObject.activeSelf)
+        if (Input.GetButtonDown("Cancel") && progressTime > 4 && !death.gameObject.activeSelf && !boss2.worldEnder.activeSelf)
         {
             if (menuSet.activeSelf)
             {
@@ -561,6 +561,10 @@ public class GameManager : MonoBehaviour //게임 총괄
             {
                 menuSet.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text
                     = shouldplaytutorial ? "Tutorial" : floor.ToString() + " - " + stage.ToString();
+                menuSet.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text
+                    = hardmode ? "HARD" : "EASY";
+                menuSet.transform.GetChild(2).GetComponent<TextMeshProUGUI>().color
+                    = hardmode ? new Color(1, 0.6f, 0.6f) : new Color(0.6f, 0.7f, 1);
                 menuSet.SetActive(true);
                 Time.timeScale = 0;
             }
@@ -647,6 +651,7 @@ public class GameManager : MonoBehaviour //게임 총괄
         if (!making || enemies[mapNum, 0] == -1)
         {
             SpriteRenderer portalsr = Portal1.GetComponent<SpriteRenderer>();
+
             if (shouldplaytutorial) //1-1이 아니라 튜토리얼로 처리하기로 했음!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             {
                 Portal1.transform.position = new Vector2(115.5f, 1);
@@ -656,13 +661,16 @@ public class GameManager : MonoBehaviour //게임 총괄
             else
             {
                 Portal1.transform.position = Vector2.up;
-                portalsr.sprite = portalSprites[stage == 3 ? 2 : 0];
+                portalsr.sprite = portalSprites[stage == 3 ? 2 : (hardmode ? 1 : 0)];
                 Portal1.SetActive(true);
 
                 //Portal2.transform.position = new Vector2(
                 //    portal_position[mapNum, 1, 0], portal_position[mapNum, 1, 1]);
                 //Portal2.SetActive(true);
             }
+
+            ParticleSystem.MainModule portalmain = Portal1.transform.GetChild(1).GetComponent<ParticleSystem>().main;
+            portalmain.startColor = stage == 3 ? new Color(0.7f, 0, 0) : (hardmode ? new Color(1, 0.6f, 0.6f) : new Color(0.6f, 0.7f, 1));
         }
 
         GameObject P1S = Portal1.transform.GetChild(0).gameObject; //포탈1 S 텍스트

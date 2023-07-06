@@ -388,7 +388,12 @@ public class Player : MonoBehaviour //플레이어
         td.transform.position = new Vector2(m, tp.y);
 
         td.transform.GetComponent<SpriteRenderer>().color
-            = new Color(1 - slow, 1 - slow, 1);
+            = new Color(1 - slow, 1 - slow, 1, stamina > 0 ? 1 : 0.5f);
+
+        var tdmain = td.transform.GetChild(0).GetComponent<ParticleSystem>().main;
+        tdmain.startColor = new Color(1 - slow, 1 - slow, 1);
+
+        td.transform.GetChild(0).gameObject.SetActive(stamina > 0);
 
 
 
@@ -584,7 +589,7 @@ public class Player : MonoBehaviour //플레이어
         }
         else if (burn < 1)
         {
-            explosiveImage.color = new Color(1, 1, 1, burn);
+            explosiveImage.color = new Color(1, 0.8f, 0, burn);
             burn -= 0.2f * Time.deltaTime;
             if (burn <= 0)
             {
@@ -594,7 +599,7 @@ public class Player : MonoBehaviour //플레이어
         }
         else
         {
-            explosiveImage.color = Color.yellow; //주황색으로 바꿔야 함
+            explosiveImage.color = new Color(1, 0.5f, 0);
             burntime -= Time.deltaTime;
         }
 
@@ -770,7 +775,8 @@ public class Player : MonoBehaviour //플레이어
 
         SpriteRenderer esr = effect.transform.GetComponent<SpriteRenderer>();
         esr.sprite = s;
-        esr.flipX = sr.flipX;
+        if (s == avoid || s == critical) esr.flipX = false;
+        else esr.flipX = sr.flipX;
         esr.sortingOrder = l;
     }
 
