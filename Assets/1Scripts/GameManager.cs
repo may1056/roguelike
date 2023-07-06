@@ -403,8 +403,8 @@ public class GameManager : MonoBehaviour //게임 총괄
             making = false;
             hpPotion.gameObject.SetActive(false);
             mpPotion.gameObject.SetActive(false);
-            nowWeapon.transform.GetChild(1).gameObject.SetActive(false);
-            nowWeapon.transform.GetChild(2).gameObject.SetActive(false);
+            //nowWeapon.transform.GetChild(1).gameObject.SetActive(false);
+            //nowWeapon.transform.GetChild(2).gameObject.SetActive(false);
             progressTime = 4.01f;
         }
         else
@@ -934,7 +934,7 @@ public class GameManager : MonoBehaviour //게임 총괄
             subWeaponImage.gameObject.SetActive(false);
 
             subWeaponTabImage.gameObject.SetActive(false);
-            subWeaponTabButton.gameObject.SetActive(false);
+            //subWeaponTabButton.gameObject.SetActive(false);
         }
         else
         {
@@ -943,7 +943,7 @@ public class GameManager : MonoBehaviour //게임 총괄
 
             subWeaponTabImage.sprite = weaponSprites[w2];
             subWeaponTabImage.gameObject.SetActive(true);
-            subWeaponTabButton.gameObject.SetActive(true);
+            //subWeaponTabButton.gameObject.SetActive(true);
         }
     }
 

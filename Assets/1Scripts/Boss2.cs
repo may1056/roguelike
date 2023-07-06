@@ -397,7 +397,7 @@ public class Boss2 : MonoBehaviour
         orbitRotating = true; //궤도를 돌기 시작
 
         hide = true; //숨는다
-        InvokeRepeating(nameof(JjabBullet), 0, phase2 ? (hm ? 0.75f : 1.5f) : (hm ? 1 : 2));
+        InvokeRepeating(nameof(JjabBullet), 0, phase2 ? 1.5f : 2);
     }
     void JjabBullet() //패턴0-C. 발각되기 전까지는 초록 탄막 발사
     {
@@ -447,8 +447,8 @@ public class Boss2 : MonoBehaviour
 
     void Rain() //패턴1. 1px 비가 내린다
     {
-        for (int i = 0; i < (hm ? 20 : 10); i++)
-            Invoke(nameof(RainMaker), i * (hm ? 0.09f : 0.19f));
+        for (int i = 0; i < (hm ? (phase2 ? 30 : 40) : 10); i++)
+            Invoke(nameof(RainMaker), i * 1.9f / (hm ? (phase2 ? 30 : 40) : 10));
 
         MakeRainFrom(true, false, 0.3f);
         if (phase2) MakeRainFrom(false, false, 0.3f);
