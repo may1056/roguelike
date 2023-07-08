@@ -51,7 +51,8 @@ public class Player : MonoBehaviour //플레이어
     public GameObject death;
 
 
-    public int atkPower;
+    public int atkPower; //일반 공격 딜
+    public int skillPower; //스킬 딜
 
 
     public static float unbeatableTime; //무적 시간
@@ -142,7 +143,7 @@ public class Player : MonoBehaviour //플레이어
     //14. 독
     public bool poison;
 
-    public ParticleSystem item1ps, item2ps;
+    public ParticleSystem item1ps, item2ps, subps, nowps;
 
 
 
@@ -180,12 +181,14 @@ public class Player : MonoBehaviour //플레이어
 
 
         bg = transform.GetChild(2);
+        bgsr = bg.GetComponent<SpriteRenderer>();
+
         td = transform.GetChild(3);
+
         cs = transform.GetChild(4);
+        cs.GetChild(0).gameObject.SetActive(Mainmenu.markkey);
 
         unbeatableTime = 0;
-
-        bgsr = bg.GetComponent<SpriteRenderer>();
 
         hp = savedhp;
 
@@ -258,13 +261,15 @@ public class Player : MonoBehaviour //플레이어
 
 
 
-    void OnEnable()
+    public void OnEnable()
     {
         //UI 파티클시스템 크기가 카메라 사이즈에 따라 들쑥날쑥이라 비율 맞춤
         Camera cam = transform.GetChild(0).GetComponent<Camera>();
-        Vector2 uipsv = new(cam.orthographicSize / 12, cam.orthographicSize / 12);
+        Vector2 uipsv = new(cam.orthographicSize / 8, cam.orthographicSize / 8); //아 반대로 작업했다..
         item1ps.GetComponent<RectTransform>().localScale = uipsv;
         item2ps.GetComponent<RectTransform>().localScale = uipsv;
+        subps.GetComponent<RectTransform>().localScale = uipsv;
+        nowps.GetComponent<RectTransform>().localScale = uipsv;
     }
 
 
@@ -276,8 +281,16 @@ public class Player : MonoBehaviour //플레이어
         Vector2 tp = transform.position;
 
 
-        if (berserker && hp < 3) atkPower = red ? 4 : 3;
-        else atkPower = red ? 2 : 1;
+        if (berserker && hp < 3)
+        {
+            atkPower = red ? 4 : 3;
+            skillPower = 3;
+        }
+        else
+        {
+            atkPower = red ? 2 : 1;
+            skillPower = 1;
+        }
 
         //animation player
         if (Input.GetButton("Horizontal"))
@@ -678,8 +691,20 @@ public class Player : MonoBehaviour //플레이어
 
 
 
-        if (itemNum.Item1 != -1) NewWonderfulLeejonghwanShitWow.itemOpen[itemNum.Item1] = true;
-        if (itemNum.Item2 != -1) NewWonderfulLeejonghwanShitWow.itemOpen[itemNum.Item2] = true;
+        if (itemNum.Item1 != -1)
+        {
+            NewWonderfulLeejonghwanShitWow.itemOpen[itemNum.Item1] = true;
+
+            //ParticleSystem.ShapeModule i1psshape = item1ps.shape;
+            //i1psshape.texture = GameManager.gameManager.itemSprites[itemNum.Item1].texture;
+        }
+        if (itemNum.Item2 != -1)
+        {
+            NewWonderfulLeejonghwanShitWow.itemOpen[itemNum.Item2] = true;
+
+            //ParticleSystem.ShapeModule i2psshape = item2ps.shape;
+            //i2psshape.texture = GameManager.gameManager.itemSprites[itemNum.Item2].texture;
+        }
 
         item1ps.gameObject.SetActive(itemNum.Item1 != -1);
         item2ps.gameObject.SetActive(itemNum.Item2 != -1);

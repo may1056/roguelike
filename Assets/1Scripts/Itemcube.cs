@@ -10,29 +10,27 @@ public class Itemcube : MonoBehaviour
 
     public bool IsPickaxe = false; // 보스전 곡괭이
 
-    ParticleSystem particle;
-
 
 
     void Start()
     {
-        particle = transform.GetChild(1).GetComponent<ParticleSystem>();
-        Color particleColor;
-
-        switch (cubeNum)
+        var particleColor = cubeNum switch
         {
-            case 0:
-                particleColor = new Color(1, 0.7f, 0); break;
-            case 1: case 2: case 3: case 4: case 5: case 6:
-                particleColor = new Color(0.5f, 0.4f, 1); break;
-            case 7: case 8: case 9: case 10: case 11: case 12: case 13: case 14:
-                particleColor = new Color(0.8f, 0.3f, 0); break;
-            default:
-                particleColor = Color.white; break;
+            0 => new Color(1, 0.7f, 0),
+            1 or 2 or 3 or 4 or 5 or 6 => new Color(0.5f, 0.4f, 1),
+            7 or 8 or 9 or 10 or 11 or 12 or 13 or 14 => new Color(0.8f, 0.3f, 0),
+            _ => Color.white,
+        };
+
+        for (int i = 1; i <= 2; i++)
+        {
+            ParticleSystem.MainModule main = transform.GetChild(i).GetComponent<ParticleSystem>().main;
+            main.startColor = particleColor;
         }
 
-        ParticleSystem.MainModule main = particle.main;
-        main.startColor = particleColor;
+        for (int i = 0; i < 8; i++)
+            transform.GetChild(2).GetChild(i).GetComponent<SpriteRenderer>().sprite
+                = transform.GetComponent<SpriteRenderer>().sprite;
 
     } //Start End
 
@@ -40,7 +38,8 @@ public class Itemcube : MonoBehaviour
     {
         dist = Vector2.Distance(transform.position, Player.player.transform.position);
 
-        transform.GetChild(0).gameObject.SetActive(dist < 1); // [E]
+        transform.GetChild(0).gameObject.SetActive(dist < 1 && Mainmenu.markkey); // [E]
+        transform.GetChild(2).gameObject.SetActive(dist < 1);
 
         if (!IsPickaxe) {
             if (dist < 1 && Input.GetKeyDown("e"))

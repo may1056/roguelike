@@ -236,8 +236,8 @@ public class GameManager : MonoBehaviour //게임 총괄
 
     public Image hpPotion, mpPotion;
 
-    public float pstimerhp = 0;//hp postion
-    public float pstimermp = 0;//mp postion
+    public float pstimerhp;//hp postion
+    public float pstimermp;//mp postion
 
     public ParticleSystem usable1ps, use1ps, usable2ps, use2ps;
 
@@ -458,7 +458,7 @@ public class GameManager : MonoBehaviour //게임 총괄
     } //Start End
 
 
-    void OnEnable()
+    public void OnEnable()
     {
         SizeUI(usable1ps); SizeUI(use1ps); SizeUI(usable2ps); SizeUI(use2ps);
         SizeUI(killps); SizeUI(coinps);
@@ -778,7 +778,11 @@ public class GameManager : MonoBehaviour //게임 총괄
             if (getto) Equip();
             else if (getto_w) Equip_w();
         }
-
+        if (Input.GetKeyDown("f"))
+        {
+            if (getto) Throw();
+            else if (getto_w) Throw_w();
+        }
 
 
         //아이템이 3개면 파괴 좀 하라고 TAB키 하이라이트
@@ -866,18 +870,19 @@ public class GameManager : MonoBehaviour //게임 총괄
             hppsmain.startSpeed = 0.2f + 0.6f * (player.hp - 1);
             hp_ps_renderer.lengthScale = 3.0f + 1.2f * (player.hp - 1);
 
-            if (player.shield <= 0) sh_ps.gameObject.SetActive(false);
+            ParticleSystem.MainModule shpsmain = sh_ps.main;
+
+            if (player.shield <= 0) shpsmain.startLifetime = 0;
             else
             {
-                sh_ps.gameObject.SetActive(true);
                 sh_ps.transform.position = hps_ps[player.hp].transform.position;
 
-                ParticleSystem.MainModule shpsmain = sh_ps.main;
                 shpsmain.startLifetime = 1.0f + 0.5f * player.shield;
                 shpsmain.startSpeed = -0.6f + 0.8f * player.shield;
                 sh_ps_renderer.lengthScale = 1.0f + 2.0f * player.shield;
             }
         }
+
 
         //MP
         for(int i = 0; i < playerAtk.maxmp; i++)
@@ -887,24 +892,25 @@ public class GameManager : MonoBehaviour //게임 총괄
             mps[i].gameObject.SetActive(i < playerAtk.mp);
         }
 
-        if (Player.itemNum.Item1 == 3 || Player.itemNum.Item2 == 3)
+        ParticleSystem.MainModule mppsmain = mp_ps.main;
+        ParticleSystem.MainModule mppssimain = mp_ps_si.main;
+
+        if (Player.itemNum.Item1 == 3 || Player.itemNum.Item2 == 3) //자해
         {
-            mp_ps_si.gameObject.SetActive(true);
-            mp_ps.gameObject.SetActive(false);
+            mppsmain.startLifetime = 0;
+            mppssimain.startLifetime = 2.2f;
         }
         else if (playerAtk.mp > 0)
         {
-            ParticleSystem.MainModule mppsmain = mp_ps.main;
             mppsmain.startLifetime = 0.7f + 0.3f * (playerAtk.mp - 1);
             mppsmain.startSpeed = 0.2f + 0.6f * (playerAtk.mp - 1);
             mp_ps_renderer.lengthScale = 3.0f + 1.2f * (playerAtk.mp - 1);
-            mp_ps_si.gameObject.SetActive(false);
-            mp_ps.gameObject.SetActive(true);
+            mppssimain.startLifetime = 0;
         }
         else
         {
-            mp_ps_si.gameObject.SetActive(false);
-            mp_ps.gameObject.SetActive(false);
+            mppsmain.startLifetime = 0;
+            mppssimain.startLifetime = 0;
         }
 
     } //ChangeHPMP End
@@ -1165,6 +1171,8 @@ public class GameManager : MonoBehaviour //게임 총괄
         ItemInfo();
 
         getto = false;
+
+        player.GetNewItem();
     }
 
     public void WeaponThrow(int code)

@@ -45,8 +45,8 @@ public class Boss2 : MonoBehaviour
 
     //pattern1
     public GameObject rain;
-    readonly float[] rainR = { 0.3f, 0.4f, 0.4f, 0.4f, 0.5f, 0.5f, 0.6f, 0.6f, 0.7f, 0.8f },
-        rainG = { 0.6f, 0.6f, 0.7f, 0.8f, 0.7f, 0.8f, 0.7f, 0.8f, 0.8f, 0.9f };
+    //readonly float[] rainR = { 0.3f, 0.4f, 0.4f, 0.4f, 0.5f, 0.5f, 0.6f, 0.6f, 0.7f, 0.8f },
+    //    rainG = { 0.6f, 0.6f, 0.7f, 0.8f, 0.7f, 0.8f, 0.7f, 0.8f, 0.8f, 0.9f };
     public Sprite rainfrom;
 
     //pattern2
@@ -124,6 +124,10 @@ public class Boss2 : MonoBehaviour
         block = GameManager.gameManager.transform.GetChild(0).GetChild(1).GetComponent<Tilemap>();
 
         Soundmanager.soundmanager.bossbgm[1].Play();
+
+        GameManager.gameManager.OnEnable();
+        Player.player.OnEnable();
+        PlayerAttack.playerAtk.OnEnable();
 
     } //Start End
 
@@ -348,19 +352,18 @@ public class Boss2 : MonoBehaviour
         {
             for (int i = 0; i < 4; i++)
             {
-                GameObject newOrb;
-                switch (Random.Range(0, 3))
+                GameObject newOrb = Random.Range(0, 3) switch //???이게 뭐시여
                 {
-                    case 0: newOrb = hpOrb; break;
-                    case 1: newOrb = mpOrb; break;
-                    default: newOrb = coinOrb; break;
-                }
+                    0 => hpOrb,
+                    1 => mpOrb,
+                    _ => coinOrb,
+                };
                 Instantiate(newOrb, jjabs[i].transform.position, Quaternion.identity);
                 Destroy(jjabs[i].gameObject);
-
-                if (Player.player.pink) Instantiate(hpOrb);
-                if (Player.player.blue) Instantiate(mpOrb);
             }
+
+            if (Player.player.pink) Instantiate(hpOrb);
+            if (Player.player.blue) Instantiate(mpOrb);
         }
         hide = false; //숨지 않아 - 숨는다는 의미는 분신들 사이에 숨어있다.
         orbitRotating = false; //궤도에서 벗어난다
@@ -412,8 +415,7 @@ public class Boss2 : MonoBehaviour
     }
     void JjabBullet() //패턴0-C. 발각되기 전까지는 초록 탄막 발사
     {
-        Color Green = new(Random.Range(0, 6) * 0.1f,
-                Random.Range(6, 11) * 0.1f, Random.Range(0, 6) * 0.1f); //다양한 초록색
+        Color Green = new(Random.Range(0, 6) * 0.1f, Random.Range(6, 11) * 0.1f, Random.Range(0, 6) * 0.1f); //다양한 초록색
         int Speed = Random.Range(1, 6); //1~5 속도 랜덤
         if (phase2) Speed += 1; //2페이즈는 더 빠름
 
@@ -458,7 +460,7 @@ public class Boss2 : MonoBehaviour
 
     void Rain() //패턴1. 1px 비가 내린다
     {
-        for (int i = 0; i < (hm ? (phase2 ? 40 : 60) : 10); i++)
+        for (int i = 0; i < (hm ? (phase2 ? 50 : 80) : 10); i++)
             Invoke(nameof(RainMaker), i * 1.99f / (hm ? (phase2 ? 40 : 60) : 10));
 
         MakeRainFrom(true, false, 0.3f);
@@ -469,17 +471,15 @@ public class Boss2 : MonoBehaviour
         //페이즈1: 위쪽에서 떨어짐
         GameObject bi = Instantiate(rain, new Vector2(
             Random.Range(-179, 180) * 0.1f, 8.9f), Quaternion.identity);
-        int n = Random.Range(0, 10);
         bi.GetComponent<SpriteRenderer>().color
-            = new Color(rainR[n], rainG[n], 1); //보기 좋은 푸른색
+            = new Color(Random.Range(0, 5) * 0.1f, Random.Range(0, 5) * 0.1f, Random.Range(7, 11) * 0.1f); //다양한 푸른색
 
         if (phase2) //페이즈2: 아래쪽에서도 올라감
         {
             GameObject bi2 = Instantiate(rain, new Vector2(
                 Random.Range(-179, 180) * 0.1f, -8.9f), Quaternion.identity);
-            int n2 = Random.Range(0, 10);
             bi2.GetComponent<SpriteRenderer>().color
-                = new Color(rainR[n2], rainG[n2], 1);
+                = new Color(Random.Range(0, 5) * 0.1f, Random.Range(0, 5) * 0.1f, Random.Range(7, 11) * 0.1f); //다양한 푸른색
             bi2.GetComponent<Rigidbody2D>().gravityScale = -1;
         }
     }

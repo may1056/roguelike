@@ -21,6 +21,8 @@ public class PlayerBullet : MonoBehaviour
     bool boss2dealed = false;
     bool boss1dealed = false;
 
+    public bool re = false;
+
 
     void Start()
     {
@@ -114,14 +116,14 @@ public class PlayerBullet : MonoBehaviour
                 {
                     b2.pollution = 0.5f;
                     b2.Apa(Color.red);
-                    b2.hp--; //자동 공격은 버서커 딜증 대상 아님
+                    b2.hp -= Player.player.skillPower; //자동 공격은 버서커 딜증 대상 아님 //이었는데 버서커 버프할 거임 ㅅㄱ
                     if (Player.player.purple) //보라 수정: 치명타
                     {
                         int r = Random.Range(0, 10);
                         if (r < 2)
                         {
                             b2.hp--;
-                            Debug.Log("치명");
+                            //Debug.Log("치명");
                             Player.player.MakeEffect(new Vector2(b2.transform.position.x, b2.transform.position.y + 2), Player.player.critical, 5, 1);
                         }
                     }
@@ -151,14 +153,14 @@ public class PlayerBullet : MonoBehaviour
                 {
                     b1.pollution = 0.5f;
                     b1.Apa(Color.red);
-                    b1.hp--; //자동 공격은 버서커 딜증 대상 아님
+                    b1.hp -= Player.player.skillPower; //자동 공격은 버서커 딜증 대상 아님 //이었는데 버서커 버프할 거임 ㅅㄱ
                     if (Player.player.purple) //보라 수정: 치명타
                     {
                         int r = Random.Range(0, 10);
                         if (r < 2)
                         {
                             b1.hp--;
-                            Debug.Log("치명");
+                            //Debug.Log("치명");
                             Player.player.MakeEffect(new Vector2(b1.transform.position.x, b1.transform.position.y + 2), Player.player.critical, 5, 1);
                         }
                     }
@@ -184,7 +186,7 @@ public class PlayerBullet : MonoBehaviour
         {
             Monster m = collision.transform.GetComponent<Monster>();
             m.Apa(Color.red);
-            m.hp -= Player.player.atkPower;
+            m.hp -= re ? Player.player.skillPower : Player.player.atkPower;
             if (Player.player.purple) //보라 수정: 치명타
             {
                 int r = Random.Range(0, 10);
@@ -218,7 +220,7 @@ public class PlayerBullet : MonoBehaviour
             {
                 case 0:
                     m.Apa(Color.red);
-                    m.hp -= Player.player.atkPower;
+                    m.hp -= re ? Player.player.skillPower : Player.player.atkPower;
                     if (Player.player.purple) //보라 수정: 치명타
                     {
                         int r = Random.Range(0, 10);
@@ -241,7 +243,7 @@ public class PlayerBullet : MonoBehaviour
                     {
                         m.pollution = 0.5f;
                         m.Apa(Color.red);
-                        m.hp--; //자동 공격은 버서커 딜증 대상 아님
+                        m.hp -= Player.player.skillPower; //자동 공격은 버서커 딜증 대상 아님 //이었는데 버서커 버프할 거임 ㅅㄱ
                         if (Player.player.purple) //보라 수정: 치명타
                         {
                             int r = Random.Range(0, 10);
@@ -271,7 +273,7 @@ public class PlayerBullet : MonoBehaviour
                 case 0:
                 case 1:
                     b2.Apa(Color.red);
-                    b2.hp -= Player.player.atkPower;
+                    b2.hp -= re || pbType == 1 ? Player.player.skillPower : Player.player.atkPower;
                     if (Player.player.purple) //보라 수정: 치명타
                     {
                         int r = Random.Range(0, 10);
@@ -285,7 +287,7 @@ public class PlayerBullet : MonoBehaviour
                     if (Player.player.poison) b2.RepeatAD();
 
                     MakeEffect(other.transform.position, Color.red, 1);
-                    DestroyReverb();
+                    if (pbType == 0) DestroyReverb();
                     break;
             }
         }
@@ -297,7 +299,7 @@ public class PlayerBullet : MonoBehaviour
                 case 0:
                 case 1:
                     b1.Apa(Color.red);
-                    b1.hp -= Player.player.atkPower;
+                    b1.hp -= re || pbType == 1 ? Player.player.skillPower : Player.player.atkPower;
                     if (Player.player.purple) //보라 수정: 치명타
                     {
                         int r = Random.Range(0, 10);
@@ -311,8 +313,9 @@ public class PlayerBullet : MonoBehaviour
                     if (Player.player.poison) b1.RepeatAD();
 
                     MakeEffect(other.transform.position, Color.red, 1);
-                    DestroyReverb();
+                    if (pbType == 0) DestroyReverb();
                     break;
+
             }
         }
 

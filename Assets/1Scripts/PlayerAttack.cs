@@ -124,7 +124,7 @@ public class PlayerAttack : MonoBehaviour
 
 
 
-    void OnEnable()
+    public void OnEnable()
     {
         //UI 파티클시스템 크기가 카메라 사이즈에 따라 들쑥날쑥이라 비율 맞춤
         Camera cam = player.transform.GetChild(0).GetComponent<Camera>();
@@ -159,32 +159,26 @@ public class PlayerAttack : MonoBehaviour
 
 
         // 근접공격 쿨타임, 애니메이션
-        if (attackuse && GameManager.ismeleeWeapon)
-        {
-            float x = player.F ? -2 : 2;
-            player.dontBehaveTime = 0;
+        if (attackuse && GameManager.ismeleeWeapon) player.dontBehaveTime = 0;
 
-        }
         else if (attackuse) //원거리 공격 쿨타임, 애니메이션?
         {
             Soundmanager.soundmanager.magicgunsounds[0].Play();
-            float x = player.F ? -2 : 2;
 
             GameObject pb = Instantiate(playerbullet,
-                transform.position, Quaternion.AngleAxis(weaponangle, Vector3.forward));
+                new Vector2(transform.position.x + Mathf.Cos(Mathf.Deg2Rad * weaponangle),
+                transform.position.y + Mathf.Sin(Mathf.Deg2Rad * weaponangle)),
+                Quaternion.AngleAxis(weaponangle, Vector3.forward));
+
             if (player.selfinjury)
             {
                 pb.GetComponent<PlayerBullet>().bulletSpeed = 30;
-                pb.transform.rotation = Quaternion.Euler(
-                    0, 0, (player.F ? 180 : 0) + Random.Range(-30, 31)); //각도 분산
+                pb.transform.rotation = Quaternion.Euler(0, 0, weaponangle + Random.Range(-20, 21)); //각도 분산
             }
-
-            //attacksr.color = new Color(1, 1, 1, 1);
 
             curAttackCooltime = 0;
             player.dontBehaveTime = 0;
         }
-        //else attacksr.color = new Color(1, 1, 1, 0);
 
 
         if ((Input.GetMouseButtonDown(0) || Input.GetKeyDown("j"))
@@ -404,7 +398,9 @@ public class PlayerAttack : MonoBehaviour
         {
             Soundmanager.soundmanager.magicgunsounds[1].Play();
             GameObject ws1 = Instantiate(playerbullet,
-                transform.position, Quaternion.Euler(0, 0, 20 * i + (player.F ? 180 : 0)));
+                new Vector2(transform.position.x + Mathf.Cos(Mathf.Deg2Rad * weaponangle),
+                transform.position.y + Mathf.Sin(Mathf.Deg2Rad * weaponangle)),
+                Quaternion.Euler(0, 0, weaponangle + i * 20));
             ws1.GetComponent<PlayerBullet>().pbType = 1;
             //ws1.GetComponent<SpriteRenderer>().color = colors[i+3];
         }
