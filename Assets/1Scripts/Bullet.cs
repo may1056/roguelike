@@ -5,7 +5,7 @@ using UnityEngine;
 public class Bullet : MonoBehaviour //탄막
 {
     public int bulletType;
-    //0: 일반 딜, 1: 슬로우, 2: 지속 딜, 4: 비
+    //0: 일반 딜, 1: 슬로우, 2: 지속 딜, 8: 실명
 
     public float bulletSpeed;
 
@@ -51,8 +51,11 @@ public class Bullet : MonoBehaviour //탄막
 
         if (Mathf.Abs(tp.x) > 200 || Mathf.Abs(tp.y) > 200)
         {
-            Destroy(gameObject);
-            Debug.Log("밖");
+            switch (bulletType)
+            {
+                case 0: case 1: case 2: case 8: Destroy0128(); break;
+                default: Destroy(gameObject); break;
+            }
         }
 
 
@@ -60,8 +63,11 @@ public class Bullet : MonoBehaviour //탄막
         if (Mathf.Abs(PlayerAttack.skillP.y) < 200 &&
             Vector2.Distance(tp, PlayerAttack.skillP) < 5.5f)
         {
-            Destroy(gameObject);
-            Debug.Log("스");
+            switch (bulletType)
+            {
+                case 0: case 1: case 2: case 8: Destroy0128(); break;
+                default: Destroy(gameObject); break;
+            }
         }
 
 
@@ -80,8 +86,11 @@ public class Bullet : MonoBehaviour //탄막
                         && Mathf.Abs(wsp.x - tp.x) < 1;
                     if (inX || inY)
                     {
-                        Destroy(gameObject);
-                        Debug.Log("무");
+                        switch (bulletType)
+                        {
+                            case 0: case 1: case 2: case 8: Destroy0128(); break;
+                            default: Destroy(gameObject); break;
+                        }
                     }
                     break;
             }
@@ -113,12 +122,15 @@ public class Bullet : MonoBehaviour //탄막
         {
             switch (bulletType)
             {
-                case 0: MakeEffect(Color.gray, 0.5f); break;
-                case 1: MakeEffect(new Color(0.56f, 0.71f, 0.84f), 1); break;
-                case 4: case 5: case 6: case 7: MakeEffect(sr.color, 0.1f); break;
+                case 0: MakeEffect(Color.gray, 0.5f); Destroy0128(); break;
+
+                case 1: MakeEffect(new Color(0.56f, 0.71f, 0.84f), 1); Destroy0128(); break;
+                case 2: MakeEffect(new Color(1, 0.6313f, 0), 1); Destroy0128(); break;
+                case 8: MakeEffect(Color.black, 1); Destroy0128(); break;
+
+                case 4: case 5: case 6: case 7: MakeEffect(sr.color, 0.1f); Destroy(gameObject); break;
             }
-            Destroy(gameObject);
-            Debug.Log("콜");
+            //Debug.Log("콜");
         } //플랫폼
     }
 
@@ -132,7 +144,11 @@ public class Bullet : MonoBehaviour //탄막
             switch (bulletType)
             {
                 case 0: MakeEffect(Color.gray, 0.5f); break;
+
                 case 1: MakeEffect(new Color(0.56f, 0.71f, 0.84f), 1); break;
+                case 2: MakeEffect(new Color(1, 0.6313f, 0), 1); break;
+                case 8: MakeEffect(Color.black, 1); break;
+
                 case 4: case 5: case 6: case 7:
                     if (sr != null) MakeEffect(sr.color, 1);
                     Destroy(gameObject); break;
@@ -157,7 +173,7 @@ public class Bullet : MonoBehaviour //탄막
                 case 0:
                     if (Player.unbeatableTime <= 0) Player.hurted = true;
                     MakeEffect(Color.red, 0.5f);
-                    Destroy(gameObject);
+                    Destroy0128();
                     break;
 
                 case 1:
@@ -165,10 +181,10 @@ public class Bullet : MonoBehaviour //탄막
                     {
                         Player pl = other.transform.GetComponent<Player>();
                         pl.slowtime = 2;
-                        if (pl.slow > 0.98f) pl.slow = 1;
-                        else pl.slow += 0.02f;
+                        if (pl.slow > 0.975f) pl.slow = 1;
+                        else pl.slow += 0.025f;
                     }
-                    Destroy(gameObject);
+                    Destroy0128();
                     break;
 
                 case 2:
@@ -176,14 +192,29 @@ public class Bullet : MonoBehaviour //탄막
                     {
                         Player pl = other.transform.GetComponent<Player>();
                         pl.burntime = 1;
-                        if (pl.burn > 0.965f && pl.burn < 1)
+                        if (pl.burn > 0.97f && pl.burn < 1)
                         {
                             pl.burn = 1;
                             pl.RepeatEx();
                         }
-                        else pl.burn += 0.035f;
+                        else pl.burn += 0.03f;
                     }
-                    Destroy(gameObject);
+                    Destroy0128();
+                    break;
+
+                case 8:
+                    if (Player.unbeatableTime <= 0)
+                    {
+                        Player pl = other.transform.GetComponent<Player>();
+                        pl.darktime = 2;
+                        if (pl.dark > 0.975f && pl.dark < 1)
+                        {
+                            pl.dark = 1;
+                            if (PlayerAttack.playerAtk.mp > 0) PlayerAttack.playerAtk.mp--;
+                        }
+                        else pl.dark += 0.025f;
+                    }
+                    Destroy0128();
                     break;
             }
         }
@@ -224,6 +255,20 @@ public class Bullet : MonoBehaviour //탄막
     void Next1px()
     {
         Instantiate(pxb1, transform.position, Quaternion.Euler(0, 0, Random.Range(0, 360)));
+    }
+
+
+    void Destroy0128() //파티클 시스템이 내장되어 있는 탄알 - 파티클 효과가 탄알 파괴와 동시에 사라지지 않게 하기
+    {
+        if (transform.childCount == 1)
+        {
+            ParticleSystem.MainModule psmain = transform.GetChild(0).GetComponent<ParticleSystem>().main;
+            psmain.loop = false;
+
+            transform.DetachChildren();
+        }
+
+        Destroy(gameObject);
     }
 
 } //Bullet End

@@ -154,9 +154,9 @@ public class GameManager : MonoBehaviour //게임 총괄
 
     //페이즈별 잡아야 할 몬스터 수, -1: 안 잡아도 된다
     readonly int[,] enemies
-        = { { 14, 0, 0, }, { 19, 0, 0, }, { 11, 0, 0, },{ 16, 0, 0, },{ 14, 15, 25, },
-        { 21, 25, 24, },{ 22, 0, 0, },{ 19, 0, 0, },{ 13, 0, 0, },{ 15, 0, 0, },
-        { 10, 23, 0, },{ 8, 0, 0, },{ 3, 0, 0, },{ 16, 12, 0, },{ 21, 0, 0, }};
+        = { { 14, 0, 0, }, { 19, 0, 0, }, { 11, 0, 0, },{ 16, 0, 0, },{ 10, 4, 0, },
+        { 14, 15, 25, }, { 21, 25, 14, },{ 22, 0, 0, },{ 19, 0, 0, },{ 11, 0, 0, },
+        { 15, 0, 0, }, { 10, 23, 0, },{ 8, 0, 0, },{ 3, 0, 0, },{ 16, 12, 0, },{ 21, 0, 0, }};
 
     public bool making; //진행 중인지
     int nowPhase; //현재 페이즈
@@ -189,6 +189,8 @@ public class GameManager : MonoBehaviour //게임 총괄
 
     public Sprite[] portalSprites; //0: Easy, 1: Hard, 2: Boss, 3: Shop
 
+    public ParticleSystem nearbyplayerps;
+    public ParticleSystem.MainModule nearbypsmain;
 
 
 
@@ -198,17 +200,23 @@ public class GameManager : MonoBehaviour //게임 총괄
     public Image[] hps = new Image[8]; //hp 구슬들
     public Image[] mps = new Image[6]; //mp 구슬들
 
+    public ParticleSystem[] hps_ps, mps_ps; //원래 잘못 만든 건데 그냥 하트들 위치 확인용으로 남겨둠
+    public ParticleSystem hp_ps, sh_ps, mp_ps, mp_ps_si; //이게 진짜임
+    public ParticleSystemRenderer hp_ps_renderer, sh_ps_renderer, mp_ps_renderer;
+
     public Text[] stat = new Text[5];
 
     public GameObject menuSet;
 
     public static int killed = 0; //킬 수
-    public Text killText;
+    public TextMeshProUGUI killText;
     public static int realkilled; //실속 있는 킬 수
+    public ParticleSystem killps;
 
 
     public static int coins = 0;
-    public Text coinText;
+    public TextMeshProUGUI coinText;
+    public ParticleSystem coinps;
 
 
     public Image bossHpLine;
@@ -223,12 +231,16 @@ public class GameManager : MonoBehaviour //게임 총괄
 
 
 
+    public Camera uicam;
 
 
     public Image hpPotion, mpPotion;
 
     public float pstimerhp = 0;//hp postion
     public float pstimermp = 0;//mp postion
+
+    public ParticleSystem usable1ps, use1ps, usable2ps, use2ps;
+
 
 
     public AudioSource recover;
@@ -249,15 +261,13 @@ public class GameManager : MonoBehaviour //게임 총괄
     readonly string[] tips =
     {
         "분홍 하트는 체력, 푸른 하트는 마나입니다.",
-        "회색 하트는 쉴드를 뜻합니다. 안 맞고 안 때리면 찹니다.",
+        "회색 하트는 쉴드입니다. 안 맞고 안 때리면 찹니다.",
         "플레이어 위의 흰 점들은 스태미나입니다. 대쉬할 때마다 소모됩니다.",
-        "설정에서 튜토리얼 또는 스토리를 끌 수 있습니다.",
-        "TAB키로 인벤토리를 열 수 있습니다.",
+        "설정에서 튜토리얼 또는 스토리를 건너뛰도록 할 수 있습니다.",
         "아이템 파괴 시 코인을 일정량 획득합니다.",
-        "무기의 공격 범위는 마우스 방향에 따라 회전합니다.",
-        "스킬로 탄막을 제거할 수 있습니다.",
+        "무기의 공격 범위는 마우스가 향하는 쪽으로 넓습니다.",
+        "몇몇 스킬은 적이 발사한 탄막을 제거합니다.",
         "적을 처치하면 체력 오브, 마나 오브, 코인이 확률적으로 등장합니다.",
-        "끼임탈출은 Esc(일시정지) - R(원위치)",
     };
     public Text tipText;
 
@@ -283,6 +293,7 @@ public class GameManager : MonoBehaviour //게임 총괄
         }
 
         player.transform.GetChild(0).GetComponent<Camera>().orthographicSize = 8;
+        uicam.orthographicSize = 8;
 
         onTabPage = false;
 
@@ -368,13 +379,13 @@ public class GameManager : MonoBehaviour //게임 총괄
             switch (floor)
             {
                 case 1:
-                    mapNum = Random.Range(0, 4); // 0~3
+                    mapNum = Random.Range(0, 5); // 0~4
                     break;
                 case 2:
-                    mapNum = Random.Range(4, 9); // 4~8
+                    mapNum = Random.Range(5, 10); // 5~9
                     break;
                 case 3:
-                    mapNum = Random.Range(9, 15); // 9~14
+                    mapNum = Random.Range(10, 16); // 10~15
                     break;
             }
             if (exceptionCount == 0) mn = false;
@@ -441,10 +452,23 @@ public class GameManager : MonoBehaviour //게임 총괄
         for (int i = 0; i < keys.Length; i++) keys[i].gameObject.SetActive(Mainmenu.markkey);
         InvokeRepeating(nameof(KeyHighlight), 0, 0.3f);
 
+
+        nearbypsmain = nearbyplayerps.GetComponent<ParticleSystem>().main;
+
     } //Start End
 
 
-
+    void OnEnable()
+    {
+        SizeUI(usable1ps); SizeUI(use1ps); SizeUI(usable2ps); SizeUI(use2ps);
+        SizeUI(killps); SizeUI(coinps);
+        SizeUI(hp_ps); SizeUI(sh_ps); SizeUI(mp_ps); SizeUI(mp_ps_si);
+    }
+    void SizeUI(ParticleSystem ps) //UI 파티클시스템 크기가 카메라 사이즈에 따라 들쑥날쑥이라 비율 맞춤
+    {
+        Vector2 uipsv = new(uicam.orthographicSize / 12, uicam.orthographicSize / 12);
+        ps.GetComponent<RectTransform>().localScale = uipsv;
+    }
 
 
     void EndProgress() //진행 화면 이제 그만 띄워라
@@ -499,12 +523,15 @@ public class GameManager : MonoBehaviour //게임 총괄
                 coins -= 10;
                 pstimerhp = 0;
                 ReadOn(4, 0);
+                use1ps.Play();
             }
         }
         hpPotion.transform.GetChild(0).GetComponent<Image>().fillAmount
             = (15 - pstimerhp) / 15;
         hpPotion.transform.GetChild(1).GetComponent<Text>().text
             = pstimerhp < 15 ? (15 - pstimerhp).ToString("N1") : null;
+        usable1ps.gameObject.SetActive(15 <= pstimerhp && coins >= 10 && (
+            !shouldplaytutorial || hpPotion.gameObject.activeSelf));
 
         pstimermp += Time.deltaTime;
         if (15 <= pstimermp)
@@ -516,12 +543,15 @@ public class GameManager : MonoBehaviour //게임 총괄
                 coins -= 10;
                 pstimermp = 0;
                 ReadOn(4, 1);
+                use2ps.Play();
             }
         }
         mpPotion.transform.GetChild(0).GetComponent<Image>().fillAmount
             = (15 - pstimermp) / 15;
         mpPotion.transform.GetChild(1).GetComponent<Text>().text
             = pstimermp < 15 ? (15 - pstimermp).ToString("N1") : null;
+        usable2ps.gameObject.SetActive(15 <= pstimermp && coins >= 10 && (
+            !shouldplaytutorial || mpPotion.gameObject.activeSelf));
 
 
 
@@ -669,8 +699,19 @@ public class GameManager : MonoBehaviour //게임 총괄
                 //Portal2.SetActive(true);
             }
 
-            ParticleSystem.MainModule portalmain = Portal1.transform.GetChild(1).GetComponent<ParticleSystem>().main;
-            portalmain.startColor = stage == 3 ? new Color(0.7f, 0, 0) : (hardmode ? new Color(1, 0.6f, 0.6f) : new Color(0.6f, 0.7f, 1));
+            Color portalpsColor = stage == 3 ? new Color(0.7f, 0, 0) : (hardmode ? new Color(1, 0.6f, 0.6f) : new Color(0.6f, 0.7f, 1));
+
+            for (int i = 1; i <= 2; i++)
+            {
+                ParticleSystem.MainModule portalmain = Portal1.transform.GetChild(i).GetComponent<ParticleSystem>().main;
+                portalmain.startColor = portalpsColor;
+            }
+
+            nearbyplayerps.gameObject.SetActive(true);
+            nearbypsmain.startColor = new Color(portalpsColor.r, portalpsColor.g, portalpsColor.b, 0.3f);
+
+            //ParticleSystem.MainModule nearbyaroundpsmain = nearbyplayerps.transform.GetChild(0).GetComponent<ParticleSystem>().main;
+            //nearbyaroundpsmain.startColor = portalpsColor;
         }
 
         GameObject P1S = Portal1.transform.GetChild(0).gameObject; //포탈1 S 텍스트
@@ -679,7 +720,7 @@ public class GameManager : MonoBehaviour //게임 총괄
         //포탈1과 가까우면
         if (!making && Vector2.Distance(player.transform.position, Portal1.transform.position) < 2)
         {
-            P1S.SetActive(true);
+            P1S.SetActive(Mainmenu.markkey);
             //P2S.SetActive(false);
 
             if (Input.GetKeyDown("s")) //포탈 타기
@@ -698,8 +739,21 @@ public class GameManager : MonoBehaviour //게임 총괄
                     NextStage();
                 }
             }
+
+            //포탈 근접 파티클 효과
+            Portal1.transform.GetChild(2).gameObject.SetActive(true);
+            nearbypsmain.loop = true;
+            nearbyplayerps.Play();
+            //nearbyplayerps.transform.GetChild(0).gameObject.SetActive(true);
         }
-        else P1S.SetActive(false);
+        else
+        {
+            P1S.SetActive(false);
+
+            Portal1.transform.GetChild(2).gameObject.SetActive(false);
+            nearbypsmain.loop = false;
+            //nearbyplayerps.transform.GetChild(0).gameObject.SetActive(false);
+        }
 
         //포탈2와 가까우면
         //else if (!making && Vector2.Distance(player.transform.position, Portal2.transform.position) < 2)
@@ -732,6 +786,21 @@ public class GameManager : MonoBehaviour //게임 총괄
             Player.itemNum.Item1 != -1 && Player.itemNum.Item2 != -1 && nowCube != null ? 1 : 0);
 
     } //Update End
+
+
+
+    public void KillPlus()
+    {
+        realkilled++;
+        killed++;
+        killps.Play();
+    }
+    public void CoinPlus(bool orb)
+    {
+        if (orb) coins++;
+        Player.player.pickupcoin.Play();
+        coinps.Play();
+    }
 
 
     public void NextStage()
@@ -790,14 +859,57 @@ public class GameManager : MonoBehaviour //게임 총괄
             else hps[i].gameObject.SetActive(false);
         }
 
+        if (player.hp > 0)
+        {
+            ParticleSystem.MainModule hppsmain = hp_ps.main;
+            hppsmain.startLifetime = 0.7f + 0.3f * (player.hp - 1);
+            hppsmain.startSpeed = 0.2f + 0.6f * (player.hp - 1);
+            hp_ps_renderer.lengthScale = 3.0f + 1.2f * (player.hp - 1);
+
+            if (player.shield <= 0) sh_ps.gameObject.SetActive(false);
+            else
+            {
+                sh_ps.gameObject.SetActive(true);
+                sh_ps.transform.position = hps_ps[player.hp].transform.position;
+
+                ParticleSystem.MainModule shpsmain = sh_ps.main;
+                shpsmain.startLifetime = 1.0f + 0.5f * player.shield;
+                shpsmain.startSpeed = -0.6f + 0.8f * player.shield;
+                sh_ps_renderer.lengthScale = 1.0f + 2.0f * player.shield;
+            }
+        }
+
         //MP
         for(int i = 0; i < playerAtk.maxmp; i++)
         {
             mps[i].color = Player.itemNum.Item1 == 3 || Player.itemNum.Item2 == 3 ?
-                Color.black : new Color(0.3f, 0.3f, 0.8f); //자해 - 검정, 기본 - 마나 색
+                Color.black : new Color(0.5f, 0.5f, 1); //자해 - 검정, 기본 - 마나 색
             mps[i].gameObject.SetActive(i < playerAtk.mp);
         }
-    }
+
+        if (Player.itemNum.Item1 == 3 || Player.itemNum.Item2 == 3)
+        {
+            mp_ps_si.gameObject.SetActive(true);
+            mp_ps.gameObject.SetActive(false);
+        }
+        else if (playerAtk.mp > 0)
+        {
+            ParticleSystem.MainModule mppsmain = mp_ps.main;
+            mppsmain.startLifetime = 0.7f + 0.3f * (playerAtk.mp - 1);
+            mppsmain.startSpeed = 0.2f + 0.6f * (playerAtk.mp - 1);
+            mp_ps_renderer.lengthScale = 3.0f + 1.2f * (playerAtk.mp - 1);
+            mp_ps_si.gameObject.SetActive(false);
+            mp_ps.gameObject.SetActive(true);
+        }
+        else
+        {
+            mp_ps_si.gameObject.SetActive(false);
+            mp_ps.gameObject.SetActive(false);
+        }
+
+    } //ChangeHPMP End
+
+
 
 
     void MakeEnemy(int ph) //적 프리팹 활성화
@@ -810,7 +922,7 @@ public class GameManager : MonoBehaviour //게임 총괄
         if (ph == 0) EnemySet(sum);
 
         //전투 종료
-        else if (ph >= phases[mapNum] && realkilled == enemies[mapNum, ph - 1])
+        else if (ph >= phases[mapNum] && realkilled >= enemies[mapNum, ph - 1])
         {
             for (int i = 0; i < phases[mapNum]; i++)
             {
@@ -843,8 +955,9 @@ public class GameManager : MonoBehaviour //게임 총괄
         }
 
         //다음 페이즈
-        else if (realkilled == enemies[mapNum, ph - 1]) EnemySet(sum + ph);
-    }
+        else if (realkilled >= enemies[mapNum, ph - 1]) EnemySet(sum + ph);
+
+    } //MakeEnemy End
 
     void EnemySet(int dex)
     {
@@ -1206,6 +1319,8 @@ public class GameManager : MonoBehaviour //게임 총괄
                 playerAtk.GetNewWeapon();
                 break;
         }
+
+        CoinPlus(false);
     }
     public void ItemWeaponInfo() // ( i )
     {

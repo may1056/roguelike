@@ -9,12 +9,13 @@ public class WorldEnder : MonoBehaviour
     float t = 0;
     public Camera cam;
     public GameObject bg;
-    public Canvas canvas;
+    public Canvas canvas, pscanvas;
     public Image white, black;
 
     void Start()
     {
         canvas.gameObject.SetActive(false);
+        pscanvas.gameObject.SetActive(false);
         bg.SetActive(false);
         white.transform.parent.gameObject.SetActive(true);
     }

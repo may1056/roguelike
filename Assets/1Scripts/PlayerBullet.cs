@@ -76,7 +76,7 @@ public class PlayerBullet : MonoBehaviour
                     float rand = 0.1f * Random.Range(0, 10);
                     pb.GetComponent<SpriteRenderer>().color = new Color(rand, rand, rand); //무채색 랜덤
                 }
-                Destroy(gameObject);
+                DestroyReverb();
             }
         }
         else //심각하지 않은 탄알은 그냥 시간 되면 없어지기
@@ -86,7 +86,7 @@ public class PlayerBullet : MonoBehaviour
             if (t <= 0)
             {
                 MakeEffect(transform.position, Color.gray, pbType == 0 ? 1 : 0.4f);
-                Destroy(gameObject);
+                DestroyReverb();
             }
         }
 
@@ -129,7 +129,7 @@ public class PlayerBullet : MonoBehaviour
                     MakeEffect(transform.position, new Color(0.6f, 0.4f, 1), 0.7f);
                     CancelInvoke(nameof(b2.RemovePollution));
                 }
-                Destroy(gameObject);
+                DestroyReverb();
             }
 
             if (boss2dist > 1) boss2dealed = false;
@@ -166,7 +166,7 @@ public class PlayerBullet : MonoBehaviour
                     MakeEffect(transform.position, new Color(0.6f, 0.4f, 1), 0.7f);
                     CancelInvoke(nameof(b1.RemovePollution));
                 }
-                Destroy(gameObject);
+                DestroyReverb();
             }
 
             if (boss1dist > 1) boss1dealed = false;
@@ -207,7 +207,7 @@ public class PlayerBullet : MonoBehaviour
         if (other.gameObject.layer == 9 && pbType != 1) //플랫폼
         {
             MakeEffect(transform.position, Color.gray, 1);
-            Destroy(gameObject);
+            DestroyReverb();
         }
 
         if (other.gameObject.CompareTag("Enemy")) //적
@@ -231,7 +231,7 @@ public class PlayerBullet : MonoBehaviour
                     }
                     if (Player.player.poison) m.RepeatAD();
                     MakeEffect(transform.position, Color.red, 1);
-                    Destroy(gameObject);
+                    DestroyReverb();
                     break;
 
                 case 2:
@@ -248,7 +248,7 @@ public class PlayerBullet : MonoBehaviour
                             if (r < 2)
                             {
                                 m.hp--;
-                                Debug.Log("치명");
+                                //Debug.Log("치명");
                                 Player.player.MakeEffect(new Vector2(other.transform.position.x, other.transform.position.y + 2), Player.player.critical, 5, 1);
                             }
                         }
@@ -256,7 +256,7 @@ public class PlayerBullet : MonoBehaviour
                         MakeEffect(transform.position, new Color(0.6f, 0.4f, 1), 0.7f);
                         CancelInvoke(nameof(m.RemovePollution));
                     }
-                    Destroy(gameObject);
+                    DestroyReverb();
                     break;
             }
         }
@@ -285,6 +285,7 @@ public class PlayerBullet : MonoBehaviour
                     if (Player.player.poison) b2.RepeatAD();
 
                     MakeEffect(other.transform.position, Color.red, 1);
+                    DestroyReverb();
                     break;
             }
         }
@@ -310,7 +311,7 @@ public class PlayerBullet : MonoBehaviour
                     if (Player.player.poison) b1.RepeatAD();
 
                     MakeEffect(other.transform.position, Color.red, 1);
-                    Destroy(gameObject);
+                    DestroyReverb();
                     break;
             }
         }
@@ -326,6 +327,20 @@ public class PlayerBullet : MonoBehaviour
         effsr.sprite = doubleCircle;
         effsr.color = c;
         eff.transform.localScale = sc * Vector2.one;
+    }
+
+
+    void DestroyReverb() //잔향
+    {
+        if (transform.childCount == 1)
+        {
+            ParticleSystem.MainModule psmain = transform.GetChild(0).GetComponent<ParticleSystem>().main;
+            psmain.loop = false;
+
+            transform.DetachChildren();
+        }
+
+        Destroy(gameObject);
     }
 
 } //PlayerBullet End

@@ -72,6 +72,10 @@ public class Player : MonoBehaviour //플레이어
     public float burntime = 0;
     public Image explosiveImage;
 
+    public float dark = 0;
+    public float darktime = 0;
+    public Image anboyeoImage;
+
 
 
     public float dontBehaveTime = 0;
@@ -138,6 +142,9 @@ public class Player : MonoBehaviour //플레이어
     //14. 독
     public bool poison;
 
+    public ParticleSystem item1ps, item2ps;
+
+
 
     // 보스전 전용 무기
     public static bool Pickaxe = false;
@@ -191,6 +198,8 @@ public class Player : MonoBehaviour //플레이어
         GetNewItem();
 
         manager.ChangeHPMP();
+
+        ChangeSt();
 
     } //Start End
 
@@ -247,6 +256,16 @@ public class Player : MonoBehaviour //플레이어
         }
     }
 
+
+
+    void OnEnable()
+    {
+        //UI 파티클시스템 크기가 카메라 사이즈에 따라 들쑥날쑥이라 비율 맞춤
+        Camera cam = transform.GetChild(0).GetComponent<Camera>();
+        Vector2 uipsv = new(cam.orthographicSize / 12, cam.orthographicSize / 12);
+        item1ps.GetComponent<RectTransform>().localScale = uipsv;
+        item2ps.GetComponent<RectTransform>().localScale = uipsv;
+    }
 
 
 
@@ -606,6 +625,33 @@ public class Player : MonoBehaviour //플레이어
         explosiveImage.gameObject.SetActive(burn > 0);
 
 
+        //ㅅㅁㅅㅁㅅㅁㅅㅁㅅㅁㅅㅁㅅㅁㅅㅁㅅㅁㅅㅁㅅㅁㅅㅁㅅㅁㅅㅁㅅㅁ
+
+        if (darktime <= 0) dark = 0;
+        else if (dark < 1)
+        {
+            anboyeoImage.color = new Color(0, 0, 0, dark);
+            dark -= 0.2f * Time.deltaTime;
+            if (dark <= 0)
+            {
+                dark = 0;
+                darktime = 0;
+            }
+        }
+        else
+        {
+            anboyeoImage.color = Color.black;
+            darktime -= Time.deltaTime;
+        }
+
+        anboyeoImage.gameObject.SetActive(dark > 0);
+        for (int i = 0; i < 5; i++)
+        {
+            Image blind = anboyeoImage.transform.GetChild(i).GetComponent<Image>();
+            blind.color = new Color(blind.color.r, blind.color.g, blind.color.b, dark);
+        }
+
+
 
 
 
@@ -634,6 +680,9 @@ public class Player : MonoBehaviour //플레이어
 
         if (itemNum.Item1 != -1) NewWonderfulLeejonghwanShitWow.itemOpen[itemNum.Item1] = true;
         if (itemNum.Item2 != -1) NewWonderfulLeejonghwanShitWow.itemOpen[itemNum.Item2] = true;
+
+        item1ps.gameObject.SetActive(itemNum.Item1 != -1);
+        item2ps.gameObject.SetActive(itemNum.Item2 != -1);
 
     } //Update End
 
@@ -808,6 +857,9 @@ public class Player : MonoBehaviour //플레이어
     void ChangeSt()
     {
         transform.GetChild(5).GetComponent<SpriteRenderer>().sprite = St[stamina];
+
+        ParticleSystem.MainModule stpsmain = transform.GetChild(5).GetChild(0).GetComponent<ParticleSystem>().main;
+        stpsmain.startLifetime = stamina;
     }
 
 

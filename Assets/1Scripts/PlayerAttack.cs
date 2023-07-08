@@ -72,6 +72,8 @@ public class PlayerAttack : MonoBehaviour
     Text skillZcooltimeText, skillXcooltimeText;
     public Sprite[] skillXSprites;
 
+    public ParticleSystem usableZps, useZps, usableXps, useXps;
+
 
 
 
@@ -120,6 +122,18 @@ public class PlayerAttack : MonoBehaviour
         manager.WeaponInfo();
     }
 
+
+
+    void OnEnable()
+    {
+        //UI 파티클시스템 크기가 카메라 사이즈에 따라 들쑥날쑥이라 비율 맞춤
+        Camera cam = player.transform.GetChild(0).GetComponent<Camera>();
+        Vector2 uipsv = new(cam.orthographicSize / 12, cam.orthographicSize / 12);
+        usableZps.GetComponent<RectTransform>().localScale = uipsv;
+        useZps.GetComponent<RectTransform>().localScale = uipsv;
+        usableXps.GetComponent<RectTransform>().localScale = uipsv;
+        useXps.GetComponent<RectTransform>().localScale = uipsv;
+    }
 
 
 
@@ -200,6 +214,9 @@ public class PlayerAttack : MonoBehaviour
 
         skillZ.transform.GetChild(0).GetComponent<Image>().
             fillAmount = cooltime / (player.selfinjury ? 1.5f : 3.0f); //cover
+        usableZps.gameObject.SetActive(cooltime <= 0 && mp >= 1 && (
+            !GameManager.shouldplaytutorial ||
+            GameManager.gameManager.Read.transform.GetChild(2).GetChild(0).GetComponent<Image>().color == new Color(1, 1, 1, 0.4f)));
 
         skilluse = cooltime <= 0 && Input.GetKeyDown("z") && mp >= 1
             && GameManager.prgEnd;
@@ -220,6 +237,8 @@ public class PlayerAttack : MonoBehaviour
             player.dontBehaveTime = 0;
             skillZ.gameObject.SetActive(true);
             manager.ReadOn(2, 0);
+            useZps.gameObject.SetActive(true);
+            useZps.Play();
         }
         else skillP = new Vector2(9999, 9999); //저 멀리
 
@@ -234,6 +253,9 @@ public class PlayerAttack : MonoBehaviour
 
         skillX.transform.GetChild(0).GetComponent<Image>().
                 fillAmount = wsCool / (player.selfinjury ? 5.0f : 10.0f); //Filled
+        usableXps.gameObject.SetActive(wsCool <= 0 && mp >= 2 && (
+            !GameManager.shouldplaytutorial ||
+            GameManager.gameManager.Read.transform.GetChild(2).GetChild(1).GetComponent<Image>().color == new Color(1, 1, 1, 0.4f)));
 
         if (wsCool <= 0 && Input.GetKeyDown("x") && mp >= 2
             && GameManager.prgEnd)
@@ -251,6 +273,8 @@ public class PlayerAttack : MonoBehaviour
             player.dontBehaveTime = 0;
             skillX.gameObject.SetActive(true);
             manager.ReadOn(2, 1);
+            useXps.gameObject.SetActive(true);
+            useXps.Play();
         }
 
         if (wsAvailable)

@@ -88,12 +88,13 @@ public class Monster : MonoBehaviour //잡몹
 
 
     /// <summary>
-    /// 원거리 공격형 몬스터 - 03, 04, 06
+    /// 원거리 공격형 몬스터 - 03, 04, 06, 08
     /// </summary>
 
     public GameObject bullet;
     float bulletTime = 0;
     public float bull_T; //탄막 생성 주기
+    bool bulletSlideDirection;
 
     Quaternion AngleSelected;
 
@@ -229,6 +230,8 @@ public class Monster : MonoBehaviour //잡몹
 
                     InvokeRepeating(nameof(ReturnDown), 7, 7); //원상복귀
                 }
+
+                bulletTime += Time.deltaTime;
                 break;
 
             case 7: //ghost
@@ -416,21 +419,20 @@ public class Monster : MonoBehaviour //잡몹
             }
             else if (r < 4) Instantiate(coinOrb, tp, Quaternion.identity);
 
-            GameManager.killed++; //죽으면서 킬 수 올리고 감
-            GameManager.realkilled++;
-            withPlayer = false;
-
             if (K)
             {
-                for (int i = -1; i <= 1; i += 2)
+                for (int i = 0; i < 2; i++)
                 {
                     GameObject s = Instantiate(littleslime,
-                        new Vector2(tp.x + i * 0.5f, tp.y), Quaternion.identity);
+                        new Vector2(tp.x + i - 0.5f, tp.y), Quaternion.identity);
                     s.transform.SetParent(transform.parent);
                     s.SetActive(true);
-                    GameManager.killed -= 2;
+                    GameManager.realkilled--;
                 }
             }
+
+            GameManager.gameManager.KillPlus();
+            withPlayer = false;
 
             //DecideEffect(Color.white);
 
@@ -476,7 +478,7 @@ public class Monster : MonoBehaviour //잡몹
         //가까우면 이동 시작
         if (dist < noticeDist)
         {
-            if (!moving && monsterNum<10)
+            if (!moving && monsterNum < 10)
             {
                 float y = 0; //몬스터별 느낌표 위치 오프셋 (y축 방향)
                 switch (monsterNum)
@@ -503,7 +505,9 @@ public class Monster : MonoBehaviour //잡몹
 
     void ShootBullet()
     {
-        GameObject b = Instantiate(bullet, tp, AngleSelected);
+        GameObject b = Instantiate(bullet, tp,
+            monsterNum == 4 || monsterNum == 6 || monsterNum == 8 ?
+            Quaternion.Euler(0, 0, AngleSelected.eulerAngles.z + (bulletSlideDirection ? 10 : -10) * (bulletTime - 0.5f)) : AngleSelected);
         b.GetComponent<SpriteRenderer>().sortingOrder = 6;
     }
 
@@ -554,6 +558,10 @@ public class Monster : MonoBehaviour //잡몹
 
         sr.sprite = Up; //손 올림
         D_U = false;
+
+        bulletTime = 0;
+        bulletSlideDirection = Random.Range(0, 2) == 0;
+
         for (int i = 0; i < 40; i++) Invoke(nameof(ShootBullet), i * 0.025f);
         Invoke(nameof(ReturnDown), 1); //1초 뒤 손 내림
     }
@@ -587,8 +595,7 @@ public class Monster : MonoBehaviour //잡몹
             poksr.sortingOrder = 8;
         }
 
-        GameManager.killed++; //죽으면서 킬 수 올리고 감
-        GameManager.realkilled++;
+        GameManager.gameManager.KillPlus();
         withPlayer = false;
         Soundmanager.soundmanager.firesounds[2].Play();
         Destroy(gameObject);
@@ -666,7 +673,7 @@ public class Monster : MonoBehaviour //잡몹
 
                 if (lezong <= 0)
                 {
-                    if (monsterNum == 5 && Random.Range(0, 2) == 1)
+                    if (K && Random.Range(0, 2) == 1)
                     {
                         //킹슬라임은 점프 때마다 확률적으로 작은 슬라임 생성
                         GameManager.realkilled--;
@@ -680,7 +687,7 @@ public class Monster : MonoBehaviour //잡몹
                 }
             break;
 
-            //turret, ice, fire는 FixedUpdate 없음
+            //turret, ice, fire, dark는 FixedUpdate 없음
 
             case 7: //ghost
                 //플레이어를 감지한 후에는 계속 이동
@@ -898,7 +905,7 @@ public class Monster : MonoBehaviour //잡몹
             if (r < 2)
             {
                 hp--;
-                Debug.Log("치명");
+                //Debug.Log("치명");
                 Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
             }
         }

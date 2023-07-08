@@ -73,6 +73,9 @@ public class NewWonderfulLeejonghwanShitWow : MonoBehaviour //메인메뉴 보�
             owningItem2.gameObject.SetActive(true);
         }
 
+        //클리어 인증 띄우기
+        gamename.transform.GetChild(0).gameObject.SetActive(GameManager.hardmode ? clearCount_hard >= 1 : clearCount_easy >= 1);
+
     } //Update End
 
 
@@ -230,9 +233,6 @@ public class NewWonderfulLeejonghwanShitWow : MonoBehaviour //메인메뉴 보�
 
             ChangeDifficulty();
         }
-
-        //클리어 인증 띄우기
-        gamename.transform.GetChild(0).gameObject.SetActive(GameManager.hardmode ? clearCount_hard >= 1 : clearCount_easy >= 1);
 
     } //LoadData End
 

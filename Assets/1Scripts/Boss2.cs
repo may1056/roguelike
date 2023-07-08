@@ -22,7 +22,7 @@ public class Boss2 : MonoBehaviour
     public Image hpCASE;
 
     Player player;
-    public GameObject cam;
+    public Camera cam, uicam;
     SpriteRenderer bgsr;
 
 
@@ -41,7 +41,7 @@ public class Boss2 : MonoBehaviour
         { 7.5f, 6.5f, 6.5f, 4.5f, 4.5f };
     GameObject[] jjabs = new GameObject[4];
     public GameObject pxb1; //1 pixel bullet
-    public GameObject hpOrb, mpOrb;
+    public GameObject hpOrb, mpOrb, coinOrb;
 
     //pattern1
     public GameObject rain;
@@ -99,7 +99,8 @@ public class Boss2 : MonoBehaviour
         t = 0;
 
         player = Player.player;
-        cam.GetComponent<Camera>().orthographicSize = 12;
+        cam.orthographicSize = 12;
+        uicam.orthographicSize = 12;
         bgsr = player.transform.GetChild(2).GetComponent<SpriteRenderer>();
 
         hm = GameManager.hardmode;
@@ -132,6 +133,7 @@ public class Boss2 : MonoBehaviour
     void Update()
     {
         cam.transform.position = -10 * Vector3.forward;
+        uicam.transform.position = -10 * Vector3.forward;
         player.transform.GetChild(2).transform.position = Vector2.zero;
 
         tp = transform.position;
@@ -168,7 +170,7 @@ public class Boss2 : MonoBehaviour
             }
 
             t += Time.deltaTime;
-            Soundmanager.soundmanager.bossbgm[1].volume = t < 120 ? (120 - t) / 20 : 0;
+            Soundmanager.soundmanager.bossbgm[1].volume = t < 130 ? (130 - t) / 30 : 0;
             if (t > 120) CancelInvoke(nameof(Craziness));
             if (t > 130) worldEnder.SetActive(true); //권한 위임
         }
@@ -309,7 +311,7 @@ public class Boss2 : MonoBehaviour
 
     void Craziness() //발광
     {
-        for (int i = 0; i < (t < 110 ? (hm ? 10 : 5) : (hm ? 25 : 15)); i++)
+        for (int i = 0; i < (t < 110 ? (hm ? 15 : 5) : (hm ? 25 : 15)); i++)
         {
             GameObject b = Instantiate(pxb1, tp,
                 Quaternion.Euler(0, 0, 10 * i + hp));
@@ -346,9 +348,18 @@ public class Boss2 : MonoBehaviour
         {
             for (int i = 0; i < 4; i++)
             {
-                if (!hm || i < 2) Instantiate(Random.Range(0, 3) == 0 ? mpOrb : hpOrb,
-                    jjabs[i].transform.position, Quaternion.identity);
+                GameObject newOrb;
+                switch (Random.Range(0, 3))
+                {
+                    case 0: newOrb = hpOrb; break;
+                    case 1: newOrb = mpOrb; break;
+                    default: newOrb = coinOrb; break;
+                }
+                Instantiate(newOrb, jjabs[i].transform.position, Quaternion.identity);
                 Destroy(jjabs[i].gameObject);
+
+                if (Player.player.pink) Instantiate(hpOrb);
+                if (Player.player.blue) Instantiate(mpOrb);
             }
         }
         hide = false; //숨지 않아 - 숨는다는 의미는 분신들 사이에 숨어있다.
@@ -447,8 +458,8 @@ public class Boss2 : MonoBehaviour
 
     void Rain() //패턴1. 1px 비가 내린다
     {
-        for (int i = 0; i < (hm ? (phase2 ? 30 : 40) : 10); i++)
-            Invoke(nameof(RainMaker), i * 1.9f / (hm ? (phase2 ? 30 : 40) : 10));
+        for (int i = 0; i < (hm ? (phase2 ? 40 : 60) : 10); i++)
+            Invoke(nameof(RainMaker), i * 1.99f / (hm ? (phase2 ? 40 : 60) : 10));
 
         MakeRainFrom(true, false, 0.3f);
         if (phase2) MakeRainFrom(false, false, 0.3f);
