@@ -37,6 +37,12 @@ public class Bullet : MonoBehaviour //탄막
                 rigid.AddTorque(15);
                 InvokeRepeating(nameof(Next1px), 1, 1);
                 break;
+
+            case 9:
+                Transform ps = transform.GetChild(1);
+                ps.localScale = 0.75f * transform.localScale;
+                ps.gameObject.SetActive(true);
+                break;
         }
 
     } //Start End
@@ -53,7 +59,7 @@ public class Bullet : MonoBehaviour //탄막
         {
             switch (bulletType)
             {
-                case 0: case 1: case 2: case 8: Destroy0128(); break;
+                case 0: case 1: case 2: case 8: case 9: DestroyReverb(); break;
                 default: Destroy(gameObject); break;
             }
         }
@@ -65,7 +71,7 @@ public class Bullet : MonoBehaviour //탄막
         {
             switch (bulletType)
             {
-                case 0: case 1: case 2: case 8: Destroy0128(); break;
+                case 0: case 1: case 2: case 8: case 9: DestroyReverb(); break;
                 default: Destroy(gameObject); break;
             }
         }
@@ -88,7 +94,7 @@ public class Bullet : MonoBehaviour //탄막
                     {
                         switch (bulletType)
                         {
-                            case 0: case 1: case 2: case 8: Destroy0128(); break;
+                            case 0: case 1: case 2: case 8: case 9: DestroyReverb(); break;
                             default: Destroy(gameObject); break;
                         }
                     }
@@ -106,11 +112,15 @@ public class Bullet : MonoBehaviour //탄막
             }
         }*/
 
-        if (bulletType >= 4 && bulletType <= 7 &&
-            (tp.x > 19 || tp.x < -19 || tp.y > 9 || tp.y < -9))
+        switch (bulletType)
         {
-            if (sr != null) MakeEffect(sr.color, 1);
-            Destroy(gameObject);
+            case 4: case 5: case 6: case 7: case 9:
+                if (tp.x > 19 || tp.x < -19 || tp.y > 9 || tp.y < -9)
+                {
+                    //if (sr != null) MakeEffect(sr.color, 1);
+                    Destroy(gameObject);
+                }
+                break;
         }
 
     } //Update End
@@ -122,13 +132,15 @@ public class Bullet : MonoBehaviour //탄막
         {
             switch (bulletType)
             {
-                case 0: MakeEffect(Color.gray, 0.5f); Destroy0128(); break;
+                case 0: MakeEffect(Color.gray, 0.5f); DestroyReverb(); break;
 
-                case 1: MakeEffect(new Color(0.56f, 0.71f, 0.84f), 1); Destroy0128(); break;
-                case 2: MakeEffect(new Color(1, 0.6313f, 0), 1); Destroy0128(); break;
-                case 8: MakeEffect(Color.black, 1); Destroy0128(); break;
+                case 1: MakeEffect(new Color(0.56f, 0.71f, 0.84f), 1); DestroyReverb(); break;
+                case 2: MakeEffect(new Color(1, 0.6313f, 0), 1); DestroyReverb(); break;
+                case 8: MakeEffect(Color.black, 1); DestroyReverb(); break;
+                case 9: MakeEffect(Color.white, 1); DestroyReverb(); break;
 
-                case 4: case 5: case 6: case 7: MakeEffect(sr.color, 0.1f); Destroy(gameObject); break;
+                case 4: case 5: case 6: case 7: //MakeEffect(sr.color, 0.1f);
+                    Destroy(gameObject); break;
             }
             //Debug.Log("콜");
         } //플랫폼
@@ -150,8 +162,12 @@ public class Bullet : MonoBehaviour //탄막
                 case 8: MakeEffect(Color.black, 1); break;
 
                 case 4: case 5: case 6: case 7:
-                    if (sr != null) MakeEffect(sr.color, 1);
+                    //if (sr != null) MakeEffect(sr.color, 1);
                     Destroy(gameObject); break;
+
+                case 9:
+                    if (sr != null) MakeEffect(sr.color, 1);
+                    DestroyReverb(); break;
             }
         }
 
@@ -159,10 +175,13 @@ public class Bullet : MonoBehaviour //탄막
         {
             switch (bulletType)
             {
-                case 4: MakeEffect(sr.color, 0.1f); Destroy(gameObject); break;
-                case 5: MakeEffect(sr.color, 0.3f); Destroy(gameObject); break;
-                case 6: MakeEffect(sr.color, 0.2f); Destroy(gameObject); break;
-                case 7: MakeEffect(sr.color, 0.1f); Destroy(gameObject); break;
+               case 4: case 5: case 6: case 7:
+                    //if (sr != null) MakeEffect(sr.color, 1);
+                    Destroy(gameObject); break;
+
+                case 9:
+                    if (sr != null) MakeEffect(sr.color, 1);
+                    DestroyReverb(); break;
             }
         }
 
@@ -173,7 +192,7 @@ public class Bullet : MonoBehaviour //탄막
                 case 0:
                     if (Player.unbeatableTime <= 0) Player.hurted = true;
                     MakeEffect(Color.red, 0.5f);
-                    Destroy0128();
+                    DestroyReverb();
                     break;
 
                 case 1:
@@ -184,7 +203,7 @@ public class Bullet : MonoBehaviour //탄막
                         if (pl.slow > 0.975f) pl.slow = 1;
                         else pl.slow += 0.025f;
                     }
-                    Destroy0128();
+                    DestroyReverb();
                     break;
 
                 case 2:
@@ -199,7 +218,7 @@ public class Bullet : MonoBehaviour //탄막
                         }
                         else pl.burn += 0.03f;
                     }
-                    Destroy0128();
+                    DestroyReverb();
                     break;
 
                 case 8:
@@ -214,22 +233,49 @@ public class Bullet : MonoBehaviour //탄막
                         }
                         else pl.dark += 0.025f;
                     }
-                    Destroy0128();
+                    DestroyReverb();
                     break;
             }
         }
 
-        if (l == 21)
+        if (l == 21) //Touhou
         {
             switch (bulletType)
             {
-                case 4:
-                case 5:
-                case 6:
-                case 7:
+                case 4: case 5: case 6: case 7:
                     if (Player.unbeatableTime <= 0) Player.hurted = true;
-                    MakeEffect(Color.red, 1);
+                    //MakeEffect(Color.red, 1);
                     Destroy(gameObject);
+                    break;
+
+                case 9: //효과 삼합 발광 탄알
+                    if (Player.unbeatableTime <= 0)
+                    {
+                        Player.hurted = true;
+                        Player pl = Player.player;
+
+                        pl.slowtime = 2;
+                        if (pl.slow > 0.5f) pl.slow = 1;
+                        else pl.slow += 0.5f;
+
+                        pl.burntime = 1;
+                        if (pl.burn > 0.5f && pl.burn < 1)
+                        {
+                            pl.burn = 1;
+                            pl.RepeatEx();
+                        }
+                        else pl.burn += 0.5f;
+
+                        pl.darktime = 2;
+                        if (pl.dark > 0.5f && pl.dark < 1)
+                        {
+                            pl.dark = 1;
+                            if (PlayerAttack.playerAtk.mp > 0) PlayerAttack.playerAtk.mp--;
+                        }
+                        else pl.dark += 0.5f;
+                    }
+                    MakeEffect(Color.red, 1);
+                    DestroyReverb();
                     break;
             }
         }
@@ -250,16 +296,28 @@ public class Bullet : MonoBehaviour //탄막
 
     void Next2px()
     {
-        Instantiate(pxb2, transform.position, Quaternion.Euler(0, 0, Random.Range(0, 360)));
+        GameObject PXB = Instantiate(pxb2, transform.position, Quaternion.Euler(0, 0, Random.Range(0, 360)));
+        PXB.GetComponent<Bullet>().bulletSpeed = Random.Range(2, 6);
+
+        SpriteRenderer PXBsr = PXB.GetComponent<SpriteRenderer>();
+        PXBsr.color = new Color(PXBsr.color.r + 0.1f * Random.Range(-1, 2),
+            PXBsr.color.g + 0.1f * Random.Range(-1, 2), PXBsr.color.b + 0.1f * Random.Range(-1, 2));
     }
     void Next1px()
     {
-        Instantiate(pxb1, transform.position, Quaternion.Euler(0, 0, Random.Range(0, 360)));
+        GameObject PXB = Instantiate(pxb1, transform.position, Quaternion.Euler(0, 0, Random.Range(0, 360)));
+        PXB.GetComponent<Bullet>().bulletSpeed = Random.Range(3, 8);
+
+        SpriteRenderer PXBsr = PXB.GetComponent<SpriteRenderer>();
+        PXBsr.color = new Color(PXBsr.color.r + 0.1f * Random.Range(-1, 2),
+            PXBsr.color.g + 0.1f * Random.Range(-1, 2), PXBsr.color.b + 0.1f * Random.Range(-1, 2));
     }
 
 
-    void Destroy0128() //파티클 시스템이 내장되어 있는 탄알 - 파티클 효과가 탄알 파괴와 동시에 사라지지 않게 하기
+    void DestroyReverb() //파티클 시스템이 내장되어 있는 탄알 - 파티클 효과가 탄알 파괴와 동시에 사라지지 않게 하기
     {
+        if (transform.childCount == 2) Destroy(transform.GetChild(0).gameObject);
+
         if (transform.childCount == 1)
         {
             ParticleSystem.MainModule psmain = transform.GetChild(0).GetComponent<ParticleSystem>().main;

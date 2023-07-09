@@ -347,7 +347,7 @@ public class Monster : MonoBehaviour //잡몹
                     if (inX || inY)
                     {
                         Apa(Color.red);
-                        hp -= 2 * Player.player.atkPower;
+                        hp -= 2 * Player.player.skillPower;
 
                         if (Player.player.purple) //보라 수정: 치명타
                         {

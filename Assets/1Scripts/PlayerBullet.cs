@@ -73,6 +73,7 @@ public class PlayerBullet : MonoBehaviour
                     pb.transform.localScale = Vector2.one;
                     pb.transform.GetChild(0).localScale = Vector2.one;
                     pb.GetComponent<PlayerBullet>().pbType = 0;
+                    pb.GetComponent<PlayerBullet>().re = true;
                     pb.GetComponent<CircleCollider2D>().isTrigger = true;
                     //pb.transform.GetChild(0).gameObject.SetActive(false);
                     float rand = 0.1f * Random.Range(0, 10);

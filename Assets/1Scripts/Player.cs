@@ -531,9 +531,9 @@ public class Player : MonoBehaviour //플레이어
         //공격당함
         if (hurted)
         {
-            int r = Random.Range(0, 10);
+            int r = Random.Range(0, 6);
 
-            if (orange && r < 2)
+            if (orange && r == 1)
             {
                 //회피
                 dodge.Play();
@@ -852,6 +852,17 @@ public class Player : MonoBehaviour //플레이어
         if (s == avoid || s == critical) esr.flipX = false;
         else esr.flipX = sr.flipX;
         esr.sortingOrder = l;
+
+        if (Mathf.Abs(PlayerAttack.skillP.y) < 100)
+        {
+            effect.transform.GetChild(0).gameObject.SetActive(true);
+            effect.transform.DetachChildren();
+        }
+        if (Mathf.Abs(PlayerAttack.wsP.y) < 100)
+        {
+            effect.transform.GetChild(1).gameObject.SetActive(true);
+            effect.transform.DetachChildren();
+        }
     }
 
 

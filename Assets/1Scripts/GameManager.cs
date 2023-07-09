@@ -580,7 +580,8 @@ public class GameManager : MonoBehaviour //게임 총괄
 
 
         //메뉴창 표시
-        if (Input.GetButtonDown("Cancel") && progressTime > 4 && !death.gameObject.activeSelf && !boss2.worldEnder.activeSelf)
+        if (Input.GetButtonDown("Cancel") && progressTime > (stage == 4 ? 8 : 4)
+            && !death.gameObject.activeSelf && !boss2.worldEnder.activeSelf)
         {
             if (menuSet.activeSelf)
             {

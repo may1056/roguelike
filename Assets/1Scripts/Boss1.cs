@@ -266,7 +266,7 @@ public class Boss1 : MonoBehaviour{
                     if (inX || inY)
                     {
                         Apa(Color.red);
-                        hp -= 2 * Player.player.atkPower;
+                        hp -= 2 * Player.player.skillPower;
                         if (Player.player.purple) //보라 수정: 치명타
                         {
                             int r = Random.Range(0, 10);

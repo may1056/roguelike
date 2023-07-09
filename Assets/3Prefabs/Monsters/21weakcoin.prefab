@@ -146,7 +146,7 @@ MonoBehaviour:
   - {fileID: 1743799531, guid: 5e38e6b0e5266ec44ab65d691d41382f, type: 3}
   - {fileID: 845095873, guid: 5e38e6b0e5266ec44ab65d691d41382f, type: 3}
   - {fileID: 0}
-  Empty: {fileID: -1180148333, guid: 777456c1ff488754a9a8d929f721ed39, type: 3}
+  Empty: {fileID: 21300000, guid: b67886d6b265eca4488ecadbd1b6109e, type: 3}
   hpOrb: {fileID: 6510405994357380013, guid: f298c78827c8618408d5e5c4b44641cc, type: 3}
   mpOrb: {fileID: 2026748482929784485, guid: dfc753a499df8d14bb6a7fc313dcaa13, type: 3}
   coinOrb: {fileID: 2026748482929784485, guid: 70d4039dbc797ac488ff53131785d764, type: 3}

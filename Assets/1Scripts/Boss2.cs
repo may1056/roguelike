@@ -281,7 +281,7 @@ public class Boss2 : MonoBehaviour
                         if (inX || inY)
                         {
                             Apa(Color.red);
-                            hp -= 2 * Player.player.atkPower;
+                            hp -= 2 * Player.player.skillPower;
                             if (Player.player.purple) //보라 수정: 치명타
                             {
                                 int r = Random.Range(0, 10);
@@ -317,29 +317,27 @@ public class Boss2 : MonoBehaviour
     {
         for (int i = 0; i < (t < 110 ? (hm ? 15 : 5) : (hm ? 25 : 15)); i++)
         {
-            GameObject b = Instantiate(pxb1, tp,
-                Quaternion.Euler(0, 0, 10 * i + hp));
-            b.GetComponent<SpriteRenderer>().color = Color.gray;
-            b.GetComponent<Bullet>().bulletSpeed = Random.Range(4, 6);
-            b.transform.localScale = 0.1f * Random.Range(5, 21) * Vector2.one;
+            GameObject[] b = new GameObject[4];
 
-            GameObject _b = Instantiate(pxb1, tp,
-                Quaternion.Euler(0, 0, -10 * i - hp));
-            _b.GetComponent<SpriteRenderer>().color = Color.black;
-            _b.GetComponent<Bullet>().bulletSpeed = Random.Range(4, 6);
-            _b.transform.localScale = 0.1f * Random.Range(5, 21) * Vector2.one;
+            b[0] = Instantiate(pxb1, tp, Quaternion.Euler(0, 0, 10 * i + hp));
+            b[0].GetComponent<Bullet>().bulletSpeed = Random.Range(4, 6);
 
-            GameObject __b = Instantiate(pxb1, tp,
-                Quaternion.Euler(0, 0, Random.Range(0, 360)));
-            __b.GetComponent<SpriteRenderer>().color = new Color(0.75f, 0.75f, 0.75f);
-            __b.GetComponent<Bullet>().bulletSpeed = Random.Range(3, 5);
-            __b.transform.localScale = 0.1f * Random.Range(5, 21) * Vector2.one;
+            b[1] = Instantiate(pxb1, tp, Quaternion.Euler(0, 0, -10 * i - hp));
+            b[1].GetComponent<Bullet>().bulletSpeed = Random.Range(4, 6);
 
-            GameObject ___b = Instantiate(pxb1, tp,
-                Quaternion.Euler(0, 0, Random.Range(0, 360)));
-            ___b.GetComponent<SpriteRenderer>().color = new Color(0.25f, 0.25f, 0.25f);
-            ___b.GetComponent<Bullet>().bulletSpeed = Random.Range(5, 7);
-            ___b.transform.localScale = 0.1f * Random.Range(5, 21) * Vector2.one;
+            b[2] = Instantiate(pxb1, tp, Quaternion.Euler(0, 0, Random.Range(0, 360)));
+            b[2].GetComponent<Bullet>().bulletSpeed = Random.Range(3, 5);
+
+            b[3] = Instantiate(pxb1, tp, Quaternion.Euler(0, 0, Random.Range(0, 360)));
+            b[3].GetComponent<Bullet>().bulletSpeed = Random.Range(5, 7);
+
+            for (int j = 0; j < 4; j++)
+            {
+                float r = 0.01f * Random.Range(5, 61);
+                b[j].GetComponent<SpriteRenderer>().color = new Color(r, r, r);
+                b[j].transform.localScale = 0.1f * Random.Range(8, 21) * Vector2.one;
+                //b[j].GetComponent<Bullet>().bulletType = 9; //파티클 시스템 넣으려 했는데 렉 미침
+            }
         }
         hp -= 10 + Random.Range(0, 3); //발광 때부터 체력의 의미가 랜덤으로 감소하는 숫자로 변질됨.
     }
@@ -472,14 +470,17 @@ public class Boss2 : MonoBehaviour
         GameObject bi = Instantiate(rain, new Vector2(
             Random.Range(-179, 180) * 0.1f, 8.9f), Quaternion.identity);
         bi.GetComponent<SpriteRenderer>().color
-            = new Color(Random.Range(0, 5) * 0.1f, Random.Range(0, 5) * 0.1f, Random.Range(7, 11) * 0.1f); //다양한 푸른색
+            = new Color(Random.Range(5, 8) * 0.1f, Random.Range(6, 9) * 0.1f, Random.Range(9, 11) * 0.1f); //다양한 푸른색
+        bi.transform.localScale = (1 + Random.Range(0, 3) * 0.25f) * Vector2.one;
 
         if (phase2) //페이즈2: 아래쪽에서도 올라감
         {
             GameObject bi2 = Instantiate(rain, new Vector2(
                 Random.Range(-179, 180) * 0.1f, -8.9f), Quaternion.identity);
             bi2.GetComponent<SpriteRenderer>().color
-                = new Color(Random.Range(0, 5) * 0.1f, Random.Range(0, 5) * 0.1f, Random.Range(7, 11) * 0.1f); //다양한 푸른색
+                = new Color(Random.Range(5, 8) * 0.1f, Random.Range(6, 9) * 0.1f, Random.Range(9, 11) * 0.1f); //다양한 푸른색
+            bi2.transform.localScale = (1 + Random.Range(0, 3) * 0.25f) * Vector2.one;
+
             bi2.GetComponent<Rigidbody2D>().gravityScale = -1;
         }
     }
@@ -497,14 +498,19 @@ public class Boss2 : MonoBehaviour
 
     void LetBullet() //패턴2. 3px 탄막이 2px 탄막을 뿌리고 2px 탄막이 1px 탄막을 뿌림
     {
-        for (int i = 0; i < (phase2 ? (hm ? 8 : 4) : (hm ? 4 : 2)); i++)
-            Invoke(nameof(ReleaseBullet), i * (0.9f / (phase2 ? (hm ? 9 : 6) : (hm ? 5 : 3))));
+        for (int i = 0; i < (phase2 ? (hm ? 12 : 4) : (hm ? 6 : 2)); i++)
+            Invoke(nameof(ReleaseBullet), i / (phase2 ? (hm ? 6.0f : 2.0f) : (hm ? 3.0f : 1.0f)));
     }
     void ReleaseBullet()
     {
-        Instantiate(pxb3, transform.position, Quaternion.Euler(0, 0, Random.Range(0, 360)));
+        GameObject PXB = Instantiate(pxb3, transform.position, Quaternion.Euler(0, 0, Random.Range(0, 360)));
+        PXB.GetComponent<Bullet>().bulletSpeed = Random.Range(1, 3);
 
-        MakeEffect(bulletborder, new Color(1, 0.4f, 0));
+        SpriteRenderer PXBsr = PXB.GetComponent<SpriteRenderer>();
+        PXBsr.color = new Color(PXBsr.color.r + 0.1f * Random.Range(-1, 2),
+            PXBsr.color.g + 0.1f * Random.Range(-1, 2), PXBsr.color.b + 0.1f * Random.Range(-1, 2));
+
+        MakeEffect(bulletborder, PXBsr.color);
     }
 
 
