@@ -291,16 +291,13 @@ public class Monster : MonoBehaviour //잡몹
             Apa(Color.red);
             hp -= Player.player.atkPower;
 
-            if (Player.player.purple) //보라 수정: 치명타
+            int r = Random.Range(0, 5);
+            if (r < Player.player.purple)
             {
-                int r = Random.Range(0, 10);
-                if (r < 2)
-                {
-                    hp--;
-                    Debug.Log("치명");
-                    Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
-                }
+                hp--;
+                Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
             }
+            if (Player.player.poison) RepeatAD();
 
             PlayerAttack.curAttackCooltime = 0;
             PlayerAttack.attackuse = false ;
@@ -316,18 +313,15 @@ public class Monster : MonoBehaviour //잡몹
             Vector2.Distance(tp, PlayerAttack.skillP) < 5.5f)
         {
             Apa(Color.red);
-            hp--;
+            hp -= Player.player.skillPower;
 
-            if (Player.player.purple) //보라 수정: 치명타
+            int r = Random.Range(0, 5);
+            if (r < Player.player.purple)
             {
-                int r = Random.Range(0, 10);
-                if (r < 2)
-                {
-                    hp--;
-                    Debug.Log("치명");
-                    Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
-                }
+                hp--;
+                Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
             }
+            if (Player.player.poison) RepeatAD();
         }
 
 
@@ -349,19 +343,13 @@ public class Monster : MonoBehaviour //잡몹
                         Apa(Color.red);
                         hp -= 2 * Player.player.skillPower;
 
-                        if (Player.player.purple) //보라 수정: 치명타
+                        int r = Random.Range(0, 5);
+                        if (r < Player.player.purple)
                         {
-                            int r = Random.Range(0, 10);
-                            if (r < 2)
-                            {
-                                hp -= 2;
-                                Debug.Log("치명");
-                                Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
-                            }
+                            hp--;
+                            Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
                         }
-
-                        if (Player.player.poison)
-                            Invoke(nameof(AfterDamage), Random.Range(1, 20));
+                        if (Player.player.poison) RepeatAD();
                     }
                 break;
             }
@@ -404,11 +392,11 @@ public class Monster : MonoBehaviour //잡몹
 
             if (!Player.player.selfinjury && !Player.player.berserker)
             {
-                r = Random.Range(0, Player.player.pink ? 10 : 25);
+                r = Random.Range(0, 25 - 10 * Player.player.pink);
                 if (r < 1) Instantiate(hpOrb, tp, Quaternion.identity);
             }
 
-            r = Random.Range(0, Player.player.blue ? 10 : 25);
+            r = Random.Range(0, 25 - 10 * Player.player.blue);
             if (r < 1) Instantiate(mpOrb, tp, Quaternion.identity);
 
             r = Random.Range(0, 10);
@@ -899,15 +887,11 @@ public class Monster : MonoBehaviour //잡몹
         Apa(Color.green);
         hp--;
 
-        if (Player.player.purple) //보라 수정: 치명타
+        int r = Random.Range(0, 5);
+        if (r < Player.player.purple)
         {
-            int r = Random.Range(0, 10);
-            if (r < 2)
-            {
-                hp--;
-                //Debug.Log("치명");
-                Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
-            }
+            hp--;
+            Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
         }
     }
 

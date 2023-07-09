@@ -126,7 +126,7 @@ public class Boss2 : MonoBehaviour
         Soundmanager.soundmanager.bossbgm[1].Play();
 
         GameManager.gameManager.OnEnable();
-        Player.player.OnEnable();
+        player.OnEnable();
         PlayerAttack.playerAtk.OnEnable();
 
     } //Start End
@@ -237,17 +237,16 @@ public class Boss2 : MonoBehaviour
                  && GameManager.prgEnd)
             {
                 Apa(Color.red);
-                hp -= Player.player.atkPower;
-                if (Player.player.purple) //보라 수정: 치명타
+                hp -= player.atkPower;
+
+                int r = Random.Range(0, 5);
+                if (r < player.purple)
                 {
-                    int r = Random.Range(0, 10);
-                    if (r < 2)
-                    {
-                        hp--;
-                        Debug.Log("치명");
-                        player.MakeEffect(new Vector2(tp.x, tp.y + 2), player.critical, 5, 1);
-                    }
+                    hp--;
+                    player.MakeEffect(new Vector2(tp.x, tp.y + 2), player.critical, 5, 1);
                 }
+                if (player.poison) RepeatAD();
+
                 PlayerAttack.curAttackCooltime = 0;
             }
             //스킬 범위 내에 있음
@@ -255,17 +254,15 @@ public class Boss2 : MonoBehaviour
                 Vector2.Distance(tp, PlayerAttack.skillP) < 5.5f)
             {
                 Apa(Color.red);
-                hp--;
-                if (Player.player.purple) //보라 수정: 치명타
+                hp -= player.skillPower;
+
+                int r = Random.Range(0, 5);
+                if (r < player.purple)
                 {
-                    int r = Random.Range(0, 10);
-                    if (r < 2)
-                    {
-                        hp--;
-                        Debug.Log("치명");
-                        player.MakeEffect(new Vector2(tp.x, tp.y + 2), player.critical, 5, 1);
-                    }
+                    hp--;
+                    player.MakeEffect(new Vector2(tp.x, tp.y + 2), player.critical, 5, 1);
                 }
+                if (player.poison) RepeatAD();
             }
             //무기 파생 스킬 범위 내에 있음
             Vector2 wsp = PlayerAttack.wsP;
@@ -281,19 +278,15 @@ public class Boss2 : MonoBehaviour
                         if (inX || inY)
                         {
                             Apa(Color.red);
-                            hp -= 2 * Player.player.skillPower;
-                            if (Player.player.purple) //보라 수정: 치명타
+                            hp -= 2 * player.skillPower;
+
+                            int r = Random.Range(0, 5);
+                            if (r < player.purple)
                             {
-                                int r = Random.Range(0, 10);
-                                if (r < 2)
-                                {
-                                    hp -= 2;
-                                    Debug.Log("치명");
-                                    player.MakeEffect(new Vector2(tp.x, tp.y + 2), player.critical, 5, 1);
-                                }
+                                hp--;
+                                player.MakeEffect(new Vector2(tp.x, tp.y + 2), player.critical, 5, 1);
                             }
-                            if (Player.player.poison)
-                                Invoke(nameof(AfterDamage), Random.Range(1, 20));
+                            if (player.poison) RepeatAD();
                         }
                         break;
                 }
@@ -360,14 +353,14 @@ public class Boss2 : MonoBehaviour
                 Destroy(jjabs[i].gameObject);
             }
 
-            if (Player.player.pink) Instantiate(hpOrb);
-            if (Player.player.blue) Instantiate(mpOrb);
+            for (int i = 0; i < player.pink; i++) Instantiate(hpOrb, tp, Quaternion.identity);
+            for (int i = 0; i < player.blue; i++) Instantiate(mpOrb, tp, Quaternion.identity);
         }
         hide = false; //숨지 않아 - 숨는다는 의미는 분신들 사이에 숨어있다.
         orbitRotating = false; //궤도에서 벗어난다
 
-        dashx = Player.player.transform.position.x - tp.x;
-        dashy = Player.player.transform.position.y - tp.y;
+        dashx = player.transform.position.x - tp.x;
+        dashy = player.transform.position.y - tp.y;
 
         rigid.AddForce((10 + 0.2f * (100 - hp) * (1 - pollution)) //자동 공격 오염 받음. 무려
             * (hm ? 1 : 0.5f) * new Vector2(dashx, dashy).normalized, ForceMode2D.Impulse); //가속. 플레이어한테.
@@ -507,8 +500,8 @@ public class Boss2 : MonoBehaviour
         PXB.GetComponent<Bullet>().bulletSpeed = Random.Range(1, 3);
 
         SpriteRenderer PXBsr = PXB.GetComponent<SpriteRenderer>();
-        PXBsr.color = new Color(PXBsr.color.r + 0.1f * Random.Range(-1, 2),
-            PXBsr.color.g + 0.1f * Random.Range(-1, 2), PXBsr.color.b + 0.1f * Random.Range(-1, 2));
+        PXBsr.color = new Color(PXBsr.color.r + 0.1f * Random.Range(-2, 1),
+            PXBsr.color.g + 0.1f * Random.Range(-1, 2), PXBsr.color.b + 0.1f * Random.Range(0, 3));
 
         MakeEffect(bulletborder, PXBsr.color);
     }
@@ -683,15 +676,11 @@ public class Boss2 : MonoBehaviour
             Apa(Color.green);
             hp--;
 
-            if (Player.player.purple) //보라 수정: 치명타
+            int r = Random.Range(0, 5);
+            if (r < player.purple)
             {
-                int r = Random.Range(0, 10);
-                if (r < 2)
-                {
-                    hp--;
-                    Debug.Log("치명");
-                    player.MakeEffect(new Vector2(tp.x, tp.y + 2), player.critical, 5, 1);
-                }
+                hp--;
+                player.MakeEffect(new Vector2(tp.x, tp.y + 2), player.critical, 5, 1);
             }
         }
     }

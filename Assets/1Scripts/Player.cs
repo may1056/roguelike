@@ -138,7 +138,7 @@ public class Player : MonoBehaviour //플레이어
     public bool dashdeal;
     public Sprite dashdealEff, dashupgradeEffIdle, dashupgradeEffWalk;
     //7. ~ 13. 빨핑파초노주보 수정
-    public bool red, pink, blue, green, yellow, orange, purple;
+    public int red, pink, blue, green, yellow, orange, purple;
     public Sprite avoid, critical;
     //14. 독
     public bool poison;
@@ -228,7 +228,7 @@ public class Player : MonoBehaviour //플레이어
         berserker = false; //5
         dashdeal = false; dashDist = 8; maxstamina = 3; //6
 
-        red = false; pink = false; blue = false; green = false; yellow = false; orange = false; purple = false;
+        red = 0; pink = 0; blue = 0; green = 0; yellow = 0; orange = 0; purple = 0;
         poison = false;
     }
     void ItemActive(int i) //아이템 설정 최신화
@@ -236,7 +236,7 @@ public class Player : MonoBehaviour //플레이어
         switch (i)
         {
             //legend
-            case 0: red = true; pink = true; blue = true; green = true; yellow = true; orange = true; purple = true; break; //알파 수정
+            case 0: red++; pink++; blue++; green++; yellow++; orange++; purple++; break; //알파 수정
 
             //rare
             case 1: canRevive = true; break;
@@ -247,13 +247,13 @@ public class Player : MonoBehaviour //플레이어
             case 6: dashdeal = true; dashDist = 12; maxstamina = 5; stamina = 5; break;
 
             //common
-            case 7: red = true; break; //밸런스를 위해 딜증 대상은 무기(일반공격, 무기파생스킬)로 한정
-            case 8: pink = true; break; //hp 오브 확률 증가
-            case 9: blue = true; break; //mp 오브 확률 증가
-            case 10: green = true; break; //이동 속도 증가
-            case 11: yellow = true; break; //공격 속도 증가
-            case 12: orange = true; break; //회피 활성화
-            case 13: purple = true; break; //치명 활성화
+            case 7: red++; break; //밸런스를 위해 딜증 대상은 무기(일반공격, 무기파생스킬)로 한정
+            case 8: pink++; break; //hp 오브 확률 증가
+            case 9: blue++; break; //mp 오브 확률 증가
+            case 10: green++; break; //이동 속도 증가
+            case 11: yellow++; break; //공격 속도 증가
+            case 12: orange++; break; //회피 활성화
+            case 13: purple++; break; //치명 활성화
 
             case 14: poison = true; break;
         }
@@ -281,16 +281,8 @@ public class Player : MonoBehaviour //플레이어
         Vector2 tp = transform.position;
 
 
-        if (berserker && hp < 3)
-        {
-            atkPower = red ? 4 : 3;
-            skillPower = 3;
-        }
-        else
-        {
-            atkPower = red ? 2 : 1;
-            skillPower = 1;
-        }
+        skillPower = berserker && hp < 3 ? 3 : 1;
+        atkPower = skillPower + red;
 
         //animation player
         if (Input.GetButton("Horizontal"))
@@ -531,9 +523,9 @@ public class Player : MonoBehaviour //플레이어
         //공격당함
         if (hurted)
         {
-            int r = Random.Range(0, 6);
+            int r = Random.Range(0, 5);
 
-            if (orange && r == 1)
+            if (r < orange)
             {
                 //회피
                 dodge.Play();
@@ -719,7 +711,7 @@ public class Player : MonoBehaviour //플레이어
         //좌우 이동 (등속, 손 떼면 바로 멈춤)
         float h = Input.GetAxisRaw("Horizontal");
 
-        transform.Translate(speed * (1 - slow) * (green ? 2 : 1)
+        transform.Translate(speed * (1 - slow) * (1 + 0.7f * green)
             * Time.deltaTime * new Vector2(h, 0));
 
         //isWalking = h != 0;
@@ -931,16 +923,13 @@ public class Player : MonoBehaviour //플레이어
                         {
                             Monster c0ijm = c0ij.GetComponent<Monster>();
                             c0ijm.Apa(Color.red);
-                            c0ijm.hp--;
-                            if (purple)
+                            c0ijm.hp -= skillPower;
+
+                            int r = Random.Range(0, 5);
+                            if (r < purple)
                             {
-                                int r = Random.Range(0, 10);
-                                if (r < 2)
-                                {
-                                    c0ijm.hp--;
-                                    Debug.Log("치명");
-                                    MakeEffect(new Vector2(mv.x, mv.y + 2), critical, 5, 1);
-                                }
+                                c0ijm.hp--;
+                                MakeEffect(new Vector2(mv.x, mv.y + 2), critical, 5, 1);
                             }
                             if (poison) c0ijm.RepeatAD();
 
@@ -962,16 +951,13 @@ public class Player : MonoBehaviour //플레이어
             if (((b2p.x > X1 && b2p.x < X2) || (b2p.x < X1 && b2p.x > X2))
                 && b2p.y > Y - 1 && b2p.y < Y + 1)
             {
-                boss2.hp--;
-                if (purple)
+                boss2.hp -= skillPower;
+
+                int r = Random.Range(0, 5);
+                if (r < purple)
                 {
-                    int r = Random.Range(0, 10);
-                    if (r < 2)
-                    {
-                        boss2.hp--;
-                        Debug.Log("치명");
-                        MakeEffect(new Vector2(b2p.x, b2p.y + 2), critical, 5, 1);
-                    }
+                    boss2.hp--;
+                    MakeEffect(new Vector2(b2p.x, b2p.y + 2), critical, 5, 1);
                 }
                 if (poison) boss2.RepeatAD();
 

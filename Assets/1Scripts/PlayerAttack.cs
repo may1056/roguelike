@@ -146,9 +146,8 @@ public class PlayerAttack : MonoBehaviour
 
         //ㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱ
 
-        maxAttackCooltime = GameManager.ismeleeWeapon ? 0.2f : 0.5f;
+        maxAttackCooltime = (GameManager.ismeleeWeapon ? 0.2f : 0.5f) * 0.4f * (3 - player.yellow); //노란 수정 공속 증가
         if (player.selfinjury) maxAttackCooltime *= 0.4f; //자해 시 공격 빠름
-        if (player.yellow) maxAttackCooltime *= 0.6f; //노란 수정 공속 증가
 
         if (curAttackCooltime <= maxAttackCooltime + 2)
             curAttackCooltime += Time.deltaTime;

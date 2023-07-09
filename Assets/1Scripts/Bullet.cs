@@ -300,8 +300,8 @@ public class Bullet : MonoBehaviour //탄막
         PXB.GetComponent<Bullet>().bulletSpeed = Random.Range(2, 6);
 
         SpriteRenderer PXBsr = PXB.GetComponent<SpriteRenderer>();
-        PXBsr.color = new Color(PXBsr.color.r + 0.1f * Random.Range(-1, 2),
-            PXBsr.color.g + 0.1f * Random.Range(-1, 2), PXBsr.color.b + 0.1f * Random.Range(-1, 2));
+        PXBsr.color = new Color(PXBsr.color.r + 0.1f * Random.Range(-2, 1),
+            PXBsr.color.g + 0.1f * Random.Range(-1, 2), PXBsr.color.b + 0.1f * Random.Range(0, 3));
     }
     void Next1px()
     {
@@ -309,14 +309,14 @@ public class Bullet : MonoBehaviour //탄막
         PXB.GetComponent<Bullet>().bulletSpeed = Random.Range(3, 8);
 
         SpriteRenderer PXBsr = PXB.GetComponent<SpriteRenderer>();
-        PXBsr.color = new Color(PXBsr.color.r + 0.1f * Random.Range(-1, 2),
-            PXBsr.color.g + 0.1f * Random.Range(-1, 2), PXBsr.color.b + 0.1f * Random.Range(-1, 2));
+        PXBsr.color = new Color(PXBsr.color.r + 0.1f * Random.Range(-2, 1),
+            PXBsr.color.g + 0.1f * Random.Range(-1, 2), PXBsr.color.b + 0.1f * Random.Range(0, 3));
     }
 
 
     void DestroyReverb() //파티클 시스템이 내장되어 있는 탄알 - 파티클 효과가 탄알 파괴와 동시에 사라지지 않게 하기
     {
-        if (transform.childCount == 2) Destroy(transform.GetChild(0).gameObject);
+        //if (transform.childCount == 2) Destroy(transform.GetChild(0).gameObject);
 
         if (transform.childCount == 1)
         {

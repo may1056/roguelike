@@ -223,16 +223,15 @@ public class Boss1 : MonoBehaviour{
         {
             Apa(Color.red);
             hp -= Player.player.atkPower;
-            if (Player.player.purple) //보라 수정: 치명타
+
+            int r = Random.Range(0, 5);
+            if (r < Player.player.purple)
             {
-                int r = Random.Range(0, 10);
-                if (r < 2)
-                {
-                    hp--;
-                    Debug.Log("치명");
-                    Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
-                }
+                hp--;
+                Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
             }
+            if (Player.player.poison) RepeatAD();
+
             PlayerAttack.curAttackCooltime = 0;
         }
         //스킬 범위 내에 있음
@@ -240,17 +239,15 @@ public class Boss1 : MonoBehaviour{
             Vector2.Distance(tp, PlayerAttack.skillP) < 5.5f)
         {
             Apa(Color.red);
-            hp--;
-            if (Player.player.purple) //보라 수정: 치명타
+            hp -= player.skillPower;
+
+            int r = Random.Range(0, 5);
+            if (r < Player.player.purple)
             {
-                int r = Random.Range(0, 10);
-                if (r < 2)
-                {
-                    hp--;
-                    Debug.Log("치명");
-                    Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
-                }
+                hp--;
+                Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
             }
+            if (Player.player.poison) RepeatAD();
         }
         //무기 파생 스킬 범위 내에 있음
         Vector2 wsp = PlayerAttack.wsP;
@@ -267,18 +264,14 @@ public class Boss1 : MonoBehaviour{
                     {
                         Apa(Color.red);
                         hp -= 2 * Player.player.skillPower;
-                        if (Player.player.purple) //보라 수정: 치명타
+
+                        int r = Random.Range(0, 5);
+                        if (r < Player.player.purple)
                         {
-                            int r = Random.Range(0, 10);
-                            if (r < 2)
-                            {
-                                hp -= 2;
-                                Debug.Log("치명");
-                                Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
-                            }
+                            hp--;
+                            Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
                         }
-                        if (Player.player.poison)
-                            Invoke(nameof(AfterDamage), Random.Range(1, 20));
+                        if (Player.player.poison) RepeatAD();
                     }
                     break;
             }
@@ -304,15 +297,11 @@ public class Boss1 : MonoBehaviour{
             Apa(Color.green);
             hp--;
 
-            if (Player.player.purple) //보라 수정: 치명타
+            int r = Random.Range(0, 5);
+            if (r < Player.player.purple)
             {
-                int r = Random.Range(0, 10);
-                if (r < 2)
-                {
-                    hp--;
-                    Debug.Log("치명");
-                    Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
-                }
+                hp--;
+                Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
             }
         }
     }
