@@ -303,7 +303,7 @@ public class Player : MonoBehaviour //플레이어
         if ((Input.GetKeyDown("w") || Input.GetKeyDown(KeyCode.Space))
             && !isJumping && GameManager.prgEnd)
         {
-            rigid.AddForce((1 - slow) * jumpPower * Vector2.up, ForceMode2D.Impulse);
+            rigid.AddForce((1 - slow) * jumpPower * (1 + Mathf.Pow(green, 0.6f) * 0.2f) * Vector2.up, ForceMode2D.Impulse);
             jump.Play();
             isJumping = true;
             sr.sprite = players[2];
@@ -711,7 +711,7 @@ public class Player : MonoBehaviour //플레이어
         //좌우 이동 (등속, 손 떼면 바로 멈춤)
         float h = Input.GetAxisRaw("Horizontal");
 
-        transform.Translate(speed * (1 - slow) * (1 + 0.7f * green)
+        transform.Translate(speed * (1 - slow) * (1 + 0.5f * green)
             * Time.deltaTime * new Vector2(h, 0));
 
         //isWalking = h != 0;
@@ -844,17 +844,6 @@ public class Player : MonoBehaviour //플레이어
         if (s == avoid || s == critical) esr.flipX = false;
         else esr.flipX = sr.flipX;
         esr.sortingOrder = l;
-
-        if (Mathf.Abs(PlayerAttack.skillP.y) < 100)
-        {
-            effect.transform.GetChild(0).gameObject.SetActive(true);
-            effect.transform.DetachChildren();
-        }
-        if (Mathf.Abs(PlayerAttack.wsP.y) < 100)
-        {
-            effect.transform.GetChild(1).gameObject.SetActive(true);
-            effect.transform.DetachChildren();
-        }
     }
 
 

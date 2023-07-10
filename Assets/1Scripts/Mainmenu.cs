@@ -24,11 +24,6 @@ public class Mainmenu : MonoBehaviour // 게임매니저 사용하려했는데 �
         menusound = transform.GetChild(0).GetComponent<AudioSource>();
     }
 
-    void Start()
-    {
-        Time.timeScale = 1;
-    }
-
 
     public void GameExit() // 게임 종료 버튼
     {

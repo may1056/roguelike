@@ -42,6 +42,7 @@ public class PlayerAttack : MonoBehaviour
     //bool weaponrotated = false;
     //float attackingtime = 0;
     public TrailRenderer weapontrail;
+    public GameObject swordps;
 
 
 
@@ -73,6 +74,7 @@ public class PlayerAttack : MonoBehaviour
     public Sprite[] skillXSprites;
 
     public ParticleSystem usableZps, useZps, usableXps, useXps;
+    public GameObject Zps, Xps;
 
 
 
@@ -189,6 +191,12 @@ public class PlayerAttack : MonoBehaviour
             manager.ReadOn(5, 0);
             manager.ReadOn(6, 0);
             Soundmanager.soundmanager.swordsounds[0].Play();
+
+            if (GameManager.ismeleeWeapon)
+            {
+                GameObject sw = Instantiate(swordps, transform.position, Quaternion.Euler(0, 0, weaponangle));
+                Destroy(sw, 1);
+            }
         }
 
         WeaponAnimation();
@@ -226,7 +234,11 @@ public class PlayerAttack : MonoBehaviour
             }
             float x = player.F ? -6 : 6;
             skillP = new Vector2(transform.position.x + x, transform.position.y);
+
             player.MakeEffect(skillP, skillSprite, -2, 1);
+            GameObject zps = Instantiate(Zps, skillP, Quaternion.identity);
+            Destroy(zps, 2);
+
             player.dontBehaveTime = 0;
             skillZ.gameObject.SetActive(true);
             manager.ReadOn(2, 0);
@@ -309,6 +321,7 @@ public class PlayerAttack : MonoBehaviour
         atk.transform.localPosition = new Vector2(0, 0);
         mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         weaponangle = Mathf.Atan2(mousePosition.y - atk.position.y, mousePosition.x - atk.position.x) * Mathf.Rad2Deg;
+
         switch (weaponNum.Item1)
         {
             case 0:
@@ -383,7 +396,11 @@ public class PlayerAttack : MonoBehaviour
         {
             wsP = transform.position;
             wscount--;
+
             player.MakeEffect(transform.position, ws0sprite, 10, 1);
+            GameObject xps = Instantiate(Xps, transform.position, Quaternion.identity);
+            Destroy(xps, 2);
+
             //소리
             Soundmanager.soundmanager.swordsounds[1].Play();
         }

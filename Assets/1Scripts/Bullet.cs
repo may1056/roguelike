@@ -297,20 +297,20 @@ public class Bullet : MonoBehaviour //탄막
     void Next2px()
     {
         GameObject PXB = Instantiate(pxb2, transform.position, Quaternion.Euler(0, 0, Random.Range(0, 360)));
-        PXB.GetComponent<Bullet>().bulletSpeed = Random.Range(2, 6);
+        PXB.GetComponent<Bullet>().bulletSpeed = Random.Range(3, 6);
 
         SpriteRenderer PXBsr = PXB.GetComponent<SpriteRenderer>();
         PXBsr.color = new Color(PXBsr.color.r + 0.1f * Random.Range(-2, 1),
-            PXBsr.color.g + 0.1f * Random.Range(-1, 2), PXBsr.color.b + 0.1f * Random.Range(0, 3));
+            PXBsr.color.g + 0.1f * Random.Range(-2, 2), PXBsr.color.b + 0.1f * Random.Range(0, 3));
     }
     void Next1px()
     {
         GameObject PXB = Instantiate(pxb1, transform.position, Quaternion.Euler(0, 0, Random.Range(0, 360)));
-        PXB.GetComponent<Bullet>().bulletSpeed = Random.Range(3, 8);
+        PXB.GetComponent<Bullet>().bulletSpeed = Random.Range(4, 8);
 
         SpriteRenderer PXBsr = PXB.GetComponent<SpriteRenderer>();
         PXBsr.color = new Color(PXBsr.color.r + 0.1f * Random.Range(-2, 1),
-            PXBsr.color.g + 0.1f * Random.Range(-1, 2), PXBsr.color.b + 0.1f * Random.Range(0, 3));
+            PXBsr.color.g + 0.1f * Random.Range(-2, 2), PXBsr.color.b + 0.1f * Random.Range(0, 3));
     }
 
 

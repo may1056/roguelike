@@ -41,6 +41,8 @@ public class NewWonderfulLeejonghwanShitWow : MonoBehaviour //메인메뉴 보�
 
     void Start()
     {
+        Time.timeScale = 1;
+
         //메인메뉴와 상호작용을 위해 끌고 오기
         mainmenu = GetComponent<Mainmenu>();
 

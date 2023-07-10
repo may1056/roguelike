@@ -250,7 +250,7 @@ public class Boss2 : MonoBehaviour
                 PlayerAttack.curAttackCooltime = 0;
             }
             //스킬 범위 내에 있음
-            if (Mathf.Abs(PlayerAttack.skillP.y) < 100 &&
+            if (Mathf.Abs(PlayerAttack.skillP.y) < 200 &&
                 Vector2.Distance(tp, PlayerAttack.skillP) < 5.5f)
             {
                 Apa(Color.red);
@@ -266,7 +266,7 @@ public class Boss2 : MonoBehaviour
             }
             //무기 파생 스킬 범위 내에 있음
             Vector2 wsp = PlayerAttack.wsP;
-            if (Mathf.Abs(wsp.y) < 100)
+            if (Mathf.Abs(wsp.y) < 200)
             {
                 switch (PlayerAttack.weaponNum.Item1)
                 {
@@ -278,7 +278,7 @@ public class Boss2 : MonoBehaviour
                         if (inX || inY)
                         {
                             Apa(Color.red);
-                            hp -= 2 * player.skillPower;
+                            hp -= player.skillPower + 1;
 
                             int r = Random.Range(0, 5);
                             if (r < player.purple)
@@ -501,7 +501,7 @@ public class Boss2 : MonoBehaviour
 
         SpriteRenderer PXBsr = PXB.GetComponent<SpriteRenderer>();
         PXBsr.color = new Color(PXBsr.color.r + 0.1f * Random.Range(-2, 1),
-            PXBsr.color.g + 0.1f * Random.Range(-1, 2), PXBsr.color.b + 0.1f * Random.Range(0, 3));
+            PXBsr.color.g + 0.1f * Random.Range(-2, 2), PXBsr.color.b + 0.1f * Random.Range(0, 3));
 
         MakeEffect(bulletborder, PXBsr.color);
     }
@@ -565,7 +565,7 @@ public class Boss2 : MonoBehaviour
     {
         rb.GetComponent<SpriteRenderer>().color = Color.red;
         rb.GetComponent<Bullet>().bulletSpeed = Random.Range(1, 6);
-        rb.localScale = 1.25f * Vector2.one;
+        rb.localScale = (1 + 0.25f * Random.Range(0, 3)) * Vector2.one;
     }
     void MakeSquare(float red, bool ud, int k)
     {

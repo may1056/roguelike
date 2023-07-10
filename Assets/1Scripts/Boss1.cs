@@ -235,7 +235,7 @@ public class Boss1 : MonoBehaviour{
             PlayerAttack.curAttackCooltime = 0;
         }
         //스킬 범위 내에 있음
-        if (Mathf.Abs(PlayerAttack.skillP.y) < 100 &&
+        if (Mathf.Abs(PlayerAttack.skillP.y) < 200 &&
             Vector2.Distance(tp, PlayerAttack.skillP) < 5.5f)
         {
             Apa(Color.red);
@@ -251,7 +251,7 @@ public class Boss1 : MonoBehaviour{
         }
         //무기 파생 스킬 범위 내에 있음
         Vector2 wsp = PlayerAttack.wsP;
-        if (Mathf.Abs(wsp.y) < 100)
+        if (Mathf.Abs(wsp.y) < 200)
         {
             switch (PlayerAttack.weaponNum.Item1)
             {
@@ -263,7 +263,7 @@ public class Boss1 : MonoBehaviour{
                     if (inX || inY)
                     {
                         Apa(Color.red);
-                        hp -= 2 * Player.player.skillPower;
+                        hp -= Player.player.skillPower + 1;
 
                         int r = Random.Range(0, 5);
                         if (r < Player.player.purple)

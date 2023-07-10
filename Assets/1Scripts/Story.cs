@@ -43,6 +43,8 @@ public class Story : MonoBehaviour
 
     void Start()
     {
+        Time.timeScale = 1;
+
         trianglesr = textbarTriangle.GetComponent<Image>();
         storyAudioSource = GetComponent<AudioSource>();
         menusound = transform.GetChild(0).GetComponent<AudioSource>();
