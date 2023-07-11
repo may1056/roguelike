@@ -442,6 +442,39 @@ public class GameManager : MonoBehaviour //게임 총괄
             case 5: player.StartBG(4); break; //배경4 : 보스1 (2-4)
             case 9: player.StartBG(5); break; //배경5 : 보스2 (3-4)
         }
+
+        //switch (floor)
+        //{
+        //    case 1:
+        //        if (stage == 1) Soundmanager.soundmanager.bgmTime = 0;
+        //        Soundmanager.soundmanager.bgm[0].time = Soundmanager.soundmanager.bgmTime;
+        //        Soundmanager.soundmanager.bgm[0].Play();
+        //        player.StartBG(1);
+        //        break;
+
+        //    case 2:
+        //        if (stage == 4) player.StartBG(4);
+        //        else
+        //        {
+        //            if (stage == 1) Soundmanager.soundmanager.bgmTime = 0;
+        //            Soundmanager.soundmanager.bgm[1].time = Soundmanager.soundmanager.bgmTime;
+        //            Soundmanager.soundmanager.bgm[1].Play();
+        //            player.StartBG(2);
+        //        }
+        //        break;
+
+        //    case 3:
+        //        if (stage == 4) player.StartBG(5);
+        //        else
+        //        {
+        //            if (stage == 1) Soundmanager.soundmanager.bgmTime = 0;
+        //            Soundmanager.soundmanager.bgm[2].time = Soundmanager.soundmanager.bgmTime;
+        //            Soundmanager.soundmanager.bgm[2].Play();
+        //            player.StartBG(3);
+        //        }
+        //        break;
+        //}
+
         if (shouldplaytutorial) player.StartBG(0); //배경0 : 튜토리얼
 
 
@@ -814,6 +847,8 @@ public class GameManager : MonoBehaviour //게임 총괄
     {
         player.SaveHP();
         playerAtk.SaveMP();
+
+        Soundmanager.soundmanager.bgmTime = Soundmanager.soundmanager.bgm[floor - 1].time;
 
         stage++;
 
