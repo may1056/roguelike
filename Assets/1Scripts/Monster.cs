@@ -235,7 +235,7 @@ public class Monster : MonoBehaviour //잡몹
                 break;
 
             case 7: //ghost
-                H = 10.0f / dist;
+                H = 5.0f / dist;
                 Targeting();
                 if (dist < 0.5f) Pokbal();
                 break;
@@ -307,10 +307,9 @@ public class Monster : MonoBehaviour //잡몹
 
 
 
-
         //스킬 범위 내에 있음
         if (Mathf.Abs(PlayerAttack.skillP.y) < 200 &&
-            Vector2.Distance(tp, PlayerAttack.skillP) < 5.5f)
+            Vector2.Distance(tp, PlayerAttack.skillP) < (monsterNum >= 10 && monsterNum <= 15 ? 8f : 5.5f))
         {
             Apa(Color.red);
             hp -= Player.player.skillPower;
@@ -334,10 +333,12 @@ public class Monster : MonoBehaviour //잡몹
             switch (PlayerAttack.weaponNum.Item1)
             {
                 case 0:
-                    bool inX = Mathf.Abs(wsp.x - tp.x) < 7.5f
-                        && Mathf.Abs(wsp.y - tp.y) < 1;
-                    bool inY = Mathf.Abs(wsp.y - tp.y) < 7.5f
-                        && Mathf.Abs(wsp.x - tp.x) < 1;
+                    bool inX = monsterNum >= 10 && monsterNum <= 15 ?
+                        Mathf.Abs(wsp.x - tp.x) < 8.5f && Mathf.Abs(wsp.y - tp.y) < 3 :
+                        Mathf.Abs(wsp.x - tp.x) < 7.5f && Mathf.Abs(wsp.y - tp.y) < 1;
+                    bool inY = monsterNum >= 10 && monsterNum <= 15 ?
+                        Mathf.Abs(wsp.y - tp.y) < 9.5f && Mathf.Abs(wsp.x - tp.x) < 2 :
+                        Mathf.Abs(wsp.y - tp.y) < 7.5f && Mathf.Abs(wsp.x - tp.x) < 1;
                     if (inX || inY)
                     {
                         Apa(Color.red);
@@ -767,6 +768,7 @@ public class Monster : MonoBehaviour //잡몹
 
             case 4: //얼음용용이
             case 6: //불용용이
+            case 8: //암흑용용이
                 MakeEffect(tp, c, 0.9f);
                 break;
 
@@ -844,7 +846,7 @@ public class Monster : MonoBehaviour //잡몹
         //hsr.flipX = sr.flipX;
         hsr.sortingOrder = 5;
 
-        if (monsterNum == 4 || monsterNum == 6)
+        if (monsterNum == 4 || monsterNum == 6 || monsterNum == 8)
             hsr.sprite = D_U ? EmptyD : EmptyU;
         else hsr.sprite = Empty;
 

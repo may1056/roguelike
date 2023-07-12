@@ -323,6 +323,7 @@ public class Bullet : MonoBehaviour //탄막
             ParticleSystem.MainModule psmain = transform.GetChild(0).GetComponent<ParticleSystem>().main;
             psmain.loop = false;
 
+            Destroy(transform.GetChild(0).gameObject, 2);
             transform.DetachChildren();
         }
 

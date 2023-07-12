@@ -153,7 +153,7 @@ MonoBehaviour:
   pollution: 0
   polluted: 0
   NoticeSprite: {fileID: 21300000, guid: 37ef1c2e4d4df2f46b3b16a28fad0ed0, type: 3}
-  noticeDist: 50
+  noticeDist: 300
   pf:
     serializedVersion: 2
     m_Bits: 0
@@ -239,7 +239,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!61 &6674191785051546347
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -257,7 +257,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 6, y: 6}
+    oldSize: {x: 2, y: 2}
     newSize: {x: 0.16, y: 0.16}
     adaptiveTilingThreshold: 0.5
     drawMode: 0

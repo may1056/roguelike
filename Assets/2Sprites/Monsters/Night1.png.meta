@@ -42,7 +42,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -113,9 +113,62 @@ TextureImporter:
     overridden: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Windows Store Apps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: Night1_0
+      rect:
+        serializedVersion: 2
+        x: 19
+        y: 1
+        width: 20
+        height: 31
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape:
+      - - {x: -4, y: -15.5}
+        - {x: -6, y: -13.5}
+        - {x: -6, y: -11.5}
+        - {x: -4, y: -9.5}
+        - {x: -2, y: -3.5}
+        - {x: -3, y: 3.5}
+        - {x: -8, y: 1.5}
+        - {x: -10, y: 3.5}
+        - {x: -10, y: 6.5}
+        - {x: -5, y: 13.5}
+        - {x: -1, y: 13.5}
+        - {x: 1, y: 15.5}
+        - {x: 4, y: 15.5}
+        - {x: 9, y: 7.5}
+        - {x: 10, y: 2.5}
+        - {x: 10, y: -0.5}
+        - {x: 6, y: -4.5}
+        - {x: 8, y: -10.5}
+        - {x: 8, y: -13.5}
+        - {x: 6, y: -15.5}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 64e28192c8627c546a291a68100b8d63
+      internalID: -426224499
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -126,7 +179,8 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Night1_0: -426224499
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

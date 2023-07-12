@@ -12,6 +12,7 @@ public class Player : MonoBehaviour //플레이어
     public static Player player;
     //public static으로 설정한 변수는 다른 스크립트에서 맘대로 퍼갈 수 있다
 
+    public Boss1 boss1;
     public Boss2 boss2;
 
     Rigidbody2D rigid;
@@ -665,7 +666,7 @@ public class Player : MonoBehaviour //플레이어
 
         //쉴드 재충전
         dontBehaveTime += Time.deltaTime;
-        if (dontBehaveTime > (selfinjury ? 10 : 3) && shield < maxshield)
+        if (dontBehaveTime > (selfinjury ? 2 : 1) * (4 - maxshield) && shield < maxshield)
         {
             recover.Play();
             shield++;
@@ -932,6 +933,62 @@ public class Player : MonoBehaviour //플레이어
                 }
             }
         }
+
+
+        if (boss1.gameObject.activeSelf)
+        {
+            Vector2 b1p = boss1.transform.position;
+
+            if (((b1p.x > X1 && b1p.x < X2) || (b1p.x < X1 && b1p.x > X2))
+                && b1p.y > Y - 7 && b1p.y < Y + 7)
+            {
+                boss1.hp -= skillPower;
+
+                int r = Random.Range(0, 5);
+                if (r < purple)
+                {
+                    boss1.hp--;
+                    MakeEffect(new Vector2(b1p.x, b1p.y + 9), critical, 5, 1);
+                }
+                if (poison) boss2.RepeatAD();
+
+                GameObject dd = Instantiate(fadeEffect, b1p, Quaternion.identity);
+                SpriteRenderer ddsr = dd.GetComponent<SpriteRenderer>();
+                ddsr.sprite = dashdealEff;
+                ddsr.sortingOrder = 8;
+            }
+
+
+            for (int j = 0; j < boss1.chessEmptySpace.transform.childCount; j++)
+            {
+                Transform cj = boss1.chessEmptySpace.transform.GetChild(j);
+
+                Vector2 mv = cj.position;
+
+                if (((mv.x > X1 && mv.x < X2) || (mv.x < X1 && mv.x > X2))
+                    && mv.y > Y - 3 && mv.y < Y + 3)
+                {
+                    Monster cjm = cj.GetComponent<Monster>();
+                    cjm.Apa(Color.red);
+                    cjm.hp -= skillPower;
+
+                    int r = Random.Range(0, 5);
+                    if (r < purple)
+                    {
+                        cjm.hp--;
+                        MakeEffect(new Vector2(mv.x, mv.y + 4), critical, 5, 1);
+                    }
+                    if (poison) cjm.RepeatAD();
+
+                    GameObject dd = Instantiate(fadeEffect, mv, Quaternion.identity);
+                    SpriteRenderer ddsr = dd.GetComponent<SpriteRenderer>();
+                    ddsr.sprite = dashdealEff;
+                    ddsr.sortingOrder = 8;
+                }
+
+            }
+        }
+
 
         if (boss2.gameObject.activeSelf)
         {

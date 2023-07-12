@@ -142,7 +142,7 @@ public class PlayerBullet : MonoBehaviour
 
             float boss1dist = Vector2.Distance(tp, b1.transform.position);
 
-            if (boss1dist < 1 && !boss1dealed)
+            if (boss1dist < 2 && !boss1dealed)
             {
                 boss1dealed = true;
 
@@ -158,7 +158,7 @@ public class PlayerBullet : MonoBehaviour
                     if (r < Player.player.purple)
                     {
                         b1.hp--;
-                        Player.player.MakeEffect(new Vector2(b1.transform.position.x, b1.transform.position.y + 2), Player.player.critical, 5, 1);
+                        Player.player.MakeEffect(new Vector2(b1.transform.position.x, b1.transform.position.y + 8), Player.player.critical, 5, 1);
                     }
                     if (Player.player.poison) b1.RepeatAD();
 
@@ -168,7 +168,7 @@ public class PlayerBullet : MonoBehaviour
                 DestroyReverb();
             }
 
-            if (boss1dist > 1) boss1dealed = false;
+            if (boss1dist > 2) boss1dealed = false;
         }
 
         //if (Mathf.Abs(tp.x) > 100 || Mathf.Abs(tp.y) > 100) Destroy(gameObject);
@@ -195,12 +195,32 @@ public class PlayerBullet : MonoBehaviour
 
             MakeEffect(collision.transform.position, Color.red, 1);
         }
-    }
+
+
+        if (collision.gameObject.CompareTag("Boss1") &&
+            collision.gameObject.layer == 20 && pbType == 1) //보스1
+        {
+            Boss1 b1 = Boss1.boss1;
+            b1.Apa(Color.red);
+            b1.hp -= Player.player.skillPower;
+
+            int r = Random.Range(0, 5);
+            if (r < Player.player.purple)
+            {
+                b1.hp--;
+                Player.player.MakeEffect(new Vector2(collision.transform.position.x, collision.transform.position.y + 8), Player.player.critical, 5, 1);
+            }
+            if (Player.player.poison) b1.RepeatAD();
+
+            //MakeEffect(collision.transform.position, Color.red, 1);
+        }
+
+    } //OnCollisionEnter2D End
 
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.layer == 9 && pbType != 1) //플랫폼
+        if (other.gameObject.layer == 9 && pbType != 1 && !re) //플랫폼
         {
             MakeEffect(transform.position, Color.gray, 1);
             DestroyReverb();
@@ -324,6 +344,7 @@ public class PlayerBullet : MonoBehaviour
             ParticleSystem.MainModule psmain = transform.GetChild(0).GetComponent<ParticleSystem>().main;
             psmain.loop = false;
 
+            Destroy(transform.GetChild(0).gameObject, 2);
             transform.DetachChildren();
         }
 

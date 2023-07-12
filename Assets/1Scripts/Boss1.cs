@@ -9,6 +9,8 @@ public class Boss1 : MonoBehaviour{
     //첫번째 보스 체스 퀸
     public static Boss1 boss1;
 
+    public GameObject chessEmptySpace; //체스말들 다 여기 종속시킬 거임
+
     Rigidbody2D rigid;
     BoxCollider2D col;
     SpriteRenderer sr;
@@ -95,9 +97,7 @@ public class Boss1 : MonoBehaviour{
 
     void ModifyHp() //hp bar 최신화
     {
-        hpText.text = hp.ToString(); //임시
-
-        if (hp > 0) hpBAR.rectTransform.sizeDelta = new Vector2(hp * 4, 70);
+        if (hp > 0) hpBAR.rectTransform.sizeDelta = new Vector2(hp, 70);
         else hpBAR.gameObject.SetActive(false);
 
         //if (t > 100 && t < 120)
@@ -129,7 +129,8 @@ public class Boss1 : MonoBehaviour{
         {
             for (int i = 0; i < 2; i++)
             {
-                Instantiate(pon, transform.position, Quaternion.identity);
+                GameObject PON = Instantiate(pon, transform.position, Quaternion.identity);
+                PON.transform.SetParent(chessEmptySpace.transform);
 
                 transform.position = new Vector2(-10 + i * 3, 0);
 
@@ -154,6 +155,8 @@ public class Boss1 : MonoBehaviour{
         InvokeRepeating(nameof(Ponspon), 3, 13); //ponspon end
 
         firstP = transform.position;
+
+        Soundmanager.soundmanager.bossbgm[0].Play();
     }
     private void Update()
     {
@@ -172,6 +175,7 @@ public class Boss1 : MonoBehaviour{
             if (spons)
             {
                 GameObject knightsss = Instantiate(knight, transform.position, Quaternion.identity);
+                knightsss.transform.SetParent(chessEmptySpace.transform);
                 transform.position = new Vector2(0,0);
                 spons = false;
             }
@@ -183,6 +187,7 @@ public class Boss1 : MonoBehaviour{
             if (!spons)
             {
                 GameObject bishopsss = Instantiate(bishop, transform.position, Quaternion.identity);
+                bishopsss.transform.SetParent(chessEmptySpace.transform);
                 transform.position = new Vector2(0, 0);
                 spons = true;
             }
@@ -193,6 +198,7 @@ public class Boss1 : MonoBehaviour{
             if (spons)
             {
                 GameObject looksss = Instantiate(look, transform.position, Quaternion.identity);
+                looksss.transform.SetParent(chessEmptySpace.transform);
                 transform.position = new Vector2(0, 0);
                 spons = false;
             }
@@ -228,7 +234,7 @@ public class Boss1 : MonoBehaviour{
             if (r < Player.player.purple)
             {
                 hp--;
-                Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
+                Player.player.MakeEffect(new Vector2(tp.x, tp.y + 9), Player.player.critical, 5, 1);
             }
             if (Player.player.poison) RepeatAD();
 
@@ -236,7 +242,7 @@ public class Boss1 : MonoBehaviour{
         }
         //스킬 범위 내에 있음
         if (Mathf.Abs(PlayerAttack.skillP.y) < 200 &&
-            Vector2.Distance(tp, PlayerAttack.skillP) < 5.5f)
+            Mathf.Abs(PlayerAttack.skillP.x - tp.x) < 5 && Mathf.Abs(PlayerAttack.skillP.y - tp.y) < 8)
         {
             Apa(Color.red);
             hp -= player.skillPower;
@@ -245,7 +251,7 @@ public class Boss1 : MonoBehaviour{
             if (r < Player.player.purple)
             {
                 hp--;
-                Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
+                Player.player.MakeEffect(new Vector2(tp.x, tp.y + 9), Player.player.critical, 5, 1);
             }
             if (Player.player.poison) RepeatAD();
         }
@@ -256,10 +262,10 @@ public class Boss1 : MonoBehaviour{
             switch (PlayerAttack.weaponNum.Item1)
             {
                 case 0:
-                    bool inX = Mathf.Abs(wsp.x - tp.x) < 7.5f
-                        && Mathf.Abs(wsp.y - tp.y) < 1;
-                    bool inY = Mathf.Abs(wsp.y - tp.y) < 7.5f
-                        && Mathf.Abs(wsp.x - tp.x) < 1;
+                    bool inX = Mathf.Abs(wsp.x - tp.x) < 10f
+                        && Mathf.Abs(wsp.y - tp.y) < 7;
+                    bool inY = Mathf.Abs(wsp.y - tp.y) < 13.5f
+                        && Mathf.Abs(wsp.x - tp.x) < 3.5f;
                     if (inX || inY)
                     {
                         Apa(Color.red);
@@ -269,7 +275,7 @@ public class Boss1 : MonoBehaviour{
                         if (r < Player.player.purple)
                         {
                             hp--;
-                            Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
+                            Player.player.MakeEffect(new Vector2(tp.x, tp.y + 9), Player.player.critical, 5, 1);
                         }
                         if (Player.player.poison) RepeatAD();
                     }
@@ -283,7 +289,8 @@ public class Boss1 : MonoBehaviour{
         transform.GetChild(0).GetComponent<SpriteRenderer>().color
             = new Color(1, 1, 1, pollution);
         transform.GetChild(0).gameObject.SetActive(pollution > 0);
-    }//update end
+
+    } //Update End
 
 
     public void RepeatAD() //AfterDamage() 반복
@@ -301,7 +308,7 @@ public class Boss1 : MonoBehaviour{
             if (r < Player.player.purple)
             {
                 hp--;
-                Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
+                Player.player.MakeEffect(new Vector2(tp.x, tp.y + 9), Player.player.critical, 5, 1);
             }
         }
     }

@@ -11,8 +11,6 @@ public class AutoAttack : MonoBehaviour
     public GameObject pollutingbullet;
 
 
-    public Boss2 boss2;
-
 
 
     void Start()
@@ -30,7 +28,22 @@ public class AutoAttack : MonoBehaviour
 
         if (manager.transform.childCount == 1) //게임매니저 자손이 있다면, 즉 맵(Grid)이 만들어져 있다면
         {
-            if (manager.transform.GetChild(0).childCount > 2) //게임매니저 0번 자손인 맵(Grid)의 자손이 둘보다 크다면, 즉 Block과 Ground 말고도 몬스터집합이 존재한다면, 즉 전투가 진행 중이라면
+
+            if (Boss1.boss1.gameObject.activeSelf)
+            {
+                for (int j = 0; j < Boss1.boss1.chessEmptySpace.transform.childCount; j++)
+                {
+                    float d = Vector2.Distance(transform.position, Boss1.boss1.chessEmptySpace.transform.GetChild(j).transform.position); //몬스터까지의 거리 일단 저장
+
+                    if (d <= nowdist) //그 거리가 현재 지정된 타겟까지의 거리보다 작으면
+                    {
+                        nowdist = d; //가까운 거리 저장
+                        nowtarget = Boss1.boss1.chessEmptySpace.transform.GetChild(j); //가까운 타겟으로 변경
+                    }
+                }
+            }
+
+            else if (manager.transform.GetChild(0).childCount > 2) //게임매니저 0번 자손인 맵(Grid)의 자손이 둘보다 크다면, 즉 Block과 Ground 말고도 몬스터집합이 존재한다면, 즉 전투가 진행 중이라면
             {
                 for (int i = 2; i < manager.transform.GetChild(0).childCount; i++) //맵의 2번 자손부터 마지막 번호 자손까지, 즉 모든 몬스터집합에 대해
                 {
@@ -41,11 +54,12 @@ public class AutoAttack : MonoBehaviour
                         if (d <= nowdist) //그 거리가 현재 지정된 타겟까지의 거리보다 작으면
                         {
                             nowdist = d; //가까운 거리 저장
-                            nowtarget = manager.transform.GetChild(0).GetChild(i).GetChild(j).transform; //가까운 타겟으로 변경
+                            nowtarget = manager.transform.GetChild(0).GetChild(i).GetChild(j); //가까운 타겟으로 변경
                         }
                     }
                 }
             }
+
         }
 
         if (nowdist < 5) target = nowtarget; //공격 범위 5 내에 최종 결정된 타겟이 존재하면 해당 몬스터를 타겟으로 지정
@@ -57,13 +71,16 @@ public class AutoAttack : MonoBehaviour
 
     void ShootBullet() //타겟이 있다면, 오염 탄알을 자기 위치에서 타겟을 바라보는 방향의 각도로 생성
     {
-        Vector2 tp = transform.position, b2tp = boss2.transform.position;
+        Vector2 tp = transform.position, b1tp = Boss1.boss1.transform.position, b2tp = Boss2.boss2.transform.position;
 
         if (target != null) Instantiate(pollutingbullet, tp,
             Quaternion.Euler(0, 0, Mathf.Rad2Deg * Mathf.Atan2(target.transform.position.y - tp.y, target.transform.position.x - tp.x)));
 
-        else if (boss2.gameObject.activeSelf && Vector2.Distance(tp, b2tp) < 5) Instantiate(pollutingbullet, tp,
-            Quaternion.Euler(0, 0, Mathf.Rad2Deg * Mathf.Atan2(b2tp.y - tp.y, b2tp.x - tp.x)));
+        else if (Boss1.boss1.gameObject.activeSelf && Mathf.Abs(b1tp.y - tp.y) < 11 && Mathf.Abs(b1tp.x - tp.x) < 7)
+            Instantiate(pollutingbullet, tp, Quaternion.Euler(0, 0, Mathf.Rad2Deg * Mathf.Atan2(b1tp.y - tp.y, b1tp.x - tp.x)));
+
+        else if (Boss2.boss2.gameObject.activeSelf && Vector2.Distance(tp, b2tp) < 5)
+            Instantiate(pollutingbullet, tp, Quaternion.Euler(0, 0, Mathf.Rad2Deg * Mathf.Atan2(b2tp.y - tp.y, b2tp.x - tp.x)));
     }
 
 } //AutoAttack

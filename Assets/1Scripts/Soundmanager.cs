@@ -20,7 +20,7 @@ public class Soundmanager : MonoBehaviour
     public AudioSource basicskillsound;
 
     public AudioSource[] bgm, bossbgm;
-    public float bgmTime;
+    public static float bgmTime;
 
 
     private void Awake()

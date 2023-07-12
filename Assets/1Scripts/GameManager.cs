@@ -76,7 +76,7 @@ public class GameManager : MonoBehaviour //게임 총괄
         "사망 시 체력과 마나가 모두 충전된 상태로 부활합니다. (아이템 소멸)", //부활
         "적을 타겟팅하는 공격자를 소환합니다. 약하지만, 적을 감속시킵니다.", //자동 공격
         "크큭.. 왼손의 흑염룡이 미쳐 날뛰려 하는 군.. 흑마법의 힘으로 모두 파.괘.해주겟어 체력 1, 쉴드 회복 느림, 공속 증가, 마나 무한, 쿨타임 감소", //자해
-        "피격 시 체력 대신 소모되는 방어막을 하나 더 갖습니다. 그리고 무적 시간이 길어집니다.", //쉴드
+        "피격 시 체력 대신 소모되는 방어막을 하나 더 갖습니다. 무적 시간이 길어지고, 쉴드 충전 시간이 감소합니다.", //쉴드
         "체력이 2 이하일 때 공격력이 2 증가합니다.", //버서커
         "대쉬 폼 미쳤다 ㄷㄷ 대쉬 거리 증가, 최대 스태미나 증가, 스태미나 회복 시간 감소", //대쉬 강화
 
@@ -358,6 +358,40 @@ public class GameManager : MonoBehaviour //게임 총괄
 
     void Start()
     {
+        switch (floor)
+        {
+            case 1:
+                if (stage == 1) Soundmanager.bgmTime = 0;
+                Soundmanager.soundmanager.bgm[0].time = Soundmanager.bgmTime;
+                Soundmanager.soundmanager.bgm[0].Play();
+                player.StartBG(1);
+                break;
+
+            case 2:
+                if (stage == 4) player.StartBG(4);
+                else
+                {
+                    if (stage == 1) Soundmanager.bgmTime = 0;
+                    Soundmanager.soundmanager.bgm[1].time = Soundmanager.bgmTime;
+                    Soundmanager.soundmanager.bgm[1].Play();
+                    player.StartBG(2);
+                }
+                break;
+
+            case 3:
+                if (stage == 4) player.StartBG(5);
+                else
+                {
+                    if (stage == 1) Soundmanager.bgmTime = 0;
+                    Soundmanager.soundmanager.bgm[2].time = Soundmanager.bgmTime;
+                    Soundmanager.soundmanager.bgm[2].Play();
+                    player.StartBG(3);
+                }
+                break;
+        }
+
+        if (shouldplaytutorial) player.StartBG(0); //배경0 : 튜토리얼
+
         if (atFirst)
         {
             atFirst = false;
@@ -433,49 +467,15 @@ public class GameManager : MonoBehaviour //게임 총괄
         bossHpLine.gameObject.SetActive(stage == 4);
 
 
-        //배경 설정
-        switch (floor * (floor - 1) - 1 + stage)
-        {
-            case 0: case 1: player.StartBG(1); break; //배경1 : 1-1, 1-2
-            case 2: case 3: case 4: player.StartBG(2); break; //배경2 : 2-1, 2-2, 2-3
-            case 6: case 7: case 8: player.StartBG(3); break; //배경3 : 3-1, 3-2, 3-3
-            case 5: player.StartBG(4); break; //배경4 : 보스1 (2-4)
-            case 9: player.StartBG(5); break; //배경5 : 보스2 (3-4)
-        }
-
-        //switch (floor)
+        ////배경 설정
+        //switch (floor * (floor - 1) - 1 + stage)
         //{
-        //    case 1:
-        //        if (stage == 1) Soundmanager.soundmanager.bgmTime = 0;
-        //        Soundmanager.soundmanager.bgm[0].time = Soundmanager.soundmanager.bgmTime;
-        //        Soundmanager.soundmanager.bgm[0].Play();
-        //        player.StartBG(1);
-        //        break;
-
-        //    case 2:
-        //        if (stage == 4) player.StartBG(4);
-        //        else
-        //        {
-        //            if (stage == 1) Soundmanager.soundmanager.bgmTime = 0;
-        //            Soundmanager.soundmanager.bgm[1].time = Soundmanager.soundmanager.bgmTime;
-        //            Soundmanager.soundmanager.bgm[1].Play();
-        //            player.StartBG(2);
-        //        }
-        //        break;
-
-        //    case 3:
-        //        if (stage == 4) player.StartBG(5);
-        //        else
-        //        {
-        //            if (stage == 1) Soundmanager.soundmanager.bgmTime = 0;
-        //            Soundmanager.soundmanager.bgm[2].time = Soundmanager.soundmanager.bgmTime;
-        //            Soundmanager.soundmanager.bgm[2].Play();
-        //            player.StartBG(3);
-        //        }
-        //        break;
+        //    case 0: case 1: player.StartBG(1); break; //배경1 : 1-1, 1-2
+        //    case 2: case 3: case 4: player.StartBG(2); break; //배경2 : 2-1, 2-2, 2-3
+        //    case 6: case 7: case 8: player.StartBG(3); break; //배경3 : 3-1, 3-2, 3-3
+        //    case 5: player.StartBG(4); break; //배경4 : 보스1 (2-4)
+        //    case 9: player.StartBG(5); break; //배경5 : 보스2 (3-4)
         //}
-
-        if (shouldplaytutorial) player.StartBG(0); //배경0 : 튜토리얼
 
 
         //진입해본 스테이지는 잠금해제
@@ -848,7 +848,7 @@ public class GameManager : MonoBehaviour //게임 총괄
         player.SaveHP();
         playerAtk.SaveMP();
 
-        Soundmanager.soundmanager.bgmTime = Soundmanager.soundmanager.bgm[floor - 1].time;
+        Soundmanager.bgmTime = Soundmanager.soundmanager.bgm[floor - 1].time;
 
         stage++;
 
