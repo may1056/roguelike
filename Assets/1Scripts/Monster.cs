@@ -15,7 +15,7 @@ public class Monster : MonoBehaviour //잡몹
     /// 공통
     /// </summary>
 
-    Rigidbody2D rigid;
+    public Rigidbody2D rigid;
     Vector2 tp;
     Vector2 nowPosition;
 
@@ -114,6 +114,14 @@ public class Monster : MonoBehaviour //잡몹
 
 
 
+    /// <summary>
+    /// 체스말 관련
+    /// </summary>
+
+    float speed;
+    bool dashing = false;
+
+
 
 
     void Awake()
@@ -137,6 +145,7 @@ public class Monster : MonoBehaviour //잡몹
         nowPosition = new Vector2(999,999);
 
         hp = GameManager.hardmode ? maxhp : (maxhp + 1) / 2;
+        maxhp = hp;
         C = transform.GetChild(0);
         ModifyHp();
 
@@ -148,7 +157,20 @@ public class Monster : MonoBehaviour //잡몹
 
         pol = transform.GetChild(1);
 
-        if (monsterNum == 3) bulletTime = 2;
+        switch (monsterNum)
+        {
+            case 3: bulletTime = 2; break;
+
+            case 10:
+                speed = 1;
+                InvokeRepeating(nameof(Pawn), Random.Range(1, 5), 5);
+                break;
+            case 11:
+                speed = 1;
+                int r = Random.Range(1, 6);
+                InvokeRepeating(nameof(Knight), r, 6);
+                break;
+        }
 
     } //Start End
 
@@ -239,20 +261,18 @@ public class Monster : MonoBehaviour //잡몹
                 Targeting();
                 if (dist < 0.5f) Pokbal();
                 break;
+
             case 10: //pon
-                //플레이어를 향해 이동 방향을 변경한다 (아프면 빨라짐)
-                if (tp.x > pp.x) H = hp == maxhp ? -2 : -4;
-                else H = hp == maxhp ? 2 : 4;
-
+                H = tp.x > pp.x ? -speed : speed;
                 Targeting();
                 break;
+
             case 11: //knight
-                //플레이어를 향해 이동 방향을 변경한다 (아프면 빨라짐)
-                if (tp.x > pp.x) H = hp == maxhp ? -2 : -4;
-                else H = hp == maxhp ? 2 : 4;
-
+                H = tp.x > pp.x ? -100 : 100;
                 Targeting();
+                sr.color = dashing ? new(0.3f, 0.3f, 0.3f) : Color.white;
                 break;
+
             case 12: //bishop
                 //플레이어를 향해 이동 방향을 변경한다 (아프면 빨라짐)
                 if (tp.x > pp.x) H = hp == maxhp ? -2 : -4;
@@ -592,6 +612,32 @@ public class Monster : MonoBehaviour //잡몹
 
 
 
+    void Pawn()
+    {
+        rigid.AddForce(100 * new Vector2(H, 0));
+        speed += 1 / speed;
+    }
+
+    void Knight()
+    {
+        rigid.AddForce(new Vector2(Mathf.Abs(Player.player.transform.position.x - tp.x) > 2 ? speed * H : 0, 100 * speed * (1 - pollution)));
+        speed += 1 / speed;
+        dashing = true;
+    }
+
+    void Bishop()
+    {
+
+    }
+
+    void Rook()
+    {
+
+    }
+
+
+
+
     public void RemovePollution() //오염 제거
     {
         if (polluted) pollution = 0;
@@ -683,34 +729,12 @@ public class Monster : MonoBehaviour //잡몹
                 if (moving) transform.Translate(H * (1 - pollution) * Time.deltaTime
                     * new Vector2(pp.x - tp.x, pp.y - tp.y).normalized);
                 break;
-            case 10: //pon
-                if (moving)
-                {
-                    transform.Translate(H * (1 - pollution) *
-                        Time.deltaTime * Vector2.right);
-
-                    //벽에 막혀 안 움직이면 점프
 
 
-
-
-
-                }
-                break;
             case 11: //knight
-                if (moving)
-                {
-                    transform.Translate(H * (1 - pollution) *
-                        Time.deltaTime * Vector2.right);
-
-                    //벽에 막혀 안 움직이면 점프
-
-
-
-
-
-                }
+                transform.Translate(H / 100 * speed * (1 - pollution) * Time.deltaTime * Vector2.right);
                 break;
+
             case 12: //bishop
                 if (moving)
                 {
@@ -803,9 +827,20 @@ public class Monster : MonoBehaviour //잡몹
     private void OnCollisionEnter2D(Collision2D collision)
     {
         int l = collision.gameObject.layer;
-        if (l == 11 || l == 13) withPlayer = true;
+        if (l == 11 || l == 13)
+        {
+            withPlayer = true;
+
+            if (dashing)
+            {
+                Player.hurted = Player.unbeatableTime <= 0;
+                dashing = false;
+            }
+        }
 
         if (l == 15) transform.position = firstP;
+
+        if (l == 8 || l == 9) dashing = false;
     }
 
 
@@ -874,7 +909,7 @@ public class Monster : MonoBehaviour //잡몹
 
         else //체스말 체력바
         {
-            C.transform.localScale = new Vector2(hp, 1);
+            C.transform.localScale = new Vector2(0.5f * hp, 0.5f);
         }
     }
 

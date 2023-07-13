@@ -759,6 +759,15 @@ public class Player : MonoBehaviour //플레이어
     {
         if (other.CompareTag("Respawn"))
             SceneManager.LoadScene(0); //낙사
+
+        if (other.gameObject.layer == 22 && dontBehaveTime <= 0) //redLaser
+            hurted = true;
+
+        if (other.gameObject.layer == 23 && dontBehaveTime <= 0) //blueLaser
+        {
+            hurted = true;
+            if (PlayerAttack.playerAtk.mp > 0) PlayerAttack.playerAtk.mp--;
+        }
     }
 
 
@@ -766,6 +775,15 @@ public class Player : MonoBehaviour //플레이어
     {
         if (other.gameObject.layer == 8) //8Block
             SlideCheck();
+
+        if (other.gameObject.layer == 22 && dontBehaveTime <= 0) //redLaser
+            hurted = true;
+
+        if (other.gameObject.layer == 23 && dontBehaveTime <= 0) //blueLaser
+        {
+            hurted = true;
+            if (PlayerAttack.playerAtk.mp > 0) PlayerAttack.playerAtk.mp--;
+        }
     }
 
 

@@ -87,6 +87,8 @@ public class NewWonderfulLeejonghwanShitWow : MonoBehaviour //메인메뉴 보�
     {
         if (savedcoin >= 10 * num && !locked[num])
         {
+            mainmenu.GetComponent<AudioSource>().Stop();
+
             //num으로 floor 계산
             selectedFloor = (num + 2) / 4 + 1;
             //num으로 stage 계산

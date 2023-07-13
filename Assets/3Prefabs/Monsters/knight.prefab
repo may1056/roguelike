@@ -30,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 428938650024458855}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 9, y: 4, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4730167093334587229}
@@ -51,6 +51,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   monsterNum: 11
+  rigid: {fileID: 0}
   fadeEffect: {fileID: 8326106217213998104, guid: c32a19154cf10874f974978490ab09ef, type: 3}
   doubleCircle: {fileID: 21300000, guid: bc8cdb377d76208459a0ccc268b24045, type: 3}
   hp: 0
@@ -61,7 +62,7 @@ MonoBehaviour:
   - {fileID: 1743799531, guid: 5e38e6b0e5266ec44ab65d691d41382f, type: 3}
   - {fileID: 845095873, guid: 5e38e6b0e5266ec44ab65d691d41382f, type: 3}
   - {fileID: -790288367, guid: 5e38e6b0e5266ec44ab65d691d41382f, type: 3}
-  Empty: {fileID: 21300000, guid: 09d90eaaa2b8dbd43923cad83d63798a, type: 3}
+  Empty: {fileID: 1486801489, guid: d54578bf12dd54e4da95a9a2cf8d3ee0, type: 3}
   hpOrb: {fileID: 6510405994357380013, guid: f298c78827c8618408d5e5c4b44641cc, type: 3}
   mpOrb: {fileID: 2026748482929784485, guid: dfc753a499df8d14bb6a7fc313dcaa13, type: 3}
   coinOrb: {fileID: 2026748482929784485, guid: 70d4039dbc797ac488ff53131785d764, type: 3}
@@ -122,7 +123,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 5
+  m_SortingOrder: 4
   m_Sprite: {fileID: -426224499, guid: aadc464737a354c9d9be8adb2efd5467, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0

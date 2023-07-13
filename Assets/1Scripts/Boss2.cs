@@ -20,6 +20,7 @@ public class Boss2 : MonoBehaviour
     public Text hpText; //임시 체력 텍스트
     public Image hpBAR;
     public Image hpCASE;
+    float gauge;
 
     Player player;
     public Camera cam, uicam;
@@ -110,6 +111,10 @@ public class Boss2 : MonoBehaviour
         Invoke(nameof(DashAttack), 1);
 
         hp = 80; //임시
+        gauge = 640.0f / 9.0f;
+        hpCASE.transform.GetChild(2).GetComponent<RectTransform>().localPosition = new(120, -5);
+        hpCASE.transform.GetChild(3).gameObject.SetActive(false);
+        hpCASE.transform.GetChild(4).gameObject.SetActive(false);
 
         InvokeRepeating(nameof(FollowEffect), 0.1f, 0.1f);
 
@@ -143,6 +148,13 @@ public class Boss2 : MonoBehaviour
         tp = transform.position;
 
 
+        if (hide) gauge = 320;
+        else gauge -= 320.0f / 9.0f * Time.deltaTime;
+        if (gauge < 0) gauge = 0;
+
+        hpCASE.transform.GetChild(1).GetComponent<RectTransform>().sizeDelta = new Vector2(gauge, 3);
+
+
         ModifyHp();
 
         if (hp <= 0) //발광
@@ -164,6 +176,7 @@ public class Boss2 : MonoBehaviour
                 MakeEffect(doubleCircle, Color.white);
 
                 hpCASE.transform.GetChild(1).gameObject.SetActive(false);
+                hpCASE.transform.GetChild(2).gameObject.SetActive(false);
 
                 ground.color = Color.white;
                 block.gameObject.SetActive(false);
@@ -366,7 +379,7 @@ public class Boss2 : MonoBehaviour
             * (hm ? 1 : 0.5f) * new Vector2(dashx, dashy).normalized, ForceMode2D.Impulse); //가속. 플레이어한테.
 
         for (int i = 0; i < (phase2 ? (hm ? 18 : 12) : (hm ? 9 : 6)); i++)
-            Invoke(nameof(DashBullet), i * (0.9f / (phase2 ? (hm ? 18 : 12) : (hm ? 9 : 6)))); //뒤로 탄막 뿌림
+            Invoke(nameof(DashBullet), i * (0.99f / (phase2 ? (hm ? 18 : 12) : (hm ? 9 : 6)))); //뒤로 탄막 뿌림
 
         if (!IsInvoking(nameof(HideMyself))) Invoke(nameof(HideMyself), 1);
     }
