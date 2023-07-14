@@ -71,6 +71,9 @@ public class Boss1 : MonoBehaviour
     public GameObject crown_ps;
 
 
+    bool hm;
+
+
 
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -241,12 +244,14 @@ public class Boss1 : MonoBehaviour
 
         sr = GetComponent<SpriteRenderer>();
 
-        InvokeRepeating(nameof(BeforeSpawn), 4, 20);
-        InvokeRepeating(nameof(Spawn), 5, 20);
+        hm = GameManager.hardmode;
 
-        gauge = 80;
+        InvokeRepeating(nameof(BeforeSpawn), 4, hm ? 10 : 20);
+        InvokeRepeating(nameof(Spawn), 5, hm ? 10 : 20);
+
+        gauge = hm ? 160 : 80;
         for (int i = 2; i <= 4; i++)
-            hpCASE.transform.GetChild(i).GetComponent<RectTransform>().localPosition = new(80 * (i - 1), -5);
+            hpCASE.transform.GetChild(i).GetComponent<RectTransform>().localPosition = new(80 * (i - 3), -45);
 
         firstP = transform.position;
 
@@ -262,10 +267,10 @@ public class Boss1 : MonoBehaviour
         Vector2 pp = player.transform.position;
         dist = Vector2.Distance(tp, pp);
 
-        H = gauge < 16 || gauge > 304 ? 0 : (tp.x > pp.x ? -pieceCount / 2.0f - 1 : pieceCount / 2.0f + 1);
+        H = gauge < (hm ? 32 : 16) || gauge > 320 - (hm ? 32 : 16) ? 0 : (tp.x > pp.x ? -pieceCount / 2.0f - 1 : pieceCount / 2.0f + 1);
 
 
-        gauge -= 16 * Time.deltaTime;
+        gauge -= (hm ? 32 : 16) * Time.deltaTime;
         if (gauge < 0) gauge = 320;
 
         hpCASE.transform.GetChild(1).GetComponent<RectTransform>().sizeDelta = new Vector2(gauge, 3);
@@ -433,7 +438,7 @@ public class Boss1 : MonoBehaviour
     }
     private void FixedUpdate()
     {
-        transform.Translate(H * (1.5f - pollution) * Time.deltaTime * Vector2.right);
+        transform.Translate(H * (hm ? 1.5f : 1) * (2 - pollution) * Time.deltaTime * Vector2.right);
 
     }
 

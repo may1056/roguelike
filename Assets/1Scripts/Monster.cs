@@ -121,6 +121,11 @@ public class Monster : MonoBehaviour //잡몹
     float speed;
     bool dashing = false;
 
+    public Sprite redLine, blueLine;
+    public GameObject redLaser, blueLaser;
+    Vector2 laserposition;
+    GameObject laser;
+
 
 
 
@@ -163,12 +168,17 @@ public class Monster : MonoBehaviour //잡몹
 
             case 10:
                 speed = 1;
-                InvokeRepeating(nameof(Pawn), Random.Range(1, 5), 5);
+                InvokeRepeating(nameof(Pawn), 0.1f * Random.Range(10, 50), 5);
                 break;
             case 11:
                 speed = 1;
-                int r = Random.Range(1, 6);
-                InvokeRepeating(nameof(Knight), r, 6);
+                InvokeRepeating(nameof(Knight), 0.1f * Random.Range(10, 60), 6);
+                break;
+            case 12:
+                InvokeRepeating(nameof(Bishop), 0.1f * Random.Range(10, 70), 7);
+                break;
+            case 13:
+                InvokeRepeating(nameof(Rook), 0.1f * Random.Range(10, 40), 4);
                 break;
         }
 
@@ -627,12 +637,36 @@ public class Monster : MonoBehaviour //잡몹
 
     void Bishop()
     {
+        laserposition = tp;
 
+        GameObject line = Instantiate(fadeEffect, tp, Quaternion.identity);
+        line.GetComponent<SpriteRenderer>().sprite = redLine;
+        line.GetComponent<Fade>().up_down = true;
+        line.GetComponent<Fade>().k = 1;
+
+        Invoke(nameof(BishopLaser), 1);
+    }
+    void BishopLaser()
+    {
+        laser = Instantiate(redLaser, laserposition, Quaternion.identity);
+        Destroy(laser, 0.75f);
     }
 
     void Rook()
     {
+        laserposition = tp;
 
+        GameObject line = Instantiate(fadeEffect, tp, Quaternion.identity);
+        line.GetComponent<SpriteRenderer>().sprite = blueLine;
+        line.GetComponent<Fade>().up_down = true;
+        line.GetComponent<Fade>().k = 1;
+
+        Invoke(nameof(RookLaser), 1);
+    }
+    void RookLaser()
+    {
+        laser = Instantiate(blueLaser, laserposition, Quaternion.identity);
+        Destroy(laser, 0.75f);
     }
 
 

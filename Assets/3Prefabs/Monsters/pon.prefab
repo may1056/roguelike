@@ -139,7 +139,7 @@ MonoBehaviour:
   fadeEffect: {fileID: 8326106217213998104, guid: c32a19154cf10874f974978490ab09ef, type: 3}
   doubleCircle: {fileID: 21300000, guid: bc8cdb377d76208459a0ccc268b24045, type: 3}
   hp: 0
-  maxhp: 4
+  maxhp: 5
   hc:
   - {fileID: -508144027, guid: 5e38e6b0e5266ec44ab65d691d41382f, type: 3}
   - {fileID: 921054833, guid: 5e38e6b0e5266ec44ab65d691d41382f, type: 3}
@@ -167,6 +167,10 @@ MonoBehaviour:
   EmptyD: {fileID: 0}
   EmptyU: {fileID: 0}
   explosion: {fileID: 0}
+  redLine: {fileID: 0}
+  blueLine: {fileID: 0}
+  redLaser: {fileID: 0}
+  blueLaser: {fileID: 0}
 --- !u!212 &4054863937716352400
 SpriteRenderer:
   m_ObjectHideFlags: 0

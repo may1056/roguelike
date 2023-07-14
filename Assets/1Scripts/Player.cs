@@ -760,10 +760,10 @@ public class Player : MonoBehaviour //플레이어
         if (other.CompareTag("Respawn"))
             SceneManager.LoadScene(0); //낙사
 
-        if (other.gameObject.layer == 22 && dontBehaveTime <= 0) //redLaser
+        if (other.gameObject.layer == 22 && unbeatableTime <= 0) //redLaser
             hurted = true;
 
-        if (other.gameObject.layer == 23 && dontBehaveTime <= 0) //blueLaser
+        if (other.gameObject.layer == 23 && unbeatableTime <= 0) //blueLaser
         {
             hurted = true;
             if (PlayerAttack.playerAtk.mp > 0) PlayerAttack.playerAtk.mp--;
@@ -776,10 +776,10 @@ public class Player : MonoBehaviour //플레이어
         if (other.gameObject.layer == 8) //8Block
             SlideCheck();
 
-        if (other.gameObject.layer == 22 && dontBehaveTime <= 0) //redLaser
+        if (other.gameObject.layer == 22 && unbeatableTime <= 0) //redLaser
             hurted = true;
 
-        if (other.gameObject.layer == 23 && dontBehaveTime <= 0) //blueLaser
+        if (other.gameObject.layer == 23 && unbeatableTime <= 0) //blueLaser
         {
             hurted = true;
             if (PlayerAttack.playerAtk.mp > 0) PlayerAttack.playerAtk.mp--;
@@ -970,7 +970,7 @@ public class Player : MonoBehaviour //플레이어
                 }
                 if (poison) boss2.RepeatAD();
 
-                GameObject dd = Instantiate(fadeEffect, b1p, Quaternion.identity);
+                GameObject dd = Instantiate(fadeEffect, new(b1p.x, transform.position.y), Quaternion.identity);
                 SpriteRenderer ddsr = dd.GetComponent<SpriteRenderer>();
                 ddsr.sprite = dashdealEff;
                 ddsr.sortingOrder = 8;

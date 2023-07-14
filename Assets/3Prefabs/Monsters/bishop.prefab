@@ -140,7 +140,7 @@ MonoBehaviour:
   fadeEffect: {fileID: 8326106217213998104, guid: c32a19154cf10874f974978490ab09ef, type: 3}
   doubleCircle: {fileID: 21300000, guid: bc8cdb377d76208459a0ccc268b24045, type: 3}
   hp: 0
-  maxhp: 2
+  maxhp: 15
   hc:
   - {fileID: -508144027, guid: 5e38e6b0e5266ec44ab65d691d41382f, type: 3}
   - {fileID: 921054833, guid: 5e38e6b0e5266ec44ab65d691d41382f, type: 3}
@@ -168,6 +168,10 @@ MonoBehaviour:
   EmptyD: {fileID: 0}
   EmptyU: {fileID: 0}
   explosion: {fileID: 0}
+  redLine: {fileID: 21300000, guid: 2187ad39a177e794e8798926f2966ef7, type: 3}
+  blueLine: {fileID: 0}
+  redLaser: {fileID: 4412007770174631551, guid: 6c330921c17324f42a98ac47b5157906, type: 3}
+  blueLaser: {fileID: 0}
 --- !u!212 &6674191785051546350
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -254,7 +258,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.0011682212, y: 0.0051784515}
+  m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -265,7 +269,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.1990655, y: 0.22323155}
+  m_Size: {x: 3, y: 3}
   m_EdgeRadius: 0
 --- !u!95 &8007046935985860044
 Animator:

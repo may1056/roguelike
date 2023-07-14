@@ -112,7 +112,7 @@ public class Boss2 : MonoBehaviour
 
         hp = 80; //임시
         gauge = 640.0f / 9.0f;
-        hpCASE.transform.GetChild(2).GetComponent<RectTransform>().localPosition = new(120, -5);
+        hpCASE.transform.GetChild(2).GetComponent<RectTransform>().localPosition = new(-40, -45);
         hpCASE.transform.GetChild(3).gameObject.SetActive(false);
         hpCASE.transform.GetChild(4).gameObject.SetActive(false);
 
