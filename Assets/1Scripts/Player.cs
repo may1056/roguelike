@@ -85,6 +85,7 @@ public class Player : MonoBehaviour //플레이어
 
     public float speed = 0; //달리기 속도
 
+    bool isJumpingRightNow = false;
 
     //bool isWalking = false;
     bool isJumping = false;
@@ -98,6 +99,8 @@ public class Player : MonoBehaviour //플레이어
     public float dashDist; //가능한 대쉬 거리
     public LayerMask lg; //Ground
     Animator animm;
+    public LayerMask dashdealLayer;
+
 
     //save position
     public Text posText;
@@ -286,10 +289,7 @@ public class Player : MonoBehaviour //플레이어
         atkPower = skillPower + red;
 
         //animation player
-        if (Input.GetButton("Horizontal"))
-            animm.SetBool("iswalking2", true);
-        else
-            animm.SetBool("iswalking2", false);
+        animm.SetBool("iswalking2", Input.GetButton("Horizontal"));
 
         //if ()
         //    animm.SetBool("isjumping2", false);
@@ -301,21 +301,8 @@ public class Player : MonoBehaviour //플레이어
         //ㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍ
 
         //점프
-        if ((Input.GetKeyDown("w") || Input.GetKeyDown(KeyCode.Space))
-            && !isJumping && GameManager.prgEnd)
-        {
-            rigid.AddForce((1 - slow) * jumpPower * (1 + Mathf.Pow(green, 0.6f) * 0.2f) * Vector2.up, ForceMode2D.Impulse);
-            jump.Play();
-            isJumping = true;
-            sr.sprite = players[2];
-        }
-
-        //연직 방향 속력이 거의 0인 상태가 0.1초 이상이면 점프 중단
-        if (Mathf.Abs(rigid.velocity.y) < 0.01f) notJumpTime += Time.deltaTime;
-        else notJumpTime = 0;
-        isJumping = notJumpTime < 0.02f;
-
-        animm.SetBool("isjumping2", isJumping);
+        if ((Input.GetKeyDown("w") || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow))
+            && !isJumping && GameManager.prgEnd) isJumpingRightNow = true;
 
 
 
@@ -396,7 +383,65 @@ public class Player : MonoBehaviour //플레이어
                 else dashsr.sprite = dashdeal ? dashupgradeEffIdle : dashSpriteIdle;
             }
 
-            if (dashdeal) DashDamage(tp.x, tp.x - tpx, tp.y);
+            if (dashdeal) //DashDamage(tp.x, tp.x - tpx, tp.y);
+            {
+                RaycastHit2D[] dashhit = Physics2D.BoxCastAll(new(tp.x - tpx / 2, tp.y), new(tpx, 2), 0, Vector2.zero, 0, dashdealLayer);
+                foreach (var dh in dashhit)
+                {
+                    int r;
+                    switch (dh.transform.tag)
+                    {
+                        case "Enemy":
+                            Monster dhm = dh.transform.GetComponent<Monster>();
+                            dhm.Apa(Color.red);
+                            dhm.hp -= skillPower;
+
+                            r = Random.Range(0, 5);
+                            if (r < purple)
+                            {
+                                dhm.hp--;
+                                MakeEffect(new Vector2(dh.transform.position.x, dh.transform.position.y + 2), critical, 5, 1);
+                            }
+                            if (poison) dhm.RepeatAD();
+                            break;
+
+                        case "Boss1":
+                            Boss1 dhb1 = dh.transform.GetComponent<Boss1>();
+                            dhb1.Apa(Color.red);
+                            dhb1.hp -= skillPower;
+
+                            r = Random.Range(0, 5);
+                            if (r < purple)
+                            {
+                                dhb1.hp--;
+                                MakeEffect(new Vector2(dh.transform.position.x, dh.transform.position.y + 9), critical, 5, 1);
+                            }
+                            if (poison) dhb1.RepeatAD();
+                            break;
+
+                        case "Boss2":
+                            Boss2 dhb2 = dh.transform.GetComponent<Boss2>();
+                            dhb2.Apa(Color.red);
+                            dhb2.hp -= skillPower;
+
+                            r = Random.Range(0, 5);
+                            if (r < purple)
+                            {
+                                dhb2.hp--;
+                                MakeEffect(new Vector2(dh.transform.position.x, dh.transform.position.y + 2), critical, 5, 1);
+                            }
+                            if (poison) dhb2.RepeatAD();
+                            break;
+
+                        default: Debug.Log("대시딜 태그 오류"); break;
+                    }
+
+                    GameObject dd = Instantiate(fadeEffect, new(dh.transform.position.x, tp.y), Quaternion.identity);
+                    SpriteRenderer ddsr = dd.GetComponent<SpriteRenderer>();
+                    ddsr.sprite = dashdealEff;
+                    ddsr.sortingOrder = 8;
+                }
+            }
 
             dontBehaveTime = 0;
 
@@ -501,7 +546,7 @@ public class Player : MonoBehaviour //플레이어
         cs.gameObject.SetActive(s);
 
         //플랫폼 내려가기
-        if (Input.GetKeyDown("s") && GameManager.prgEnd)
+        if ((Input.GetKeyDown("s") || Input.GetKeyDown(KeyCode.DownArrow)) && GameManager.prgEnd)
         {
             isSliding = true;
             this.gameObject.layer = 13; //13PlayerSlide
@@ -712,13 +757,35 @@ public class Player : MonoBehaviour //플레이어
         //좌우 이동 (등속, 손 떼면 바로 멈춤)
         float h = Input.GetAxisRaw("Horizontal");
 
-        transform.Translate(speed * (1 - slow) * (1 + 0.5f * green)
-            * Time.deltaTime * new Vector2(h, 0));
+        //transform.Translate(speed * (1 - slow) * (1 + 0.5f * green)
+        //    * Time.deltaTime * new Vector2(h, 0));
+
+        rigid.velocity = new(speed * (1 - slow) * (1 + 0.5f * green) * h, rigid.velocity.y);
 
         //isWalking = h != 0;
 
         //if (onceDashed) //대쉬 후 이펙트는 계속 만들어줌
-            //Instantiate(dashEffect, transform.position, Quaternion.identity);
+        //Instantiate(dashEffect, transform.position, Quaternion.identity);
+
+
+        //점프
+        if (isJumpingRightNow)
+        {
+            rigid.AddForce((1 - slow) * jumpPower * (1 + Mathf.Pow(green, 0.6f) * 0.2f) * Vector2.up, ForceMode2D.Impulse);
+
+            jump.Play();
+            isJumping = true;
+            sr.sprite = players[2];
+
+            isJumpingRightNow = false;
+        }
+
+        //연직 방향 속력이 거의 0인 상태가 0.1초 이상이면 점프 중단
+        if (Mathf.Abs(rigid.velocity.y) < 0.01f) notJumpTime += Time.deltaTime;
+        else notJumpTime = 0;
+        isJumping = notJumpTime < 0.02f;
+
+        animm.SetBool("isjumping2", isJumping);
 
     } //FixedUpdate End
 

@@ -51,16 +51,14 @@ public class PlayerAttack : MonoBehaviour
     public int maxmp;
     static int savedmp = 6;
 
-    public float cooltime = 0;
+    float cooltime = 0;
 
-    bool skilluse; //스킬 시전하는지
-    public static Vector2 skillP; //스킬 원 위치
     public Sprite skillSprite;
+    public LayerMask skillLayer;
 
 
     //weapon skill
     float wsCool = 0;
-    public static Vector2 wsP;
     bool wsAvailable = false;
     float wsgoing = 3;
     int wscount = 0;
@@ -98,10 +96,6 @@ public class PlayerAttack : MonoBehaviour
         attacksr = atk.GetComponent<SpriteRenderer>();
         attackbc = atk.GetComponent<BoxCollider2D>();
         attackani = atk.GetComponent<Animator>();
-
-        //attacksr.color = new Color(1, 1, 1, 0);
-
-        wsP = new Vector2(9999, 9999);
 
         skillZcooltimeText = skillZ.transform.GetChild(1).GetComponent<Text>();
         skillXcooltimeText = skillX.transform.GetChild(1).GetComponent<Text>();
@@ -219,10 +213,8 @@ public class PlayerAttack : MonoBehaviour
             !GameManager.shouldplaytutorial ||
             GameManager.gameManager.Read.transform.GetChild(2).GetChild(0).GetComponent<Image>().color == new Color(1, 1, 1, 0.4f)));
 
-        skilluse = cooltime <= 0 && Input.GetKeyDown("z") && mp >= 1
-            && GameManager.prgEnd;
 
-        if (skilluse) //약한 스킬
+        if (cooltime <= 0 && Input.GetKeyDown("z") && mp >= 1 && GameManager.prgEnd) //약한 스킬
         {
             Soundmanager.soundmanager.basicskillsound.Play();
             if (player.selfinjury) cooltime = 1.5f;
@@ -232,8 +224,25 @@ public class PlayerAttack : MonoBehaviour
                 mp--;
                 manager.ChangeHPMP();
             }
-            float x = player.F ? -6 : 6;
-            skillP = new Vector2(transform.position.x + x, transform.position.y);
+            Vector2 skillP = new(transform.position.x + (player.F ? -6 : 6), transform.position.y);
+
+            RaycastHit2D[] hit = Physics2D.CircleCastAll(skillP, 5.5f, Vector2.zero, 0, skillLayer);
+            foreach (var h in hit)
+            {
+                switch (h.transform.tag)
+                {
+                    case "Enemy": h.transform.GetComponent<Monster>().SkillDamage(0); break;
+                    case "Boss1": h.transform.GetComponent<Boss1>().SkillDamage(0); break;
+                    case "Boss2": h.transform.GetComponent<Boss2>().SkillDamage(0); break;
+                    case "Bullet":
+                        Bullet hb = h.transform.GetComponent<Bullet>();
+                        int t = hb.bulletType;
+                        if (t == 0 || t == 1 || t == 2 || t == 8 || t == 9) hb.DestroyReverb();
+                        else Destroy(hb.gameObject);
+                        break;
+                    default: Debug.Log("Z 스킬 태그 버그"); break;
+                }
+            }
 
             player.MakeEffect(skillP, skillSprite, -2, 1);
             GameObject zps = Instantiate(Zps, skillP, Quaternion.identity);
@@ -245,7 +254,6 @@ public class PlayerAttack : MonoBehaviour
             useZps.gameObject.SetActive(true);
             useZps.Play();
         }
-        else skillP = new Vector2(9999, 9999); //저 멀리
 
 
         //무기 파생 스킬
@@ -394,8 +402,43 @@ public class PlayerAttack : MonoBehaviour
     {
         if (wsgoing <= co)
         {
-            wsP = transform.position;
             wscount--;
+
+            RaycastHit2D[] hitx = Physics2D.BoxCastAll(transform.position, new(14, 1), 0, Vector2.zero, 0, skillLayer);
+            RaycastHit2D[] hity = Physics2D.BoxCastAll(transform.position, new(1, 14), 0, Vector2.zero, 0, skillLayer);
+
+            foreach (var hx in hitx)
+            {
+                switch (hx.transform.tag)
+                {
+                    case "Enemy": hx.transform.GetComponent<Monster>().SkillDamage(1); break;
+                    case "Boss1": hx.transform.GetComponent<Boss1>().SkillDamage(1); break;
+                    case "Boss2": hx.transform.GetComponent<Boss2>().SkillDamage(1); break;
+                    case "Bullet":
+                        Bullet hxb = hx.transform.GetComponent<Bullet>();
+                        int t = hxb.bulletType;
+                        if (t == 0 || t == 1 || t == 2 || t == 8 || t == 9) hxb.DestroyReverb();
+                        else Destroy(hxb.gameObject);
+                        break;
+                    default: Debug.Log("X0x 스킬 태그 버그"); break;
+                }
+            }
+            foreach (var hy in hity)
+            {
+                switch (hy.transform.tag)
+                {
+                    case "Enemy": hy.transform.GetComponent<Monster>().SkillDamage(1); break;
+                    case "Boss1": hy.transform.GetComponent<Boss1>().SkillDamage(1); break;
+                    case "Boss2": hy.transform.GetComponent<Boss2>().SkillDamage(1); break;
+                    case "Bullet":
+                        Bullet hyb = hy.transform.GetComponent<Bullet>();
+                        int t = hyb.bulletType;
+                        if (t == 0 || t == 1 || t == 2 || t == 8 || t == 9) hyb.DestroyReverb();
+                        else Destroy(hyb.gameObject);
+                        break;
+                    default: Debug.Log("X0y 스킬 태그 버그"); break;
+                }
+            }
 
             player.MakeEffect(transform.position, ws0sprite, 10, 1);
             GameObject xps = Instantiate(Xps, transform.position, Quaternion.identity);
@@ -404,8 +447,8 @@ public class PlayerAttack : MonoBehaviour
             //소리
             Soundmanager.soundmanager.swordsounds[1].Play();
         }
-        else wsP = new Vector2(9999, 9999);
-    }
+
+    } //WeaponSkill0 End
 
 
     void WeaponSkill1() //불안정한 총지팡이 스킬

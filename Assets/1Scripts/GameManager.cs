@@ -41,7 +41,7 @@ public class GameManager : MonoBehaviour //게임 총괄
 
     //아이템
     readonly string[] Items = { "알파 수정",
-        "부활", "자동 공격", "자해", "추가 쉴드", "버서커", "대쉬 강화",
+        "부활", "자동 공격", "자해", "추가 쉴드", "버서커", "대시 강화",
         "붉은 수정", "분홍 수정", "푸른 수정", "초록 수정", "노란 수정", "주황 수정", "보라 수정", "독", };
 
     readonly int[] Items_legendary = { 2,
@@ -78,7 +78,7 @@ public class GameManager : MonoBehaviour //게임 총괄
         "크큭.. 왼손의 흑염룡이 미쳐 날뛰려 하는 군.. 흑마법의 힘으로 모두 파.괘.해주겟어 체력 1, 쉴드 회복 느림, 공속 증가, 마나 무한, 쿨타임 감소", //자해
         "피격 시 체력 대신 소모되는 방어막을 하나 더 갖습니다. 무적 시간이 길어지고, 쉴드 충전 시간이 감소합니다.", //쉴드
         "체력이 2 이하일 때 공격력이 2 증가합니다.", //버서커
-        "대쉬 폼 미쳤다 ㄷㄷ 대쉬 거리 증가, 최대 스태미나 증가, 스태미나 회복 시간 감소", //대쉬 강화
+        "대시 폼 미쳤다 ㄷㄷ 대시 거리 증가, 최대 스태미나 증가, 스태미나 회복 시간 감소, 대시 적중 시 딜 부여", //대시 강화
 
         "일반 공격 피해량이 1 증가합니다.", //붉은 수정
         "체력 오브가 나타날 확률이 증가합니다.", //분홍 수정
@@ -152,11 +152,13 @@ public class GameManager : MonoBehaviour //게임 총괄
     //맵별 페이즈 수
     public int[] phases;
 
-    //페이즈별 잡아야 할 몬스터 수, -1: 안 잡아도 된다
-    readonly int[,] enemies
-        = { { 14, 0, 0, }, { 19, 0, 0, }, { 11, 0, 0, },{ 16, 0, 0, },{ 10, 4, 0, },
-        { 14, 15, 25, }, { 21, 25, 14, },{ 22, 0, 0, },{ 19, 0, 0, },{ 11, 0, 0, },
-        { 15, 0, 0, }, { 10, 23, 0, },{ 8, 0, 0, },{ 3, 0, 0, },{ 16, 12, 0, },{ 21, 0, 0, }};
+    ////페이즈별 잡아야 할 몬스터 수, -1: 안 잡아도 된다
+    //readonly int[,] enemies
+    //    = { { 14, 0, 0, }, { 19, 0, 0, }, { 11, 0, 0, },{ 16, 0, 0, },{ 10, 4, 0, },
+    //    { 14, 15, 25, }, { 21, 25, 14, },{ 22, 0, 0, },{ 19, 0, 0, },{ 11, 0, 0, },
+    //    { 15, 0, 0, }, { 10, 23, 0, },{ 8, 0, 0, },{ 3, 0, 0, },{ 16, 12, 0, },{ 21, 0, 0, }};
+
+    int enemies = 999; //위에 저 짓거리 이제 안 해도 된다!!!
 
     public bool making; //진행 중인지
     int nowPhase; //현재 페이즈
@@ -263,7 +265,7 @@ public class GameManager : MonoBehaviour //게임 총괄
         "분홍 하트는 체력, 푸른 하트는 마나입니다.",
         "Z 스킬은 마나 1, X 스킬은 마나 2가 소모됩니다.",
         "회색 하트는 쉴드입니다. 안 맞고 안 때리면 찹니다.",
-        "플레이어 위의 흰 점들은 스태미나입니다. 대쉬할 때마다 소모됩니다.",
+        "플레이어 위의 흰 점들은 스태미나입니다. 대시할 때마다 소모됩니다.",
         "설정에서 튜토리얼 또는 스토리를 건너뛰도록 할 수 있습니다.",
         "아이템 파괴 시 코인을 일정량 획득합니다.",
         "검의 일반 공격 범위는 마우스가 향하는 쪽으로 넓습니다.",
@@ -697,7 +699,8 @@ public class GameManager : MonoBehaviour //게임 총괄
                 if (phaseTime > 0.5f && !appeared)
                 {
                     Transform set = map.transform.GetChild(nowPhase + 2);
-                    for (int i = 0; i < set.childCount; i++)
+                    enemies = set.childCount;
+                    for (int i = 0; i < enemies; i++)
                         set.GetChild(i).gameObject.SetActive(true);
                     appeared = true;
                 }
@@ -714,7 +717,7 @@ public class GameManager : MonoBehaviour //게임 총괄
 
 
         //전투가 끝났거나 다 잡을 필요 없으면 포탈들 정위치 후 보이기
-        if (!making || enemies[mapNum, 0] == -1)
+        if (!making)// || enemies[mapNum, 0] == -1)
         {
             SpriteRenderer portalsr = Portal1.GetComponent<SpriteRenderer>();
 
@@ -966,7 +969,7 @@ public class GameManager : MonoBehaviour //게임 총괄
         if (ph == 0) EnemySet(sum);
 
         //전투 종료
-        else if (ph >= phases[mapNum] && realkilled >= enemies[mapNum, ph - 1])
+        else if (ph >= phases[mapNum] && realkilled >= enemies)//[mapNum, ph - 1])
         {
             for (int i = 0; i < phases[mapNum]; i++)
             {
@@ -999,7 +1002,7 @@ public class GameManager : MonoBehaviour //게임 총괄
         }
 
         //다음 페이즈
-        else if (realkilled >= enemies[mapNum, ph - 1]) EnemySet(sum + ph);
+        else if (realkilled >= enemies) EnemySet(sum + ph);
 
     } //MakeEnemy End
 

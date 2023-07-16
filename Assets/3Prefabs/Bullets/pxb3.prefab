@@ -97,9 +97,9 @@ GameObject:
   - component: {fileID: 7487618894235900578}
   - component: {fileID: -5967599440143326361}
   - component: {fileID: 3183260091468593199}
-  m_Layer: 0
+  m_Layer: 25
   m_Name: pxb3
-  m_TagString: Untagged
+  m_TagString: Bullet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

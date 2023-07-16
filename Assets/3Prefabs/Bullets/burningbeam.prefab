@@ -13,9 +13,9 @@ GameObject:
   - component: {fileID: 8341761784640369120}
   - component: {fileID: 4108525850984056869}
   - component: {fileID: 7138139936117677783}
-  m_Layer: 0
+  m_Layer: 25
   m_Name: burningbeam
-  m_TagString: Untagged
+  m_TagString: Bullet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

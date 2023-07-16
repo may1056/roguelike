@@ -337,54 +337,54 @@ public class Monster : MonoBehaviour //잡몹
 
 
 
-        //스킬 범위 내에 있음
-        if (Mathf.Abs(PlayerAttack.skillP.y) < 200 &&
-            Vector2.Distance(tp, PlayerAttack.skillP) < (monsterNum >= 10 && monsterNum <= 15 ? 8f : 5.5f))
-        {
-            Apa(Color.red);
-            hp -= Player.player.skillPower;
+        ////스킬 범위 내에 있음
+        //if (Mathf.Abs(PlayerAttack.skillP.y) < 200 &&
+        //    Vector2.Distance(tp, PlayerAttack.skillP) < (monsterNum >= 10 && monsterNum <= 15 ? 8f : 5.5f))
+        //{
+        //    Apa(Color.red);
+        //    hp -= Player.player.skillPower;
 
-            int r = Random.Range(0, 5);
-            if (r < Player.player.purple)
-            {
-                hp--;
-                Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
-            }
-            if (Player.player.poison) RepeatAD();
-        }
+        //    int r = Random.Range(0, 5);
+        //    if (r < Player.player.purple)
+        //    {
+        //        hp--;
+        //        Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
+        //    }
+        //    if (Player.player.poison) RepeatAD();
+        //}
 
 
 
         //무기 파생 스킬 범위 내에 있음
-        Vector2 wsp = PlayerAttack.wsP;
+        //Vector2 wsp = PlayerAttack.wsP;
 
-        if (Mathf.Abs(wsp.y) < 200)
-        {
-            switch (PlayerAttack.weaponNum.Item1)
-            {
-                case 0:
-                    bool inX = monsterNum >= 10 && monsterNum <= 15 ?
-                        Mathf.Abs(wsp.x - tp.x) < 8.5f && Mathf.Abs(wsp.y - tp.y) < 3 :
-                        Mathf.Abs(wsp.x - tp.x) < 7.5f && Mathf.Abs(wsp.y - tp.y) < 1;
-                    bool inY = monsterNum >= 10 && monsterNum <= 15 ?
-                        Mathf.Abs(wsp.y - tp.y) < 9.5f && Mathf.Abs(wsp.x - tp.x) < 2 :
-                        Mathf.Abs(wsp.y - tp.y) < 7.5f && Mathf.Abs(wsp.x - tp.x) < 1;
-                    if (inX || inY)
-                    {
-                        Apa(Color.red);
-                        hp -= Player.player.skillPower + 1;
+        //if (Mathf.Abs(wsp.y) < 200)
+        //{
+        //    switch (PlayerAttack.weaponNum.Item1)
+        //    {
+        //        case 0:
+        //            bool inX = monsterNum >= 10 && monsterNum <= 15 ?
+        //                Mathf.Abs(wsp.x - tp.x) < 8.5f && Mathf.Abs(wsp.y - tp.y) < 3 :
+        //                Mathf.Abs(wsp.x - tp.x) < 7.5f && Mathf.Abs(wsp.y - tp.y) < 1;
+        //            bool inY = monsterNum >= 10 && monsterNum <= 15 ?
+        //                Mathf.Abs(wsp.y - tp.y) < 9.5f && Mathf.Abs(wsp.x - tp.x) < 2 :
+        //                Mathf.Abs(wsp.y - tp.y) < 7.5f && Mathf.Abs(wsp.x - tp.x) < 1;
+        //            if (inX || inY)
+        //            {
+        //                Apa(Color.red);
+        //                hp -= Player.player.skillPower + 1;
 
-                        int r = Random.Range(0, 5);
-                        if (r < Player.player.purple)
-                        {
-                            hp--;
-                            Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
-                        }
-                        if (Player.player.poison) RepeatAD();
-                    }
-                break;
-            }
-        }
+        //                int r = Random.Range(0, 5);
+        //                if (r < Player.player.purple)
+        //                {
+        //                    hp--;
+        //                    Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
+        //                }
+        //                if (Player.player.poison) RepeatAD();
+        //            }
+        //        break;
+        //    }
+        //}
 
         /*
         //위치 저장 데미지 입음
@@ -531,6 +531,19 @@ public class Monster : MonoBehaviour //잡몹
     }
 
 
+    public void SkillDamage(int more)
+    {
+        Apa(Color.red);
+        hp -= Player.player.skillPower + more;
+
+        int r = Random.Range(0, 5);
+        if (r < Player.player.purple)
+        {
+            hp--;
+            Player.player.MakeEffect(new Vector2(tp.x, tp.y + (monsterNum >= 10 && monsterNum <= 15 ? 4 : 2)), Player.player.critical, 5, 1);
+        }
+        if (Player.player.poison) RepeatAD();
+    }
 
 
     //아래 함수 덩어리는 모두 용용이들의 Invoke 반복을 위해 존재

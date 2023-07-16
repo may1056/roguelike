@@ -10,6 +10,7 @@ TagManager:
   - SkillCircle
   - Boss1
   - Boss2
+  - Bullet
   layers:
   - Default
   - TransparentFX
@@ -36,7 +37,7 @@ TagManager:
   - red
   - blue
   - 
-  - 
+  - bullet
   - 
   - 
   - 
