@@ -9,6 +9,10 @@ public class GameManager : MonoBehaviour //게임 총괄
 {
     public static GameManager gameManager;
 
+    GameObject Bgm;
+    public AudioClip[] bgmClip;
+    AudioSource bgmAudio;
+
     public static bool hardmode;
 
     public static bool shouldplaytutorial = false;
@@ -25,6 +29,7 @@ public class GameManager : MonoBehaviour //게임 총괄
     Transform p_l; //point_line
     int dot; //반짝거릴 점 번호
     Transform nowOn;
+    Image nowOnImage;
 
 
     //ㅋㅋㅋㅋㅋㅋㅋㅋ
@@ -56,18 +61,15 @@ public class GameManager : MonoBehaviour //게임 총괄
 
     GameObject nowCube;
 
-    public Text itemText;
     public GameObject itemCube;
     public Sprite[] itemSprites;
     int icnum; //아이템 큐브 번호, 즉 새로 들어온 아이템을 뜻함
     public GameObject itemChangeScreen;
     public Image itemGet;
     bool getto = false;
-    public Image item1Image, item2Image;
-    public Image item1tabImage, item2tabImage;
-    public Button item1tabButton, item2tabButton;
-    public Image item1Info, item2Info;
-    public Text item1destroyCoin, item2destroyCoin;
+    public Image[] itemImage, itemTabImage, itemInfo;
+    public Button[] itemTabButton;
+    public Text[] itemDestroyCoin;
 
     readonly string[] Items_explaination =
     {
@@ -181,6 +183,8 @@ public class GameManager : MonoBehaviour //게임 총괄
     public GameObject Portal1; //쉬움, 보통
     public GameObject Portal2; //어려움, 기믹
 
+    SpriteRenderer portalsr;
+
     //readonly float[,,] portal_position //맵별 포탈 위치
     //    = { { { 0, 0 }, { 999, 999 } }, { { 0, 5 }, { 999, 999 } }, { { -2, 1 }, { 2, 1 } }, { { 20, 1 }, { 26, 1 } }, { { -2, 0 }, { 2, 0 } },
     //    { { 4.5f, -15 }, { 13.5f, -15 } }, { { 2.5f, -0.5f }, { 7.5f, -0.5f } }, { { 31.5f, 1.5f }, { 36.5f, 1.5f } } };
@@ -202,7 +206,6 @@ public class GameManager : MonoBehaviour //게임 총괄
     public Image[] hps = new Image[8]; //hp 구슬들
     public Image[] mps = new Image[6]; //mp 구슬들
 
-    public ParticleSystem[] hps_ps, mps_ps; //원래 잘못 만든 건데 그냥 하트들 위치 확인용으로 남겨둠
     public ParticleSystem hp_ps, sh_ps, mp_ps, mp_ps_si; //이게 진짜임
     public ParticleSystemRenderer hp_ps_renderer, sh_ps_renderer, mp_ps_renderer;
 
@@ -237,9 +240,10 @@ public class GameManager : MonoBehaviour //게임 총괄
 
 
     public Image hpPotion, mpPotion;
+    Image hpPotionCover, mpPotionCover;
 
-    public float pstimerhp;//hp postion
-    public float pstimermp;//mp postion
+    public float pstimerhp, pstimermp; //hp, mp postion
+    Text pstimerhpText, pstimermpText;
 
     public ParticleSystem usable1ps, use1ps, usable2ps, use2ps;
 
@@ -254,7 +258,7 @@ public class GameManager : MonoBehaviour //게임 총괄
 
     public Image nowWeapon;
 
-    public static (int, int) savedItem;
+    public static int[] savedItem = { -1, -1, -1 };
 
 
 
@@ -277,6 +281,8 @@ public class GameManager : MonoBehaviour //게임 총괄
 
 
     public Image[] keys;
+
+    Image tabkeyimage;
 
 
 
@@ -310,7 +316,7 @@ public class GameManager : MonoBehaviour //게임 총괄
 
         //floor-stage는 텍스트메쉬프로를 사용해볼 것임. 예쁘기 때문
         Progress.rectTransform.GetChild(0).GetComponent<TextMeshProUGUI>().text
-            = floor.ToString() + " - " + stage.ToString(); //층 - 스테이지
+            = $"{floor} - {stage}"; //층 - 스테이지
 
         //point_line은 점과 선 집합이며, 각 점에는 같은 번호에 해당하는 선이 종속되어 있다.
         p_l = Progress.rectTransform.GetChild(2);
@@ -347,6 +353,7 @@ public class GameManager : MonoBehaviour //게임 총괄
 
         nowOn = Progress.rectTransform.GetChild(1);
         nowOn.transform.position = p_l.GetChild(dot).position;
+        nowOnImage = nowOn.GetComponent<Image>();
 
         RectTransform nort = nowOn.GetComponent<RectTransform>();
         if (stage == 4) nort.sizeDelta = new Vector2(50, 50);
@@ -354,8 +361,28 @@ public class GameManager : MonoBehaviour //게임 총괄
 
         tipText.text = tips[Random.Range(0, tips.Length)]; //팁도 같이 띄움
 
+
+        //씬 넘어가도 파괴되지 않는 브금 재생 관련
+        //var objs = GameObject.FindGameObjectsWithTag("bgm");
+        //if (objs.Length >= 2) Destroy(GameObject.Find("bgms"));
+        Bgm = GameObject.Find("bgms");
+        DontDestroyOnLoad(Bgm);
+        bgmAudio = Bgm.GetComponent<AudioSource>();
+
     } //Awake End
 
+
+    public void OnEnable()
+    {
+        SizeUI(usable1ps); SizeUI(use1ps); SizeUI(usable2ps); SizeUI(use2ps);
+        SizeUI(killps); SizeUI(coinps);
+        SizeUI(hp_ps); SizeUI(sh_ps); SizeUI(mp_ps); SizeUI(mp_ps_si);
+    }
+    void SizeUI(ParticleSystem ps) //UI 파티클시스템 크기가 카메라 사이즈에 따라 들쑥날쑥이라 비율 맞춤
+    {
+        Vector2 uipsv = new(uicam.orthographicSize / 12, uicam.orthographicSize / 12);
+        ps.GetComponent<RectTransform>().localScale = uipsv;
+    }
 
 
     void Start()
@@ -363,30 +390,35 @@ public class GameManager : MonoBehaviour //게임 총괄
         switch (floor)
         {
             case 1:
-                if (stage == 1) Soundmanager.bgmTime = 0;
-                Soundmanager.soundmanager.bgm[0].time = Soundmanager.bgmTime;
-                Soundmanager.soundmanager.bgm[0].Play();
+                if (stage == 1) bgmAudio.clip = bgmClip[0];
+                if (!bgmAudio.isPlaying) bgmAudio.Play();
                 player.StartBG(1);
                 break;
 
             case 2:
-                if (stage == 4) player.StartBG(4);
+                if (stage == 4)
+                {
+                    bgmAudio.Stop();
+                    player.StartBG(4);
+                }
                 else
                 {
-                    if (stage == 1) Soundmanager.bgmTime = 0;
-                    Soundmanager.soundmanager.bgm[1].time = Soundmanager.bgmTime;
-                    Soundmanager.soundmanager.bgm[1].Play();
+                    if (stage == 1) bgmAudio.clip = bgmClip[1];
+                    if (!bgmAudio.isPlaying) bgmAudio.Play();
                     player.StartBG(2);
                 }
                 break;
 
             case 3:
-                if (stage == 4) player.StartBG(5);
+                if (stage == 4)
+                {
+                    bgmAudio.Stop();
+                    player.StartBG(5);
+                }
                 else
                 {
-                    if (stage == 1) Soundmanager.bgmTime = 0;
-                    Soundmanager.soundmanager.bgm[2].time = Soundmanager.bgmTime;
-                    Soundmanager.soundmanager.bgm[2].Play();
+                    if (stage == 1) bgmAudio.clip = bgmClip[2];
+                    if (!bgmAudio.isPlaying) bgmAudio.Play();
                     player.StartBG(3);
                 }
                 break;
@@ -466,6 +498,14 @@ public class GameManager : MonoBehaviour //게임 총괄
         map.transform.SetParent(gameObject.transform); //게임매니저가 맵의 부모가 됨
 
 
+        //포션 관련
+        hpPotionCover = hpPotion.transform.GetChild(0).GetComponent<Image>();
+        pstimerhpText = hpPotion.transform.GetChild(1).GetComponent<Text>();
+
+        mpPotionCover = mpPotion.transform.GetChild(0).GetComponent<Image>();
+        pstimermpText = mpPotion.transform.GetChild(1).GetComponent<Text>();
+
+
         bossHpLine.gameObject.SetActive(stage == 4);
 
 
@@ -489,23 +529,19 @@ public class GameManager : MonoBehaviour //게임 총괄
         for (int i = 0; i < keys.Length; i++) keys[i].gameObject.SetActive(Mainmenu.markkey);
         InvokeRepeating(nameof(KeyHighlight), 0, 0.3f);
 
-
+        //포탈 관련
+        portalsr = Portal1.GetComponent<SpriteRenderer>();
         nearbypsmain = nearbyplayerps.GetComponent<ParticleSystem>().main;
+
+
+        tabkeyimage = keys[5].transform.GetChild(0).GetComponent<Image>();
+
+
+        StartCoroutine(Coroutine01());
 
     } //Start End
 
 
-    public void OnEnable()
-    {
-        SizeUI(usable1ps); SizeUI(use1ps); SizeUI(usable2ps); SizeUI(use2ps);
-        SizeUI(killps); SizeUI(coinps);
-        SizeUI(hp_ps); SizeUI(sh_ps); SizeUI(mp_ps); SizeUI(mp_ps_si);
-    }
-    void SizeUI(ParticleSystem ps) //UI 파티클시스템 크기가 카메라 사이즈에 따라 들쑥날쑥이라 비율 맞춤
-    {
-        Vector2 uipsv = new(uicam.orthographicSize / 12, uicam.orthographicSize / 12);
-        ps.GetComponent<RectTransform>().localScale = uipsv;
-    }
 
 
     void EndProgress() //진행 화면 이제 그만 띄워라
@@ -521,7 +557,7 @@ public class GameManager : MonoBehaviour //게임 총괄
         if (progressTime > (stage == 4 ? 8 : 4) && !prgEnd) EndProgress();
         else progressTime += Time.unscaledDeltaTime; //TimeScale에 구애받지 않음
 
-        nowOn.GetComponent<Image>().color = new Color(1, 0, 0, progressTime % 1);
+        nowOnImage.color = new Color(1, 0, 0, progressTime % 1);
 
 
         //개발자 핵 - "종"
@@ -536,24 +572,24 @@ public class GameManager : MonoBehaviour //게임 총괄
         }
 
 
-        if (Input.GetKeyDown("o")) {
-            if (ShopSet.activeSelf)
-            {
-                ShopSet.SetActive(false);
-                Time.timeScale = 1f;
-            }
-            else
-            {
-                ShopSet.SetActive(true);
-                Time.timeScale = 0;
-            }
-        }
-        //상점 열고닫기
+        //if (Input.GetKeyDown("o")) {
+        //    if (ShopSet.activeSelf)
+        //    {
+        //        ShopSet.SetActive(false);
+        //        Time.timeScale = 1f;
+        //    }
+        //    else
+        //    {
+        //        ShopSet.SetActive(true);
+        //        Time.timeScale = 0;
+        //    }
+        //}
+        ////상점 열고닫기
 
         pstimerhp += Time.deltaTime;
         if (15 <= pstimerhp)
         {
-            if (Input.GetKeyDown("1")
+            if (Input.GetKeyDown(KeyCode.Alpha1)
                 && player.hp < player.maxhp && coins >= 10)
             {
                 player.hp += 3;
@@ -563,17 +599,11 @@ public class GameManager : MonoBehaviour //게임 총괄
                 use1ps.Play();
             }
         }
-        hpPotion.transform.GetChild(0).GetComponent<Image>().fillAmount
-            = (15 - pstimerhp) / 15;
-        hpPotion.transform.GetChild(1).GetComponent<Text>().text
-            = pstimerhp < 15 ? (15 - pstimerhp).ToString("N1") : null;
-        usable1ps.gameObject.SetActive(15 <= pstimerhp && coins >= 10 && (
-            !shouldplaytutorial || hpPotion.gameObject.activeSelf));
 
         pstimermp += Time.deltaTime;
         if (15 <= pstimermp)
         {
-            if (Input.GetKeyDown("2")
+            if (Input.GetKeyDown(KeyCode.Alpha2)
                 && playerAtk.mp < playerAtk.maxmp && coins >= 10)
             {
                 playerAtk.mp += 3;
@@ -583,37 +613,31 @@ public class GameManager : MonoBehaviour //게임 총괄
                 use2ps.Play();
             }
         }
-        mpPotion.transform.GetChild(0).GetComponent<Image>().fillAmount
-            = (15 - pstimermp) / 15;
-        mpPotion.transform.GetChild(1).GetComponent<Text>().text
-            = pstimermp < 15 ? (15 - pstimermp).ToString("N1") : null;
-        usable2ps.gameObject.SetActive(15 <= pstimermp && coins >= 10 && (
-            !shouldplaytutorial || mpPotion.gameObject.activeSelf));
 
 
-
-
-        ChangeHPMP();
 
 
         if (!boss2.worldEnder.activeSelf) 게임실행시간 += Time.deltaTime;
-        게임실행시간텍스트.text = ((int)(게임실행시간 / 60)).ToString() + ":" + ((int)(게임실행시간 % 60)).ToString("D2");
 
         if (Input.GetKeyDown(KeyCode.Tab) && progressTime > 4)
         {
             onTabPage = !onTabPage;
+            tabPage.gameObject.SetActive(onTabPage);
+
+            foreach (var i in itemInfo) i.gameObject.SetActive(false);
+            subWeaponInfo.gameObject.SetActive(false);
+            nowWeaponInfo.gameObject.SetActive(false);
+
             ItemInfo();
             WeaponInfo();
             ReadOn(3, 1);
         }
 
-        tabPage.gameObject.SetActive(onTabPage);
 
-
-        stat[0].text = "공격력: 공격력 변수 추가필요" /*+ Player.maxAttackCooltime.ToString()*/;
-        stat[1].text = "공격속도: " + PlayerAttack.maxAttackCooltime.ToString();
-        stat[2].text = "이동속도: " + player.speed.ToString();
-        stat[3].text = "점프력: " + player.jumpPower.ToString();
+        //stat[0].text = "공격력: 공격력 변수 추가필요" /*+ Player.maxAttackCooltime.ToString()*/;
+        //stat[1].text = "공격속도: " + PlayerAttack.maxAttackCooltime.ToString();
+        //stat[2].text = "이동속도: " + player.speed.ToString();
+        //stat[3].text = "점프력: " + player.jumpPower.ToString();
 
 
         //메뉴창 표시
@@ -628,7 +652,7 @@ public class GameManager : MonoBehaviour //게임 총괄
             else
             {
                 menuSet.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text
-                    = shouldplaytutorial ? "Tutorial" : floor.ToString() + " - " + stage.ToString();
+                    = shouldplaytutorial ? "Tutorial" : $"{floor} - {stage}";
                 menuSet.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text
                     = hardmode ? "HARD" : "EASY";
                 menuSet.transform.GetChild(2).GetComponent<TextMeshProUGUI>().color
@@ -642,28 +666,23 @@ public class GameManager : MonoBehaviour //게임 총괄
 
         if (menuSet.activeSelf)
         {
-            if (Input.GetKeyDown("r"))
+            if (Input.GetKeyDown(KeyCode.R))
             {
                 SsipBug();
                 menuSet.SetActive(false);
                 Time.timeScale = 1f;
             }
 
-            if (Input.GetKeyDown("q")) GameExit();
+            if (Input.GetKeyDown(KeyCode.Q)) GameExit();
         }
 
 
-        //킬 수 표시
-        killText.text = killed.ToString();
-
-        //획득 동전 수 표시
-        coinText.text = coins.ToString();
 
         //빠른 재시작
         //if (Input.GetKeyDown(KeyCode.Backspace) && progressTime > 4) SceneManager.LoadScene(1);
 
-        if (ismeleeWeapon) isMWText.text = "원거리로 바꾸기";
-        else isMWText.text = "근거리로 바꾸기";
+        //if (ismeleeWeapon) isMWText.text = "원거리로 바꾸기";
+        //else isMWText.text = "근거리로 바꾸기";
 
 
 
@@ -715,121 +734,149 @@ public class GameManager : MonoBehaviour //게임 총괄
 
 
 
-
-        //전투가 끝났거나 다 잡을 필요 없으면 포탈들 정위치 후 보이기
-        if (!making)// || enemies[mapNum, 0] == -1)
+        if (Input.GetKeyDown(KeyCode.S) &&
+            !making && Vector2.Distance(player.transform.position, Portal1.transform.position) < 2)
         {
-            SpriteRenderer portalsr = Portal1.GetComponent<SpriteRenderer>();
-
-            if (shouldplaytutorial) //1-1이 아니라 튜토리얼로 처리하기로 했음!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            if (shouldplaytutorial)
             {
-                Portal1.transform.position = new Vector2(115.5f, 1);
-                portalsr.sprite = portalSprites[0];
-                Portal1.SetActive(true);
+                Read.gameObject.SetActive(true);
+                hpPotion.gameObject.SetActive(true);
+                mpPotion.gameObject.SetActive(true);
+                nowWeapon.transform.GetChild(1).gameObject.SetActive(true);
+                nowWeapon.transform.GetChild(2).gameObject.SetActive(true);
             }
-            else
-            {
-                Portal1.transform.position = Vector2.up;
-                portalsr.sprite = portalSprites[stage == 3 ? 2 : (hardmode ? 1 : 0)];
-                Portal1.SetActive(true);
-
-                //Portal2.transform.position = new Vector2(
-                //    portal_position[mapNum, 1, 0], portal_position[mapNum, 1, 1]);
-                //Portal2.SetActive(true);
-            }
-
-            Color portalpsColor = stage == 3 ? new Color(0.7f, 0, 0) : (hardmode ? new Color(1, 0.6f, 0.6f) : new Color(0.6f, 0.7f, 1));
-
-            for (int i = 1; i <= 2; i++)
-            {
-                ParticleSystem.MainModule portalmain = Portal1.transform.GetChild(i).GetComponent<ParticleSystem>().main;
-                portalmain.startColor = portalpsColor;
-            }
-
-            nearbyplayerps.gameObject.SetActive(true);
-            nearbypsmain.startColor = new Color(portalpsColor.r, portalpsColor.g, portalpsColor.b, 0.3f);
-
-            //ParticleSystem.MainModule nearbyaroundpsmain = nearbyplayerps.transform.GetChild(0).GetComponent<ParticleSystem>().main;
-            //nearbyaroundpsmain.startColor = portalpsColor;
+            else NextStage();
         }
 
-        GameObject P1S = Portal1.transform.GetChild(0).gameObject; //포탈1 S 텍스트
-        //GameObject P2S = Portal2.transform.GetChild(0).gameObject; //포탈2 S 텍스트
 
-        //포탈1과 가까우면
-        if (!making && Vector2.Distance(player.transform.position, Portal1.transform.position) < 2)
-        {
-            P1S.SetActive(Mainmenu.markkey);
-            //P2S.SetActive(false);
-
-            if (Input.GetKeyDown("s")) //포탈 타기
-            {
-                if (shouldplaytutorial)
-                {
-                    Read.gameObject.SetActive(true);
-                    hpPotion.gameObject.SetActive(true);
-                    mpPotion.gameObject.SetActive(true);
-                    nowWeapon.transform.GetChild(1).gameObject.SetActive(true);
-                    nowWeapon.transform.GetChild(2).gameObject.SetActive(true);
-                }
-                else
-                {
-                    //mapNum = portal_mapNum[mapNum, 0];
-                    NextStage();
-                }
-            }
-
-            //포탈 근접 파티클 효과
-            Portal1.transform.GetChild(2).gameObject.SetActive(true);
-            nearbypsmain.loop = true;
-            nearbyplayerps.Play();
-            //nearbyplayerps.transform.GetChild(0).gameObject.SetActive(true);
-        }
-        else
-        {
-            P1S.SetActive(false);
-
-            Portal1.transform.GetChild(2).gameObject.SetActive(false);
-            nearbypsmain.loop = false;
-            //nearbyplayerps.transform.GetChild(0).gameObject.SetActive(false);
-        }
-
-        //포탈2와 가까우면
-        //else if (!making && Vector2.Distance(player.transform.position, Portal2.transform.position) < 2)
-        //{
-        //    P1S.SetActive(false);
-        //    P2S.SetActive(true);
-        //    if (Input.GetKeyDown("s")) //포탈 타기
-        //    {
-        //        mapNum = portal_mapNum[mapNum, 1];
-        //        NextStage();
-        //    }
-        //}
-        //else //멀리 있다면
-        //{
-        //    P1S.SetActive(false);
-        //    P2S.SetActive(false);
-        //}
-
-
-        if (Input.GetKeyDown("e"))
+        if (Input.GetKeyDown(KeyCode.E))
         {
             if (getto) Equip();
             else if (getto_w) Equip_w();
         }
-        if (Input.GetKeyDown("f"))
+        if (Input.GetKeyDown(KeyCode.F))
         {
             if (getto) Throw();
             else if (getto_w) Throw_w();
         }
 
-
-        //아이템이 3개면 파괴 좀 하라고 TAB키 하이라이트
-        keys[5].transform.GetChild(0).GetComponent<Image>().color = new Color(1, 0, 0,
-            Player.itemNum.Item1 != -1 && Player.itemNum.Item2 != -1 && nowCube != null ? 1 : 0);
-
     } //Update End
 
+
+    IEnumerator Coroutine01() //업데이트에서의 매 프레임 실행이 좀 과한 것들은 코루틴에서 0.1초마다 실행
+    {
+        WaitForSeconds wait = new(0.1f); //캐싱
+
+        while (true)
+        {
+            //체력과 마나 최신화
+            ChangeHPMP();
+
+            //체력 포션
+            hpPotionCover.fillAmount = (15 - pstimerhp) / 15;
+            pstimerhpText.text = pstimerhp < 15 ? (15 - pstimerhp).ToString("N1") : null;
+            usable1ps.gameObject.SetActive(15 <= pstimerhp && coins >= 10 && (!shouldplaytutorial || hpPotion.gameObject.activeSelf));
+
+            //마나 포션
+            mpPotionCover.fillAmount = (15 - pstimermp) / 15;
+            pstimermpText.text = pstimermp < 15 ? (15 - pstimermp).ToString("N1") : null;
+            usable2ps.gameObject.SetActive(15 <= pstimermp && coins >= 10 && (!shouldplaytutorial || mpPotion.gameObject.activeSelf));
+
+            //여러 정보 텍스트 표시
+            killText.text = killed.ToString();
+            coinText.text = coins.ToString();
+            게임실행시간텍스트.text = ((int)(게임실행시간 / 60)).ToString() + ":" + ((int)(게임실행시간 % 60)).ToString("D2");
+
+            //TAB 관련
+            bool tabred = true;
+            for (int i = 0; i < Player.itemNum.Length; i++)
+            {
+                if (Player.itemNum[i] == -1) tabred = false;
+            }
+            tabkeyimage.color = new Color(1, 0, 0, tabred && nowCube != null ? 1 : 0);
+
+
+            //포탈 관련
+
+            //전투가 끝났거나 다 잡을 필요 없으면 포탈들 정위치 후 보이기
+            if (!making) // || enemies[mapNum, 0] == -1)
+            {
+                if (shouldplaytutorial) //1-1이 아니라 튜토리얼로 처리하기로 했음!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                {
+                    Portal1.transform.position = new Vector2(115.5f, 1);
+                    portalsr.sprite = portalSprites[0];
+                    Portal1.SetActive(true);
+                }
+                else
+                {
+                    Portal1.transform.position = Vector2.up;
+                    portalsr.sprite = portalSprites[stage == 3 ? 2 : (hardmode ? 1 : 0)];
+                    Portal1.SetActive(true);
+
+                    //Portal2.transform.position = new Vector2(
+                    //    portal_position[mapNum, 1, 0], portal_position[mapNum, 1, 1]);
+                    //Portal2.SetActive(true);
+                }
+
+                Color portalpsColor = stage == 3 ? new Color(0.7f, 0, 0) : (hardmode ? new Color(1, 0.6f, 0.6f) : new Color(0.6f, 0.7f, 1));
+
+                for (int i = 1; i <= 2; i++)
+                {
+                    ParticleSystem.MainModule portalmain = Portal1.transform.GetChild(i).GetComponent<ParticleSystem>().main;
+                    portalmain.startColor = portalpsColor;
+                }
+
+                nearbyplayerps.gameObject.SetActive(true);
+                nearbypsmain.startColor = new Color(portalpsColor.r, portalpsColor.g, portalpsColor.b, 0.3f);
+
+                //ParticleSystem.MainModule nearbyaroundpsmain = nearbyplayerps.transform.GetChild(0).GetComponent<ParticleSystem>().main;
+                //nearbyaroundpsmain.startColor = portalpsColor;
+            }
+
+            //포탈1과 가까우면
+            if (!making && Vector2.Distance(player.transform.position, Portal1.transform.position) < 2)
+            {
+                Portal1.transform.GetChild(0).gameObject.SetActive(Mainmenu.markkey); //포탈1 S 텍스트
+                //P2S.SetActive(false);
+
+                //키 입력은 업데이트로 뺌
+
+                //포탈 근접 파티클 효과
+                Portal1.transform.GetChild(2).gameObject.SetActive(true);
+                nearbypsmain.loop = true;
+                nearbyplayerps.Play();
+                //nearbyplayerps.transform.GetChild(0).gameObject.SetActive(true);
+            }
+            else
+            {
+                Portal1.transform.GetChild(0).gameObject.SetActive(false); //포탈1 S 텍스트
+
+                Portal1.transform.GetChild(2).gameObject.SetActive(false);
+                nearbypsmain.loop = false;
+                //nearbyplayerps.transform.GetChild(0).gameObject.SetActive(false);
+            }
+
+            //포탈2와 가까우면
+            //else if (!making && Vector2.Distance(player.transform.position, Portal2.transform.position) < 2)
+            //{
+            //    P1S.SetActive(false);
+            //    P2S.SetActive(true);
+            //    if (Input.GetKeyDown("s")) //포탈 타기
+            //    {
+            //        mapNum = portal_mapNum[mapNum, 1];
+            //        NextStage();
+            //    }
+            //}
+            //else //멀리 있다면
+            //{
+            //    P1S.SetActive(false);
+            //    P2S.SetActive(false);
+            //}
+
+
+            yield return wait;
+        }
+    }
 
 
     public void KillPlus()
@@ -850,8 +897,6 @@ public class GameManager : MonoBehaviour //게임 총괄
     {
         player.SaveHP();
         playerAtk.SaveMP();
-
-        Soundmanager.bgmTime = Soundmanager.soundmanager.bgm[floor - 1].time;
 
         stage++;
 
@@ -916,7 +961,7 @@ public class GameManager : MonoBehaviour //게임 총괄
             if (player.shield <= 0) shpsmain.startLifetime = 0;
             else
             {
-                sh_ps.transform.position = hps_ps[player.hp].transform.position;
+                sh_ps.transform.position = hps[player.hp].transform.position;
 
                 shpsmain.startLifetime = 1.0f + 0.5f * player.shield;
                 shpsmain.startSpeed = -0.6f + 0.8f * player.shield;
@@ -928,7 +973,7 @@ public class GameManager : MonoBehaviour //게임 총괄
         //MP
         for(int i = 0; i < playerAtk.maxmp; i++)
         {
-            mps[i].color = Player.itemNum.Item1 == 3 || Player.itemNum.Item2 == 3 ?
+            mps[i].color = Player.itemNum[0] == 3 || Player.itemNum[1] == 3 ?
                 Color.black : new Color(0.5f, 0.5f, 1); //자해 - 검정, 기본 - 마나 색
             mps[i].gameObject.SetActive(i < playerAtk.mp);
         }
@@ -936,7 +981,7 @@ public class GameManager : MonoBehaviour //게임 총괄
         ParticleSystem.MainModule mppsmain = mp_ps.main;
         ParticleSystem.MainModule mppssimain = mp_ps_si.main;
 
-        if (Player.itemNum.Item1 == 3 || Player.itemNum.Item2 == 3) //자해
+        if (Player.itemNum[0] == 3 || Player.itemNum[1] == 3) //자해
         {
             mppsmain.startLifetime = 0;
             mppssimain.startLifetime = 2.2f;
@@ -981,9 +1026,8 @@ public class GameManager : MonoBehaviour //게임 총괄
 
             if (Random.Range(0, 3) >= 0) //3분의 2 확률로 아이템큐브 //일 생각이었는데 무기 제작이 제대로 안 돼서 일단 아이템만
             {
-            newItem: icnum = Random.Range(0, 15);
-                if (icnum == Player.itemNum.Item1 || icnum == Player.itemNum.Item2)
-                    goto newItem; //겹치면 다시 뽑음
+                do icnum = Random.Range(0, 15);
+                while (icnum == Player.itemNum[0] || icnum == Player.itemNum[1]);
 
                 nowCube = Instantiate(itemCube, 2.5f * Vector2.right, Quaternion.identity);
                 nowCube.GetComponent<Itemcube>().cubeNum = icnum;
@@ -991,9 +1035,8 @@ public class GameManager : MonoBehaviour //게임 총괄
             }
             else //3분의 1 확률로 무기큐브
             {
-            newWeapon: wcnum = Random.Range(0, 4);
-                if (wcnum == PlayerAttack.weaponNum.Item1 || wcnum == PlayerAttack.weaponNum.Item2)
-                    goto newWeapon; //겹치면 다시 뽑음
+                do wcnum = Random.Range(0, 4);
+                while (wcnum == PlayerAttack.weaponNum.Item1 || wcnum == PlayerAttack.weaponNum.Item2);
 
                 nowCube = Instantiate(weaponCube, 2.5f * Vector2.right, Quaternion.identity);
                 nowCube.GetComponent<Weaponcube>().cubeNum = wcnum;
@@ -1039,48 +1082,30 @@ public class GameManager : MonoBehaviour //게임 총괄
 
     public void ItemInfo() //현재 무슨 아이템을 가지고 있나
     {
-        int i1 = Player.itemNum.Item1, i2 = Player.itemNum.Item2;
-
-        //itemText.text = "1. " + (i1 == -1 ? "없음" : Items[i1]) +
-        //    " 2. " + (i2 == -1 ? "없음" : Items[i2]);
-
-        if (i1 == -1)
+        for (int i = 0; i < Player.itemNum.Length; i++)
         {
-            item1Image.gameObject.SetActive(false);
+            int n = Player.itemNum[i];
 
-            item1tabImage.gameObject.SetActive(false);
-            item1tabButton.gameObject.SetActive(false);
+            if (n == -1)
+            {
+                itemImage[i].gameObject.SetActive(false);
+
+                itemTabImage[i].gameObject.SetActive(false);
+                itemTabButton[i].gameObject.SetActive(false);
+            }
+            else
+            {
+                itemImage[i].sprite = itemSprites[n];
+                itemImage[i].gameObject.SetActive(true);
+
+                itemTabImage[i].sprite = itemSprites[n];
+                itemTabImage[i].gameObject.SetActive(true);
+                itemTabButton[i].gameObject.SetActive(true);
+
+                itemDestroyCoin[i].text = $"+{5 * Mathf.Pow(Items_legendary[n] + 1, 2)}";
+            }
         }
-        else
-        {
-            item1Image.sprite = itemSprites[i1];
-            item1Image.gameObject.SetActive(true);
 
-            item1tabImage.sprite = itemSprites[i1];
-            item1tabImage.gameObject.SetActive(true);
-            item1tabButton.gameObject.SetActive(true);
-
-            item1destroyCoin.text = "+" + ((Items_legendary[i1] + 1) * (Items_legendary[i1] + 1) * 5).ToString();
-        }
-
-        if (i2 == -1)
-        {
-            item2Image.gameObject.SetActive(false);
-
-            item2tabImage.gameObject.SetActive(false);
-            item2tabButton.gameObject.SetActive(false);
-        }
-        else
-        {
-            item2Image.sprite = itemSprites[i2];
-            item2Image.gameObject.SetActive(true);
-
-            item2tabImage.sprite = itemSprites[i2];
-            item2tabImage.gameObject.SetActive(true);
-            item2tabButton.gameObject.SetActive(true);
-
-            item2destroyCoin.text = "+" + ((Items_legendary[i2] + 1) * (Items_legendary[i2] + 1) * 5).ToString();
-        }
     }
     public void WeaponInfo() //현재 무슨 무기를 가지고 있나
     {
@@ -1107,47 +1132,37 @@ public class GameManager : MonoBehaviour //게임 총괄
         }
     }
 
-
     public void ItemChangeHaseyo() //인벤토리 꽉 참! 템 버려!
     {
-        Transform[] bg = new Transform[3]; //background
-        Image[] it = new Image[3]; //item
-        Text[] na = new Text[3]; //name
-        Text[] ex = new Text[3]; //explaination
-        Text[] le = new Text[3]; //legendary
-
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < Player.itemNum.Length + 1; i++)
         {
-            bg[i] = itemChangeScreen.transform.GetChild(i);
-            it[i] = bg[i].GetChild(0).GetComponent<Image>();
-            na[i] = bg[i].GetChild(0).GetChild(0).GetComponent<Text>();
-            ex[i] = bg[i].GetChild(1).GetComponent<Text>();
-            le[i] = bg[i].GetChild(2).GetComponent<Text>();
+            int n;
+            if (i < Player.itemNum.Length) n = Player.itemNum[i]; //기존 아이템
+            else n = icnum; //신규 아이템
+
+            //배경 background
+            Transform bg = itemChangeScreen.transform.GetChild(i);
+
+            //아이템 item
+            Image it = bg.GetChild(0).GetComponent<Image>();
+            it.sprite = itemSprites[n];
+
+            //이름 name
+            Text na = bg.GetChild(0).GetChild(0).GetComponent<Text>();
+            na.text = Items[n];
+
+            //설명 explanation
+            Text ex = bg.GetChild(1).GetComponent<Text>();
+            ex.text = Items_explaination[n];
+
+            //등급 legandary
+            Text le = bg.GetChild(2).GetComponent<Text>();
+            le.text = Items_legendary[n] switch { 2 => "전설", 1 => "희귀", 0 => "일반", _ => "버그" };
+            le.color = Items_legendary[n] switch { 2 => new Color(1, 0.7f, 0), 1 => new Color(0.5f, 0.4f, 1), 0 => new Color(0.8f, 0.3f, 0), _ => Color.white };
         }
-
-        int i1 = Player.itemNum.Item1;
-        it[0].sprite = itemSprites[i1];
-        na[0].text = Items[i1];
-        ex[0].text = Items_explaination[i1];
-        le[0].text = Items_legendary[i1] == 2 ? "전설" : (Items_legendary[i1] == 1 ? "희귀" : "일반");
-        le[0].color = Items_legendary[i1] == 2 ? new Color(1, 0.7f, 0) : (Items_legendary[i1] == 1 ? new Color(0.5f, 0.4f, 1) : new Color(0.8f, 0.3f, 0));
-
-        int i2 = Player.itemNum.Item2;
-        it[1].sprite = itemSprites[i2];
-        na[1].text = Items[i2];
-        ex[1].text = Items_explaination[i2];
-        le[1].text = Items_legendary[i2] == 2 ? "전설" : (Items_legendary[i2] == 1 ? "희귀" : "일반");
-        le[1].color = Items_legendary[i2] == 2 ? new Color(1, 0.7f, 0) : (Items_legendary[i2] == 1 ? new Color(0.5f, 0.4f, 1) : new Color(0.8f, 0.3f, 0));
-
-        it[2].sprite = itemSprites[icnum];
-        na[2].text = Items[icnum];
-        ex[2].text = Items_explaination[icnum];
-        le[2].text = Items_legendary[icnum] == 2 ? "전설" : (Items_legendary[icnum] == 1 ? "희귀" : "일반");
-        le[2].color = Items_legendary[icnum] == 2 ? new Color(1, 0.7f, 0) : (Items_legendary[icnum] == 1 ? new Color(0.5f, 0.4f, 1) : new Color(0.8f, 0.3f, 0));
 
         itemChangeScreen.SetActive(true);
     }
-
     public void WeaponChangeHaseyo() //인벤토리 꽉 참! 무기 버려!
     {
         Transform[] bg = new Transform[3]; //background
@@ -1178,26 +1193,18 @@ public class GameManager : MonoBehaviour //게임 총괄
         weaponChangeScreen.SetActive(true);
     }
 
-
-    public void ItemThrow(int code) //1: item1 버리기, 2: item2 버리기, 3: 새로운 아이템 안 먹기
+    public void ItemThrow(int code)
     {
-        int deleteNum = icnum; //버리는 템 번호 (할당하래서 아무거나 넣음;)
+        int deleteNum; //버리는 템 번호
 
-        switch (code)
+        if (code >= 0) //code번째 아이템 버리기
         {
-            case 1:
-                deleteNum = Player.itemNum.Item1;
-                Player.itemNum.Item1 = icnum;
-                break;
-
-            case 2:
-                deleteNum = Player.itemNum.Item2;
-                Player.itemNum.Item2 = icnum;
-                break;
-
-            case 3: deleteNum = icnum; break;
+            deleteNum = Player.itemNum[code];
+            Player.itemNum[code] = icnum;
         }
+        else deleteNum = icnum; //새로운 아이템 안 먹기
 
+        //아이템큐브 내놓기
         if (deleteNum != -1)
         {
             nowCube = Instantiate(itemCube, Player.player.transform.position, Quaternion.identity);
@@ -1215,7 +1222,6 @@ public class GameManager : MonoBehaviour //게임 총괄
 
         player.GetNewItem();
     }
-
     public void WeaponThrow(int code)
     {
         int deleteNum = wcnum;
@@ -1248,24 +1254,18 @@ public class GameManager : MonoBehaviour //게임 총괄
         getto_w = false;
     }
 
-
     public void ItemGettodaje()
     {
-        Image it; //item
-        Text na; //name
-        Text ex; //explaination
-        Text le; //legendary
-
-        it = itemGet.transform.GetChild(0).GetComponent<Image>();
-        na = it.transform.GetChild(0).GetComponent<Text>();
-        ex = itemGet.transform.GetChild(1).GetComponent<Text>();
-        le = itemGet.transform.GetChild(2).GetComponent<Text>();
+        Image it = itemGet.transform.GetChild(0).GetComponent<Image>(); //item
+        Text na = itemGet.transform.GetChild(0).GetChild(0).GetComponent<Text>(); //name
+        Text ex = itemGet.transform.GetChild(1).GetComponent<Text>(); //explanation
+        Text le = itemGet.transform.GetChild(2).GetComponent<Text>(); //legendary
 
         it.sprite = itemSprites[icnum];
         na.text = Items[icnum];
         ex.text = Items_explaination[icnum];
-        le.text = Items_legendary[icnum] == 2 ? "전설" : (Items_legendary[icnum] == 1 ? "희귀" : "일반");
-        le.color = Items_legendary[icnum] == 2 ? new Color(1, 0.7f, 0) : (Items_legendary[icnum] == 1 ? new Color(0.5f, 0.4f, 1) : new Color(0.8f, 0.3f, 0));
+        le.text = Items_legendary[icnum] switch { 2 => "전설", 1 => "희귀", 0 => "일반", _ => "버그" };
+        le.color = Items_legendary[icnum] switch { 2 => new Color(1, 0.7f, 0), 1 => new Color(0.5f, 0.4f, 1), 0 => new Color(0.8f, 0.3f, 0), _ => Color.white };
 
         itemGet.gameObject.SetActive(true);
         getto = true;
@@ -1273,7 +1273,6 @@ public class GameManager : MonoBehaviour //게임 총괄
         player.GetNewItem();
         ReadOn(1, 0);
     }
-
     public void WeaponGettodaje()
     {
         Image we; //weapon
@@ -1300,24 +1299,27 @@ public class GameManager : MonoBehaviour //게임 총괄
     {
         itemGet.gameObject.SetActive(false);
 
-        ItemThrow(3);
+        ItemThrow(-1);
     }
     public void Equip()
     {
         itemGet.gameObject.SetActive(false);
         getto = false;
 
-        if (Player.itemNum.Item1 == -1) //아이템1에 넣음
+        bool ch = true;
+
+        for (int i = 0; i < Player.itemNum.Length; i++)
         {
-            Player.itemNum.Item1 = icnum;
-            ItemInfo();
+            if (Player.itemNum[i] == -1) //i번째 아이템에 넣음
+            {
+                Player.itemNum[i] = icnum;
+                ItemInfo();
+                ch = false;
+                break;
+            }
         }
-        else if (Player.itemNum.Item2 == -1) //아이템2에 넣음
-        {
-            Player.itemNum.Item2 = icnum;
-            ItemInfo();
-        }
-        else ItemChangeHaseyo();
+
+        if (ch) ItemChangeHaseyo();
 
         player.GetNewItem();
         ReadOn(1, 0);
@@ -1346,64 +1348,53 @@ public class GameManager : MonoBehaviour //게임 총괄
     }
 
 
-    public void ItemWeaponSell(int n) //파괴
+    public void ItemWeaponSell(int code) //파괴
     {
-        switch (n)
+        if (code >= 0) //아이템 파괴
         {
-            case 1:
-                coins += (int)Mathf.Pow(Items_legendary[Player.itemNum.Item1] + 1, 2) * 5;
-                Player.itemNum.Item1 = -1;
-                player.GetNewItem();
-                break;
-
-            case 2:
-                coins += (int)Mathf.Pow(Items_legendary[Player.itemNum.Item2] + 1, 2) * 5;
-                Player.itemNum.Item2 = -1;
-                player.GetNewItem();
-                break;
-
-            case 3:
-                coins += 40;
-                PlayerAttack.weaponNum.Item2 = -1;
-                playerAtk.GetNewWeapon();
-                break;
+            coins += (int)Mathf.Pow(Items_legendary[Player.itemNum[code]] + 1, 2) * 5;
+            Player.itemNum[code] = -1;
+            player.GetNewItem();
+        }
+        else //서브무기 파괴
+        {
+            coins += 40; //임시
+            PlayerAttack.weaponNum.Item2 = -1;
+            playerAtk.GetNewWeapon();
         }
 
         CoinPlus(false);
     }
     public void ItemWeaponInfo() // ( i )
     {
-        int i1 = Player.itemNum.Item1,
-            i2 = Player.itemNum.Item2,
+        int //i1 = Player.itemNum[0],
+            //i2 = Player.itemNum[1],
             w1 = PlayerAttack.weaponNum.Item1,
             w2 = PlayerAttack.weaponNum.Item2;
 
-        if (i1 != -1)
+        for (int i = 0; i < Player.itemNum.Length; i++)
         {
-            item1Info.transform.GetChild(0).GetComponent<Image>().sprite
-                = itemSprites[i1];
-            item1Info.transform.GetChild(0).GetChild(0).GetComponent<Text>().text
-                = Items[i1];
-            item1Info.transform.GetChild(1).GetComponent<Text>().text
-                = Items_explaination[i1];
-            item1Info.transform.GetChild(2).GetComponent<Text>().text
-                = Items_legendary[i1] == 2 ? "전설" : (Items_legendary[i1] == 1 ? "희귀" : "일반");
-            item1Info.transform.GetChild(2).GetComponent<Text>().color
-                = Items_legendary[i1] == 2 ? new Color(1, 0.7f, 0) : (Items_legendary[i1] == 1 ? new Color(0.5f, 0.4f, 1) : new Color(0.8f, 0.3f, 0));
-        }
+            int n = Player.itemNum[i];
 
-        if (i2 != -1)
-        {
-            item2Info.transform.GetChild(0).GetComponent<Image>().sprite
-                = itemSprites[i2];
-            item2Info.transform.GetChild(0).GetChild(0).GetComponent<Text>().text
-                = Items[i2];
-            item2Info.transform.GetChild(1).GetComponent<Text>().text
-                = Items_explaination[i2];
-            item2Info.transform.GetChild(2).GetComponent<Text>().text
-                = Items_legendary[i2] == 2 ? "전설" : (Items_legendary[i2] == 1 ? "희귀" : "일반");
-            item2Info.transform.GetChild(2).GetComponent<Text>().color
-                = Items_legendary[i2] == 2 ? new Color(1, 0.7f, 0) : (Items_legendary[i2] == 1 ? new Color(0.5f, 0.4f, 1) : new Color(0.8f, 0.3f, 0));
+            if (n != -1)
+            {
+                //아이템 item
+                Image it = itemInfo[i].transform.GetChild(0).GetComponent<Image>();
+                it.sprite = itemSprites[n];
+
+                //이름 name
+                Text na = itemInfo[i].transform.GetChild(0).GetChild(0).GetComponent<Text>();
+                na.text = Items[n];
+
+                //설명 explanation
+                Text ex = itemInfo[i].transform.GetChild(1).GetComponent<Text>();
+                ex.text = Items_explaination[n];
+
+                //등급 legandary
+                Text le = itemInfo[i].transform.GetChild(2).GetComponent<Text>();
+                le.text = Items_legendary[n] switch { 2 => "전설", 1 => "희귀", 0 => "일반", _ => "버그" };
+                le.color = Items_legendary[n] switch { 2 => new Color(1, 0.7f, 0), 1 => new Color(0.5f, 0.4f, 1), 0 => new Color(0.8f, 0.3f, 0), _ => Color.white };
+            }
         }
 
         nowWeaponInfo.transform.GetChild(0).GetComponent<Image>().sprite
@@ -1428,7 +1419,7 @@ public class GameManager : MonoBehaviour //게임 총괄
 
     void KeyHighlight()
     {
-        keys[5].transform.GetChild(0).gameObject.SetActive(!keys[5].transform.GetChild(0).gameObject.activeSelf);
+        tabkeyimage.gameObject.SetActive(!keys[5].transform.GetChild(0).gameObject.activeSelf);
     }
 
 

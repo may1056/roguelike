@@ -28,6 +28,8 @@ public class Clear : MonoBehaviour
         dark.gameObject.SetActive(true);
         Time.timeScale = 1;
 
+        if (GameObject.Find("bgms") != null) Destroy(GameObject.Find("bgms"));
+
 
         //기록
         bool playedfromscratch = NewWonderfulLeejonghwanShitWow.selectedFloor == 1 && NewWonderfulLeejonghwanShitWow.selectedStage == 1;
@@ -89,13 +91,15 @@ public class Clear : MonoBehaviour
 
 
         //사용 아이템과 무기
-        goods[0].sprite = items[Player.itemNum.Item1 + 1];
-        goods[1].sprite = items[Player.itemNum.Item2 + 1];
-        goods[2].sprite = weapons[PlayerAttack.weaponNum.Item1 + 1];
-        goods[3].sprite = weapons[PlayerAttack.weaponNum.Item2 + 1];
 
-        for (int i = 0; i < 4; i++)
+        int L = Player.itemNum.Length;
+
+        for (int i = 0; i < L + 2; i++)
         {
+            if (i < L) goods[i].sprite = items[Player.itemNum[i] + 1];
+            else if (i == L) goods[i].sprite = weapons[PlayerAttack.weaponNum.Item1 + 1];
+            else goods[i].sprite = weapons[PlayerAttack.weaponNum.Item2 + 1];
+
             var ps = particles[i].shape;
             ps.texture = goods[i].sprite.texture;
 

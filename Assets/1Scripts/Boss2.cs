@@ -83,6 +83,9 @@ public class Boss2 : MonoBehaviour
     public GameObject worldEnder;
 
 
+    AudioSource bgmAudio;
+
+
 
     void Awake()
     {
@@ -128,7 +131,9 @@ public class Boss2 : MonoBehaviour
         ground = GameManager.gameManager.transform.GetChild(0).GetChild(0).GetComponent<Tilemap>();
         block = GameManager.gameManager.transform.GetChild(0).GetChild(1).GetComponent<Tilemap>();
 
-        Soundmanager.soundmanager.bossbgm[1].Play();
+        bgmAudio = GameObject.Find("bgms").GetComponent<AudioSource>();
+        bgmAudio.clip = GameManager.gameManager.bgmClip[4];
+        bgmAudio.Play();
 
         GameManager.gameManager.OnEnable();
         player.OnEnable();
@@ -187,7 +192,7 @@ public class Boss2 : MonoBehaviour
             }
 
             t += Time.deltaTime;
-            Soundmanager.soundmanager.bossbgm[1].volume = t < 130 ? (130 - t) / 30 : 0;
+            bgmAudio.volume = t < 130 ? (130 - t) / 30 : 0;
             if (t > 120) CancelInvoke(nameof(Craziness));
             if (t > 130) worldEnder.SetActive(true); //권한 위임
         }

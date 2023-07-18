@@ -11,6 +11,7 @@ TagManager:
   - Boss1
   - Boss2
   - Bullet
+  - bgm
   layers:
   - Default
   - TransparentFX

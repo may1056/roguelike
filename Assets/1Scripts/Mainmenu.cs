@@ -22,6 +22,8 @@ public class Mainmenu : MonoBehaviour // 게임매니저 사용하려했는데 �
     void Awake()
     {
         menusound = transform.GetChild(0).GetComponent<AudioSource>();
+
+        if (GameObject.Find("bgms") != null) Destroy(GameObject.Find("bgms"));
     }
 
 
@@ -41,7 +43,7 @@ public class Mainmenu : MonoBehaviour // 게임매니저 사용하려했는데 �
         GameManager.coins = 0;
         GameManager.atFirst = true;
         GameManager.게임실행시간 = 0;
-        Player.itemNum = (-1, -1);
+        Player.itemNum = new int[] { -1, -1, -1 };
         PlayerAttack.weaponNum = (0, 1);
         Story.isEnding = false;
 

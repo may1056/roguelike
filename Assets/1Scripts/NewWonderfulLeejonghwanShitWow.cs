@@ -23,7 +23,7 @@ public class NewWonderfulLeejonghwanShitWow : MonoBehaviour //메인메뉴 보�
     static int[] itemIndex = { 0, 0, 0 }; //진열된 동급 아이템 중 현재 번호 - 일반, 희귀, 전설
     public Image[] itemSet;
     public Sprite[] itemSprites;
-    public Image owningItem1, owningItem2;
+    public Image[] owningItem;
 
     public GameObject start;
 
@@ -32,6 +32,7 @@ public class NewWonderfulLeejonghwanShitWow : MonoBehaviour //메인메뉴 보�
     public static int maxKill_easy, maxKill_hard, maxCoin; //클리어 횟수, 최다 킬수, 코인 최대 획득
 
     public TextMeshProUGUI gamename, difficultyMarker;
+    GameObject clear;
     public Image recordWindow;
     public TextMeshProUGUI[] recordTexts;
 
@@ -52,6 +53,8 @@ public class NewWonderfulLeejonghwanShitWow : MonoBehaviour //메인메뉴 보�
         //스테이지 선택 화면 일단 끄기
         start.SetActive(false);
 
+        clear = gamename.transform.GetChild(0).gameObject;
+
     } //Start End
 
 
@@ -60,32 +63,17 @@ public class NewWonderfulLeejonghwanShitWow : MonoBehaviour //메인메뉴 보�
     {
         coinText.text = savedcoin.ToString();
 
-
-        if (GameManager.savedItem.Item1 == -1) owningItem1.gameObject.SetActive(false);
-        else
-        {
-            owningItem1.GetComponent<Image>().sprite = itemSprites[GameManager.savedItem.Item1];
-            owningItem1.gameObject.SetActive(true);
-        }
-
-        if (GameManager.savedItem.Item2 == -1) owningItem2.gameObject.SetActive(false);
-        else
-        {
-            owningItem2.GetComponent<Image>().sprite = itemSprites[GameManager.savedItem.Item2];
-            owningItem2.gameObject.SetActive(true);
-        }
-
         //클리어 인증 띄우기
-        gamename.transform.GetChild(0).gameObject.SetActive(GameManager.hardmode ? clearCount_hard >= 1 : clearCount_easy >= 1);
+        clear.SetActive(GameManager.hardmode ? clearCount_hard >= 1 : clearCount_easy >= 1);
 
     } //Update End
 
 
 
 
-    public void JumpToStage(int num) //num은 0~9 중 하나
+    public void JumpToStage(int num) //num은 0~9 중 하나 //매개변수를 두 개 전달할 수가 없어서
     {
-        if (savedcoin >= 10 * num && !locked[num])
+        if (savedcoin >= 5 * num && !locked[num])
         {
             mainmenu.GetComponent<AudioSource>().Stop();
 
@@ -94,7 +82,7 @@ public class NewWonderfulLeejonghwanShitWow : MonoBehaviour //메인메뉴 보�
             //num으로 stage 계산
             selectedStage = (num < 2 ? num : (num - 2) % 4) + 1;
 
-            savedcoin -= 10 * num;
+            savedcoin -= 5 * num;
             mainmenu.GameStart();
         }
         else Debug.Log("안 열린 스테이지거나 돈 없음");
@@ -112,17 +100,28 @@ public class NewWonderfulLeejonghwanShitWow : MonoBehaviour //메인메뉴 보�
 
             //아이템 번호
             itemSet[i].transform.GetChild(1).GetComponent<Text>().text
-                = (itemIndex[i] + 1).ToString() + " / " + itemAmount[i].ToString();
+                = $"{itemIndex[i] + 1} / {itemAmount[i]}";
 
             //아이템 잠김 여부
             itemSet[i].transform.GetChild(2).gameObject.SetActive(!itemOpen[num[i]]);
 
             //아이템 구매 가능 여부
-            itemSet[i].transform.GetChild(3).GetComponent<Button>().image.color =
-                savedcoin >= 10 && itemOpen[num[i]] && GameManager.savedItem.Item1 != num[i] && GameManager.savedItem.Item2 == -1 ?
+            itemSet[i].transform.GetChild(3).GetComponent<Button>().image.color = CanBuyItem(i) ?
                 Color.white : Color.gray;
         }
-    }
+
+        //이미 구매한 아이템들 표시
+        for (int i = 0; i < GameManager.savedItem.Length; i++)
+        {
+            if (GameManager.savedItem[i] == -1) owningItem[i].gameObject.SetActive(false);
+            else
+            {
+                owningItem[i].GetComponent<Image>().sprite = itemSprites[GameManager.savedItem[i]];
+                owningItem[i].gameObject.SetActive(true);
+            }
+        }
+
+    } //ItemModify End
     public void ItemListPrev(int legendary) //진열된 아이템을 이전 것으로 변경
     {
         if (itemIndex[legendary] > 0)
@@ -141,25 +140,54 @@ public class NewWonderfulLeejonghwanShitWow : MonoBehaviour //메인메뉴 보�
     }
     public void ItemBuy(int legendary) //아이템 구매
     {
-        int num = 999;
-        switch (legendary)
+        int num = legendary switch
         {
-            case 0: num = itemIndex[0] + itemAmount[1] + itemAmount[2]; break;
-            case 1: num = itemIndex[1] + itemAmount[2]; break;
-            case 2: num = itemIndex[2]; break;
-        }
+            0 => itemIndex[0] + itemAmount[1] + itemAmount[2],
+            1 => itemIndex[1] + itemAmount[2],
+            2 => itemIndex[2],
+            _ => -1
+        };
 
-        if (savedcoin >= 10 * (legendary + 1) * (legendary + 1) //돈이 있는지
-            && itemOpen[num] //아이템 잠금 열었는지
-            && GameManager.savedItem.Item1 != num //아이템 안 겹치는지
-            && GameManager.savedItem.Item2 == -1) //공간이 더 있는지
+        if (CanBuyItem(legendary))
         {
-            savedcoin -= 10 * (legendary + 1) * (legendary + 1);
-            if (GameManager.savedItem.Item1 == -1) GameManager.savedItem.Item1 = num;
-            else GameManager.savedItem.Item2 = num;
+            savedcoin -= 10 * (int)Mathf.Pow(legendary + 1, 2);
+            GameManager.savedItem[FirstEmptySpace()] = num;
         }
 
         ItemModify();
+    }
+    bool CanBuyItem(int legendary)
+    {
+        int num = legendary switch
+        {
+            0 => itemIndex[0] + itemAmount[1] + itemAmount[2],
+            1 => itemIndex[1] + itemAmount[2],
+            2 => itemIndex[2],
+            _ => -1
+        };
+        int L = GameManager.savedItem.Length; //아이템 배열 길이
+
+        bool dif = true; //아이템 안 겹치는지
+
+        for (int i = 0; i < L; i++)
+        {
+            if (GameManager.savedItem[i] == num) dif = false;
+        }
+
+        return
+            savedcoin >= 10 * (int)Mathf.Pow(legendary + 1, 2) //돈이 있는지
+            && itemOpen[num] //아이템 잠금 열었는지
+            && dif //아이템 안 겹치는지
+            && GameManager.savedItem[L - 1] == -1; //공간이 더 있는지
+    }
+    int FirstEmptySpace()
+    {
+        int fes = 99; //첫 빈 공간
+        for (int i = 0; i < GameManager.savedItem.Length; i++)
+        {
+            if (GameManager.savedItem[i] == -1 && i < fes) fes = i;
+        }
+        return fes;
     }
 
 
@@ -221,11 +249,12 @@ public class NewWonderfulLeejonghwanShitWow : MonoBehaviour //메인메뉴 보�
         {
             stageButtons[i].transform.GetChild(1).gameObject.SetActive(locked[i]); //자물쇠 보이기 여부
             stageButtons[i].transform.GetChild(2).gameObject.SetActive(!locked[i]); //비용 보이기 여부
+            stageButtons[i].transform.GetChild(2).GetChild(0).GetComponent<Text>().text = (5 * i).ToString(); //비용 여기서 수정해라
         }
 
         //아이템 완전 초기화
-        Player.itemNum = (-1, -1);
-        GameManager.savedItem = (-1, -1);
+        Player.itemNum = new int[] { -1, -1, -1 };
+        GameManager.savedItem = new int[] { -1, -1, -1 };
         ItemModify();
 
         //옵션 변수가 스위치 상태랑 따로 노는 것을 방지

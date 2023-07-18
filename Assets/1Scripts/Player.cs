@@ -12,6 +12,8 @@ public class Player : MonoBehaviour //플레이어
     public static Player player;
     //public static으로 설정한 변수는 다른 스크립트에서 맘대로 퍼갈 수 있다
 
+    Vector2 tp;
+
     public Boss1 boss1;
     public Boss2 boss2;
 
@@ -28,6 +30,10 @@ public class Player : MonoBehaviour //플레이어
 
 
     Transform td; //대쉬 끝 위치
+    SpriteRenderer tdsr;
+    Transform tdps;
+    ParticleSystem.MainModule tdpsmain;
+
     public Transform po; //저장된 위치 표시 오브젝트
     Transform cs; //슬라이드 가능 알림 화살표
 
@@ -35,7 +41,7 @@ public class Player : MonoBehaviour //플레이어
     public GameObject fadeEffect;
 
 
-    public Sprite[] players = new Sprite[3]; //지금은 사용 안 하는 중!!!!!!!!
+    //public Sprite[] players = new Sprite[3]; //지금은 사용 안 하는 중!!!!!!!!
     //애니메이션 만들기 귀찮아서 임시방편으로 스프라이트 교체용
     //0: 평소 상태(멈춤), 1: 걷기(달리기), 2: 뛰기(점프)
 
@@ -77,6 +83,7 @@ public class Player : MonoBehaviour //플레이어
     public float dark = 0;
     public float darktime = 0;
     public Image anboyeoImage;
+    Image[] blind = new Image[5];
 
 
 
@@ -129,7 +136,8 @@ public class Player : MonoBehaviour //플레이어
 
 
     //아이템 관련
-    public static (int, int) itemNum = (-1, -1); //????이게 되네
+    //public static int maxItem = 2;
+    public static int[] itemNum = { -1, -1, -1 };
 
     //1. 부활
     bool canRevive;
@@ -147,7 +155,8 @@ public class Player : MonoBehaviour //플레이어
     //14. 독
     public bool poison;
 
-    public ParticleSystem item1ps, item2ps, subps, nowps;
+    public ParticleSystem[] itemps;
+    public ParticleSystem subps, nowps;
 
 
 
@@ -177,6 +186,7 @@ public class Player : MonoBehaviour //플레이어
     void Awake()
     {
         player = this; //이게 나다
+        tp = transform.position;
 
         rigid = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
@@ -188,6 +198,9 @@ public class Player : MonoBehaviour //플레이어
         bgsr = bg.GetComponent<SpriteRenderer>();
 
         td = transform.GetChild(3);
+        tdsr = td.GetComponent<SpriteRenderer>();
+        tdps = td.GetChild(0);
+        tdpsmain = tdps.GetComponent<ParticleSystem>().main;
 
         cs = transform.GetChild(4);
         cs.GetChild(0).gameObject.SetActive(Mainmenu.markkey);
@@ -208,6 +221,10 @@ public class Player : MonoBehaviour //플레이어
 
         ChangeSt();
 
+        for (int i = 0; i < 5; i++) blind[i] = anboyeoImage.transform.GetChild(i).GetComponent<Image>();
+
+        StartCoroutine(Coroutine01());
+
     } //Start End
 
 
@@ -220,8 +237,7 @@ public class Player : MonoBehaviour //플레이어
         manager.ItemInfo();
 
         ItemDefault();
-        ItemActive(itemNum.Item1);
-        ItemActive(itemNum.Item2);
+        for (int i = 0; i < itemNum.Length; i++) ItemActive(itemNum[i]);
     }
     void ItemDefault() //아이템 설정 기본값으로 되돌리기
     {
@@ -270,8 +286,8 @@ public class Player : MonoBehaviour //플레이어
         //UI 파티클시스템 크기가 카메라 사이즈에 따라 들쑥날쑥이라 비율 맞춤
         Camera cam = transform.GetChild(0).GetComponent<Camera>();
         Vector2 uipsv = new(cam.orthographicSize / 8, cam.orthographicSize / 8); //아 반대로 작업했다..
-        item1ps.GetComponent<RectTransform>().localScale = uipsv;
-        item2ps.GetComponent<RectTransform>().localScale = uipsv;
+
+        for (int i = 0; i < itemNum.Length; i++) itemps[i].GetComponent<RectTransform>().localScale = uipsv;
         subps.GetComponent<RectTransform>().localScale = uipsv;
         nowps.GetComponent<RectTransform>().localScale = uipsv;
     }
@@ -280,64 +296,28 @@ public class Player : MonoBehaviour //플레이어
 
     void Update()
     {
+        tp = transform.position;
+
+        //원위치
         if (GameManager.mapouterror) transform.position = Vector2.zero;
 
-        Vector2 tp = transform.position;
-
-
-        skillPower = berserker && hp < 3 ? 3 : 1;
-        atkPower = skillPower + red;
-
-        //animation player
-        animm.SetBool("iswalking2", Input.GetButton("Horizontal"));
-
-        //if ()
-        //    animm.SetBool("isjumping2", false);
-        //else
-        //    animm.SetBool("isjumping2", true);
-
-
-
-        //ㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍㅈㅍ
-
-        //점프
-        if ((Input.GetKeyDown("w") || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow))
-            && !isJumping && GameManager.prgEnd) isJumpingRightNow = true;
-
-
-
-
-
-        //ㅂㅎㅂㅎㅂㅎㅂㅎㅂㅎㅂㅎㅂㅎㅂㅎㅂㅎㅂㅎㅂㅎㅂㅎㅂㅎㅂㅎ
 
         //방향 전환
         if (Input.GetButton("Horizontal") && GameManager.prgEnd)
             sr.flipX = Input.GetAxisRaw("Horizontal") == -1;
 
-        F = sr.flipX; //하도 많이 써서 정의함
+        //하도 많이 써서 정의함
+        F = sr.flipX;
 
 
+        //점프
+        if ((Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow))
+            && !isJumping && GameManager.prgEnd) isJumpingRightNow = true;
 
-
-        if (!isJumping) //점프 ㄴ
-        {
-            onceDashed = false;
-
-            //if (isWalking) sr.sprite = players[1]; //걷고 있으면 걷는 스프라이트
-            //else sr.sprite = players[0]; //멈춰 있으면 멈춘 스프라이트
-        }
-
-
-
-
-
-
-
-        //ㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅ
 
         //이하 내용은 대쉬 관련
 
-        Vector2 d = F ? -1 * transform.right : transform.right; //direction
+        Vector2 d = F ? -transform.right : transform.right; //direction
 
         RaycastHit2D hit;
         float[] gx = new float[5]; //감지한 Ground의 x좌표
@@ -360,9 +340,8 @@ public class Player : MonoBehaviour //플레이어
 
 
         //마우스 우클릭 대쉬
-        if (!onceDashed && (Input.GetMouseButtonDown(1)
-            || Input.GetKeyDown("k")) && slow < 1 && stamina > 0 //k는 임시 대쉬 키
-             && GameManager.prgEnd)
+        if (!onceDashed && (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.K)) //k는 임시 대쉬 키
+            && slow < 1 && stamina > 0 && GameManager.prgEnd)
         {
             onceDashed = true;
             Soundmanager.soundmanager.dashsound.Play();
@@ -385,7 +364,7 @@ public class Player : MonoBehaviour //플레이어
 
             if (dashdeal) //DashDamage(tp.x, tp.x - tpx, tp.y);
             {
-                RaycastHit2D[] dashhit = Physics2D.BoxCastAll(new(tp.x - tpx / 2, tp.y), new(tpx, 2), 0, Vector2.zero, 0, dashdealLayer);
+                RaycastHit2D[] dashhit = Physics2D.BoxCastAll(new(tp.x - tpx / 2, tp.y), new(Mathf.Abs(tpx), 2), 0, Vector2.zero, 0, dashdealLayer);
                 foreach (var dh in dashhit)
                 {
                     int r;
@@ -454,182 +433,12 @@ public class Player : MonoBehaviour //플레이어
             manager.ReadOn(6, 1);
         }
 
-        //대쉬 도달 위치 표시
+        //대쉬 도달 위치
         td.transform.position = new Vector2(m, tp.y);
 
-        td.transform.GetComponent<SpriteRenderer>().color
-            = new Color(1 - slow, 1 - slow, 1, stamina > 0 ? 1 : 0.5f);
 
-        var tdmain = td.transform.GetChild(0).GetComponent<ParticleSystem>().main;
-        tdmain.startColor = new Color(1 - slow, 1 - slow, 1);
-
-        td.transform.GetChild(0).gameObject.SetActive(stamina > 0);
-
-
-
-
-
-
-        //ㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊㅇㅊ
-        /*
-        if (posCool <= 0) //가능
-        {
-            //저장 위치가 없으면 바로 저장하기
-            if ((Input.GetMouseButtonDown(2) || Input.GetKeyDown("l"))
-                && !posSaved) SavePos();
-
-            //위치가 이미 저장되어 있다면 길게 눌러 새로 저장
-            if (Input.GetMouseButton(2) || Input.GetKey("l"))
-            {
-                postime += Time.deltaTime;
-                if (postime >= 1 && postime <= 10) SavePos();
-            }
-
-            //빠르게 눌러 돌아가기
-            if (Input.GetMouseButtonUp(2) || Input.GetKeyUp("l"))
-            {
-                if (posSaved && postime < 1)
-                {
-                    DamagePos(0, tp);
-                    DamagePos(1, pos);
-                    transform.position = pos;
-                    posSaved = false;
-                    posCool = 10;
-                    dontBehaveTime = 0;
-                }
-                postime = 0;
-            }
-            else //발동 타이밍 제외 posP는 딴 데 가 있다
-            {
-                posP[0] = new Vector2(9999, 9999);
-                posP[1] = posP[0];
-            }
-
-            //POS 온오프
-            po.gameObject.SetActive(posSaved);
-        }
-        else //불가능
-        {
-            posCool -= Time.deltaTime;
-
-            posP[0] = new Vector2(9999, 9999);
-            posP[1] = posP[0];
-        }
-
-        posText.text = posCool.ToString("N1");
-        */
-
-
-
-
-
-
-        //ㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹㄴㄹ
-
-        //내려갈 수 있는가?
-        Debug.DrawRay(tp, -1 * transform.up, Color.blue, 0.1f);
-
-        RaycastHit2D B1, B2; //block
-        B1 = Physics2D.Raycast(
-            new Vector2(tp.x - 0.5f, tp.y), -1 * transform.up, 1, lb);
-        B2 = Physics2D.Raycast(
-            new Vector2(tp.x + 0.5f, tp.y), -1 * transform.up, 1, lb);
-
-        RaycastHit2D G1, G2; //ground
-        G1 = Physics2D.Raycast(
-            new Vector2(tp.x - 0.5f, tp.y), -1 * transform.up, 1, lg);
-        G2 = Physics2D.Raycast(
-            new Vector2(tp.x + 0.5f, tp.y), -1 * transform.up, 1, lg);
-
-        bool s = (B1.transform != null || B2.transform != null)
-            && G1.transform == null && G2.transform == null;
-        cs.gameObject.SetActive(s);
-
-        //플랫폼 내려가기
-        if ((Input.GetKeyDown("s") || Input.GetKeyDown(KeyCode.DownArrow)) && GameManager.prgEnd)
-        {
-            isSliding = true;
-            this.gameObject.layer = 13; //13PlayerSlide
-            slideP = transform.position; //원래 위치 저장
-        }
-
-        if (slideP.y - transform.position.y > 2) SlideCheck();
-
-
-
-
-
-
-
-        //ㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍㅇㅍ
-
-        //무적 시간: 안 아픔
-        unbeatableTime -= Time.deltaTime;
-
-        //공격당함
-        if (hurted)
-        {
-            int r = Random.Range(0, 5);
-
-            if (r < orange)
-            {
-                //회피
-                dodge.Play();
-                MakeEffect(new Vector2(tp.x, tp.y + 2), avoid, 5, 1);
-            }
-            else
-            {
-                ouch.Play();
-                BeforeHurt(1);
-            }
-
-            hurted = false;
-        }
-
-        if (inEnemies == 0) hurted = false;
-
-        if (hurtTime > 0) Hurt(); //아플 때
-        else sr.color = Color.white; //기본
-
-        if (hp > maxhp) hp = maxhp;
-
-
-
-
-        if (hp <= 0) //쉐이망
-        {
-            if (canRevive) //부활 아이템
-            {
-                hp = maxhp;
-                shield = maxshield;
-                unbeatableTime = 2;
-                canRevive = false;
-                if (itemNum.Item1 == 1) itemNum.Item1 = -1;
-                else itemNum.Item2 = -1;
-                manager.ItemInfo();
-                GameObject rev = Instantiate(fadeEffect, tp, Quaternion.identity);
-                rev.GetComponent<SpriteRenderer>().sprite = posSprite;
-                rev.GetComponent<Fade>().k = 0.5f;
-                reviveImage.gameObject.SetActive(true);
-                Invoke(nameof(AfterRevive), 2);
-            }
-            else
-            {
-                death.SetActive(true);
-                death.transform.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>().text
-                    = "+" + GameManager.coins.ToString();
-                Time.timeScale = 0;
-            }
-        }
-
-        reviveImage.color = new Color(1, 1, 1, unbeatableTime * 0.5f);
-
-
-
-
-
-        //ㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹㅅㄹ
-
+        //슬로우 빔
+        frozenImage.gameObject.SetActive(slow > 0);
         if (slowtime <= 0) slow = 0;
         else if (slow < 1)
         {
@@ -647,113 +456,200 @@ public class Player : MonoBehaviour //플레이어
             slowtime -= 2 * Time.deltaTime;
         }
 
-        frozenImage.gameObject.SetActive(slow > 0);
 
-
-        //ㅍㅂㅍㅂㅍㅂㅍㅂㅍㅂㅍㅂㅍㅂㅍㅂㅍㅂㅍㅂㅍㅂㅍㅂㅍㅂㅍㅂㅍㅂ
-
-        if (burntime <= 0)
+        //플랫폼 내려가기
+        if ((Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)) && GameManager.prgEnd)
         {
-            burn = 0;
-            CancelInvoke(nameof(Explode));
+            isSliding = true;
+            this.gameObject.layer = 13; //13PlayerSlide
+            slideP = transform.position; //원래 위치 저장
         }
-        else if (burn < 1)
+
+
+        //공격당함
+        if (hurted)
         {
-            explosiveImage.color = new Color(1, 0.8f, 0, burn);
-            burn -= 0.2f * Time.deltaTime;
-            if (burn <= 0)
+            int r = Random.Range(0, 5);
+            if (r < orange)
             {
-                burn = 0;
-                burntime = 0;
+                //회피
+                dodge.Play();
+                MakeEffect(new Vector2(tp.x, tp.y + 2), avoid, 5, 1);
             }
-        }
-        else
-        {
-            explosiveImage.color = new Color(1, 0.5f, 0);
-            burntime -= Time.deltaTime;
-        }
-
-        explosiveImage.gameObject.SetActive(burn > 0);
-
-
-        //ㅅㅁㅅㅁㅅㅁㅅㅁㅅㅁㅅㅁㅅㅁㅅㅁㅅㅁㅅㅁㅅㅁㅅㅁㅅㅁㅅㅁㅅㅁ
-
-        if (darktime <= 0) dark = 0;
-        else if (dark < 1)
-        {
-            anboyeoImage.color = new Color(0, 0, 0, dark);
-            dark -= 0.2f * Time.deltaTime;
-            if (dark <= 0)
+            else
             {
-                dark = 0;
-                darktime = 0;
+                ouch.Play();
+                BeforeHurt(1);
             }
-        }
-        else
-        {
-            anboyeoImage.color = Color.black;
-            darktime -= Time.deltaTime;
+            hurted = false;
         }
 
-        anboyeoImage.gameObject.SetActive(dark > 0);
-        for (int i = 0; i < 5; i++)
-        {
-            Image blind = anboyeoImage.transform.GetChild(i).GetComponent<Image>();
-            blind.color = new Color(blind.color.r, blind.color.g, blind.color.b, dark);
-        }
+        if (inEnemies == 0) hurted = false;
 
+        if (hurtTime > 0) Hurt(); //아플 때
 
-
-
-
-
-        //ㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷㅅㄷ
-
-        //쉴드 재충전
-        dontBehaveTime += Time.deltaTime;
-        if (dontBehaveTime > (selfinjury ? 2 : 1) * (4 - maxshield) && shield < maxshield)
-        {
-            recover.Play();
-            shield++;
-            dontBehaveTime = 0;
-            manager.ChangeHPMP();
-        }
-
-
-
-
-
-
-
-        bg.transform.localPosition = -0.1f * tp; //배경 이동
-
-
-
-        if (itemNum.Item1 != -1)
-        {
-            NewWonderfulLeejonghwanShitWow.itemOpen[itemNum.Item1] = true;
-
-            //ParticleSystem.ShapeModule i1psshape = item1ps.shape;
-            //i1psshape.texture = GameManager.gameManager.itemSprites[itemNum.Item1].texture;
-        }
-        if (itemNum.Item2 != -1)
-        {
-            NewWonderfulLeejonghwanShitWow.itemOpen[itemNum.Item2] = true;
-
-            //ParticleSystem.ShapeModule i2psshape = item2ps.shape;
-            //i2psshape.texture = GameManager.gameManager.itemSprites[itemNum.Item2].texture;
-        }
-
-        item1ps.gameObject.SetActive(itemNum.Item1 != -1);
-        item2ps.gameObject.SetActive(itemNum.Item2 != -1);
+        if (hp > maxhp) hp = maxhp;
 
     } //Update End
 
 
 
+    IEnumerator Coroutine01() //0.1초마다 반복
+    {
+        WaitForSeconds wait = new(0.1f);
+
+        while (true)
+        {
+            tp = transform.position;
+
+            //공격력 설정
+            skillPower = berserker && hp < 3 ? 3 : 1;
+            atkPower = skillPower + red;
+
+            //animation player
+            animm.SetBool("iswalking2", Input.GetButton("Horizontal"));
+
+
+            //점프 ㄴ
+            if (!isJumping) onceDashed = false;
+
+
+            //대시 도달 위치
+            tdsr.color = new Color(1 - slow, 1 - slow, 1, stamina > 0 ? 1 : 0.5f);
+            tdps.gameObject.SetActive(stamina > 0);
+            tdpsmain.startColor = new Color(1 - slow, 1 - slow, 1);
+
+
+            //내려갈 수 있는가?
+            Debug.DrawRay(tp, -1 * transform.up, Color.blue, 0.1f);
+
+            RaycastHit2D B1, B2; //block
+            B1 = Physics2D.Raycast(new Vector2(tp.x - 0.5f, tp.y), -1 * transform.up, 1, lb);
+            B2 = Physics2D.Raycast(new Vector2(tp.x + 0.5f, tp.y), -1 * transform.up, 1, lb);
+
+            RaycastHit2D G1, G2; //ground
+            G1 = Physics2D.Raycast(new Vector2(tp.x - 0.5f, tp.y), -1 * transform.up, 1, lg);
+            G2 = Physics2D.Raycast(new Vector2(tp.x + 0.5f, tp.y), -1 * transform.up, 1, lg);
+
+            bool s = (B1.transform != null || B2.transform != null) && G1.transform == null && G2.transform == null;
+            cs.gameObject.SetActive(s);
+
+            //충분히 내려왔다
+            if (slideP.y - transform.position.y > 2) SlideCheck();
+
+
+            //무적 시간: 안 아픔
+            unbeatableTime -= 0.1f;
+
+
+            if (hp <= 0) //쉐이망
+            {
+                if (canRevive) //부활 아이템
+                {
+                    hp = maxhp;
+                    shield = maxshield;
+                    unbeatableTime = 2;
+                    canRevive = false;
+                    for (int i = 0; i < itemNum.Length; i++)
+                    {
+                        if (itemNum[i] == 1) itemNum[i] = -1;
+                    }
+                    manager.ItemInfo();
+                    GameObject rev = Instantiate(fadeEffect, tp, Quaternion.identity);
+                    rev.GetComponent<SpriteRenderer>().sprite = posSprite;
+                    rev.GetComponent<Fade>().k = 0.5f;
+                    reviveImage.gameObject.SetActive(true);
+                    Invoke(nameof(AfterRevive), 2);
+                }
+                else
+                {
+                    death.SetActive(true);
+                    death.transform.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>().text = $"+{GameManager.coins}";
+                    Time.timeScale = 0;
+                }
+            }
+
+            reviveImage.color = new Color(1, 1, 1, unbeatableTime * 0.5f);
+
+
+            //불타는 빔
+            explosiveImage.gameObject.SetActive(burn > 0);
+            if (burntime <= 0)
+            {
+                burn = 0;
+                CancelInvoke(nameof(Explode));
+            }
+            else if (burn < 1)
+            {
+                explosiveImage.color = new Color(1, 0.8f, 0, burn);
+                burn -= 0.02f;
+                if (burn <= 0)
+                {
+                    burn = 0;
+                    burntime = 0;
+                }
+            }
+            else
+            {
+                explosiveImage.color = new Color(1, 0.5f, 0);
+                burntime -= 0.1f;
+            }
+
+            //암흑의 빔
+            anboyeoImage.gameObject.SetActive(dark > 0);
+            for (int i = 0; i < 5; i++) blind[i].color = new Color(blind[i].color.r, blind[i].color.g, blind[i].color.b, dark);
+            if (darktime <= 0) dark = 0;
+            else if (dark < 1)
+            {
+                anboyeoImage.color = new Color(0, 0, 0, dark);
+                dark -= 0.02f;
+                if (dark <= 0)
+                {
+                    dark = 0;
+                    darktime = 0;
+                }
+            }
+            else
+            {
+                anboyeoImage.color = Color.black;
+                darktime -= 0.1f;
+            }
+
+
+            //쉴드 재충전
+            dontBehaveTime += 0.1f;
+            if (dontBehaveTime > (selfinjury ? 2 : 1) * (4 - maxshield) && shield < maxshield)
+            {
+                recover.Play();
+                shield++;
+                dontBehaveTime = 0;
+                manager.ChangeHPMP();
+            }
+
+
+            //배경 이동
+            if (!boss2.gameObject.activeSelf) bg.transform.localPosition = -0.1f * tp;
+
+
+            //아이템 원
+            for (int i = 0; i < itemNum.Length; i++)
+            {
+                itemps[i].gameObject.SetActive(itemNum[i] != -1); //효과
+                if (itemNum[i] != -1) NewWonderfulLeejonghwanShitWow.itemOpen[itemNum[i]] = true;
+            }
+
+
+            yield return wait;
+        }
+
+    } //Coroutine01 End
+
+
 
     void FixedUpdate()
     {
+        tp = transform.position;
+
         //좌우 이동 (등속, 손 떼면 바로 멈춤)
         float h = Input.GetAxisRaw("Horizontal");
 
@@ -775,7 +671,7 @@ public class Player : MonoBehaviour //플레이어
 
             jump.Play();
             isJumping = true;
-            sr.sprite = players[2];
+            //sr.sprite = players[2];
 
             isJumpingRightNow = false;
         }
@@ -832,8 +728,8 @@ public class Player : MonoBehaviour //플레이어
 
         if (other.gameObject.layer == 23 && unbeatableTime <= 0) //blueLaser
         {
-            hurted = true;
             if (PlayerAttack.playerAtk.mp > 0) PlayerAttack.playerAtk.mp--;
+            else hurted = true;
         }
     }
 
@@ -975,7 +871,8 @@ public class Player : MonoBehaviour //플레이어
         manager.ChangeHPMP();
     }
 
-    void DashDamage(float X1, float X2, float Y) //6. 강한 대쉬
+
+    /*  void DashDamage(float X1, float X2, float Y) //6. 강한 대쉬
     {
         if (manager.transform.childCount == 1)
         {
@@ -1102,8 +999,7 @@ public class Player : MonoBehaviour //플레이어
         }
 
     } //DashDamage End
-
-
+    */
 
 
     public void StartBG(int num) //시작 시 배경 선정

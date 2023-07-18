@@ -6,8 +6,6 @@ public class AutoAttack : MonoBehaviour
 {
     public GameManager manager;
 
-    Transform target; //목표
-
     public GameObject pollutingbullet;
 
 
@@ -18,7 +16,7 @@ public class AutoAttack : MonoBehaviour
         InvokeRepeating(nameof(ShootBullet), 0, 0.5f); //0.5초마다 ShootBullet() 함수 실행
     }
 
-
+    /*
     void Update()
     {
         Transform nowtarget = null; //타겟은 일단 아무것도 없다
@@ -67,20 +65,35 @@ public class AutoAttack : MonoBehaviour
         if (!manager.making) CancelInvoke(nameof(ShootBullet)); //전투가 끝났다면 ShootBullet() 함수 반복 실행 중단
 
     } //Update End
-
+    */
 
     void ShootBullet() //타겟이 있다면, 오염 탄알을 자기 위치에서 타겟을 바라보는 방향의 각도로 생성
     {
-        Vector2 tp = transform.position, b1tp = Boss1.boss1.transform.position, b2tp = Boss2.boss2.transform.position;
+        Vector2 tp = transform.position; //, b1tp = Boss1.boss1.transform.position, b2tp = Boss2.boss2.transform.position;
+
+        Transform target = null;
+        float nowdist = 999;
+
+        var hit = Physics2D.CircleCastAll(tp, 6, Vector2.zero, 0, Player.player.dashdealLayer);
+        foreach (var h in hit)
+        {
+            float d = Vector2.Distance(tp, h.transform.position); //몬스터까지의 거리 일단 저장
+
+            if (d < nowdist)
+            {
+                nowdist = d;
+                target = h.transform;
+            }
+        }
 
         if (target != null) Instantiate(pollutingbullet, tp,
             Quaternion.Euler(0, 0, Mathf.Rad2Deg * Mathf.Atan2(target.transform.position.y - tp.y, target.transform.position.x - tp.x)));
 
-        else if (Boss1.boss1.gameObject.activeSelf && Mathf.Abs(b1tp.y - tp.y) < 11 && Mathf.Abs(b1tp.x - tp.x) < 7)
-            Instantiate(pollutingbullet, tp, Quaternion.Euler(0, 0, Mathf.Rad2Deg * Mathf.Atan2(b1tp.y - tp.y, b1tp.x - tp.x)));
+        //else if (Boss1.boss1.gameObject.activeSelf && Mathf.Abs(b1tp.y - tp.y) < 11 && Mathf.Abs(b1tp.x - tp.x) < 7)
+        //    Instantiate(pollutingbullet, tp, Quaternion.Euler(0, 0, Mathf.Rad2Deg * Mathf.Atan2(b1tp.y - tp.y, b1tp.x - tp.x)));
 
-        else if (Boss2.boss2.gameObject.activeSelf && Vector2.Distance(tp, b2tp) < 5)
-            Instantiate(pollutingbullet, tp, Quaternion.Euler(0, 0, Mathf.Rad2Deg * Mathf.Atan2(b2tp.y - tp.y, b2tp.x - tp.x)));
+        //else if (Boss2.boss2.gameObject.activeSelf && Vector2.Distance(tp, b2tp) < 5)
+        //    Instantiate(pollutingbullet, tp, Quaternion.Euler(0, 0, Mathf.Rad2Deg * Mathf.Atan2(b2tp.y - tp.y, b2tp.x - tp.x)));
     }
 
 } //AutoAttack

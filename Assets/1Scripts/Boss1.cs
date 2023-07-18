@@ -142,6 +142,7 @@ public class Boss1 : MonoBehaviour
     void BeforeSpawn()
     {
         GameObject cr = Instantiate(crown_ps, new(tp.x, tp.y + 4.9f), Quaternion.identity);
+        cr.transform.SetParent(transform);
         Destroy(cr, 3);
     }
     private void Spawn()
@@ -160,38 +161,15 @@ public class Boss1 : MonoBehaviour
 
         //4.9
 
-        GameObject[] pieces = new GameObject[8];
-        Vector2 v = new(tp.x, tp.y + 4.9f);
-
-        switch (pieceCount)
+        GameObject[] pieces = pieceCount switch
         {
-            case 0: //8폰
-                for (int i = 0; i < 8; i++) pieces[i] = Instantiate(pon, v, Quaternion.identity);
-                break;
-
-            case 1: //6폰 2말
-                for (int i = 0; i < 8; i++) pieces[i] = Instantiate(i < 6 ? pon : knight, v, Quaternion.identity);
-                break;
-
-            case 2: //4폰 2말 2비숍
-                for (int i = 0; i < 4; i++) pieces[i] = Instantiate(pon, v, Quaternion.identity);
-                for (int i = 4; i < 6; i++)
-                {
-                    pieces[i] = Instantiate(knight, v, Quaternion.identity);
-                    pieces[i + 2] = Instantiate(bishop, v, Quaternion.identity);
-                }
-                break;
-
-            case 3: //2폰 2말 2비숍 2룩
-                for (int i = 0; i < 2; i++)
-                {
-                    pieces[i] = Instantiate(pon, v, Quaternion.identity);
-                    pieces[i + 2] = Instantiate(knight, v, Quaternion.identity);
-                    pieces[i + 4] = Instantiate(bishop, v, Quaternion.identity);
-                    pieces[i + 6] = Instantiate(look, v, Quaternion.identity);
-                }
-                break;
-        }
+            //폰, 말, 비숍, 룩의 개수 - 알아서 밸런스 조정하시오
+            0 => MakePieces(6, 2, 0, 0),
+            1 => MakePieces(6, 0, 2, 0),
+            2 => MakePieces(6, 0, 0, 2),
+            3 => MakePieces(2, 2, 2, 2),
+            _ => MakePieces(0, 0, 4, 4)
+        };
 
 
         int[] r8n = Random8Numbers();
@@ -203,6 +181,25 @@ public class Boss1 : MonoBehaviour
             pieces[n].GetComponent<Monster>().rigid.AddForce(200 * new Vector2(2 * Mathf.Cos(45 * r8n[n]), Mathf.Sin(45 * r8n[n])));
         }
 
+    }
+    GameObject[] MakePieces(int _pawn, int _knight, int _bishop, int _rook)
+    {
+        GameObject[] _pieces = new GameObject[8];
+        Vector2 v = new(tp.x, tp.y + 4.9f);
+
+        for (int i = 0; i < _pawn; i++)
+            _pieces[i] = Instantiate(pon, v, Quaternion.identity);
+
+        for (int i = _pawn; i < _pawn + _knight; i++)
+            _pieces[i] = Instantiate(knight, v, Quaternion.identity);
+
+        for (int i = _pawn + _knight; i < _pawn + _knight + _bishop; i++)
+            _pieces[i] = Instantiate(bishop, v, Quaternion.identity);
+
+        for (int i = _pawn + _knight + _bishop; i < _pawn + _knight + _bishop + _rook; i++)
+            _pieces[i] = Instantiate(look, v, Quaternion.identity);
+
+        return _pieces;
     }
     int[] Random8Numbers() //대체 왜 되는 거지
     {
@@ -255,7 +252,9 @@ public class Boss1 : MonoBehaviour
 
         firstP = transform.position;
 
-        Soundmanager.soundmanager.bossbgm[0].Play();
+        AudioSource bgmAudio = GameObject.Find("bgms").GetComponent<AudioSource>();
+        bgmAudio.clip = GameManager.gameManager.bgmClip[3];
+        bgmAudio.Play();
 
         GameManager.gameManager.OnEnable();
         player.OnEnable();
@@ -452,7 +451,7 @@ public class Boss1 : MonoBehaviour
     }
     private void FixedUpdate()
     {
-        transform.Translate(H * (hm ? 1.5f : 1) * (2 - pollution) * Time.deltaTime * Vector2.right);
+        transform.Translate(H * (hm ? 1.25f : 0.75f) * (1.5f - pollution) * Time.deltaTime * Vector2.right);
 
     }
 

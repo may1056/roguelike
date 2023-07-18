@@ -148,35 +148,37 @@ public class PlayerAttack : MonoBehaviour
         if (curAttackCooltime <= maxAttackCooltime + 2)
             curAttackCooltime += Time.deltaTime;
 
-        attackuse = (Input.GetMouseButton(0) || Input.GetKey("j"))
+        attackuse = (Input.GetMouseButton(0) || Input.GetKey(KeyCode.J))
             && (curAttackCooltime >= maxAttackCooltime); //j는 임시 공격 키
 
 
 
         // 근접공격 쿨타임, 애니메이션
-        if (attackuse && GameManager.ismeleeWeapon) player.dontBehaveTime = 0;
-
-        else if (attackuse) //원거리 공격 쿨타임, 애니메이션?
+        if (attackuse) //원거리 공격 쿨타임, 애니메이션?
         {
-            Soundmanager.soundmanager.magicgunsounds[0].Play();
-
-            GameObject pb = Instantiate(playerbullet,
-                new Vector2(transform.position.x + Mathf.Cos(Mathf.Deg2Rad * weaponangle),
-                transform.position.y + Mathf.Sin(Mathf.Deg2Rad * weaponangle)),
-                Quaternion.AngleAxis(weaponangle, Vector3.forward));
-
-            if (player.selfinjury)
+            if (GameManager.ismeleeWeapon) player.dontBehaveTime = 0;
+            else
             {
-                pb.GetComponent<PlayerBullet>().bulletSpeed = 30;
-                pb.transform.rotation = Quaternion.Euler(0, 0, weaponangle + Random.Range(-20, 21)); //각도 분산
-            }
+                Soundmanager.soundmanager.magicgunsounds[0].Play();
 
-            curAttackCooltime = 0;
-            player.dontBehaveTime = 0;
+                GameObject pb = Instantiate(playerbullet,
+                    new Vector2(transform.position.x + Mathf.Cos(Mathf.Deg2Rad * weaponangle),
+                    transform.position.y + Mathf.Sin(Mathf.Deg2Rad * weaponangle)),
+                    Quaternion.AngleAxis(weaponangle, Vector3.forward));
+
+                if (player.selfinjury)
+                {
+                    pb.GetComponent<PlayerBullet>().bulletSpeed = 30;
+                    pb.transform.rotation = Quaternion.Euler(0, 0, weaponangle + Random.Range(-20, 21)); //각도 분산
+                }
+
+                curAttackCooltime = 0;
+                player.dontBehaveTime = 0;
+            }
         }
 
 
-        if ((Input.GetMouseButtonDown(0) || Input.GetKeyDown("j"))
+        if ((Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.J))
             && curAttackCooltime >= maxAttackCooltime)
         {
             isweaponattacked = true;
@@ -214,7 +216,7 @@ public class PlayerAttack : MonoBehaviour
             GameManager.gameManager.Read.transform.GetChild(2).GetChild(0).GetComponent<Image>().color == new Color(1, 1, 1, 0.4f)));
 
 
-        if (cooltime <= 0 && Input.GetKeyDown("z") && mp >= 1 && GameManager.prgEnd) //약한 스킬
+        if (cooltime <= 0 && Input.GetKeyDown(KeyCode.Z) && mp >= 1 && GameManager.prgEnd) //약한 스킬
         {
             Soundmanager.soundmanager.basicskillsound.Play();
             if (player.selfinjury) cooltime = 1.5f;
@@ -270,7 +272,7 @@ public class PlayerAttack : MonoBehaviour
             !GameManager.shouldplaytutorial ||
             GameManager.gameManager.Read.transform.GetChild(2).GetChild(1).GetComponent<Image>().color == new Color(1, 1, 1, 0.4f)));
 
-        if (wsCool <= 0 && Input.GetKeyDown("x") && mp >= 2
+        if (wsCool <= 0 && Input.GetKeyDown(KeyCode.X) && mp >= 2
             && GameManager.prgEnd)
         {
             wsAvailable = true;
@@ -313,7 +315,7 @@ public class PlayerAttack : MonoBehaviour
         if (mp > maxmp) mp = maxmp;
 
 
-        if (Input.GetKeyDown("c") && GameManager.prgEnd)
+        if (Input.GetKeyDown(KeyCode.C) && GameManager.prgEnd)
         {
             WeaponChange();
             GameManager.gameManager.WeaponInfo();

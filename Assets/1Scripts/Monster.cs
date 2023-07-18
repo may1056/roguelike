@@ -15,6 +15,9 @@ public class Monster : MonoBehaviour //잡몹
     /// 공통
     /// </summary>
 
+    Player player;
+    Vector2 pp;
+
     public Rigidbody2D rigid;
     Vector2 tp;
     Vector2 nowPosition;
@@ -29,8 +32,10 @@ public class Monster : MonoBehaviour //잡몹
     public int maxhp; //최대 체력
 
     Transform C;
+    SpriteRenderer Csr, Cmoresr;
     public Sprite[] hc = new Sprite[5]; //hp circles
 
+    bool F = false;
     SpriteRenderer sr;
     public Sprite Empty; //Hurt, Poisoned는 여기에 색 덧입힌다
 
@@ -47,6 +52,7 @@ public class Monster : MonoBehaviour //잡몹
     public float pollution = 0; //오염 정도
     public bool polluted = false; //오염되었는지
     Transform pol;
+    SpriteRenderer polsr;
 
 
     public Sprite NoticeSprite;
@@ -82,7 +88,7 @@ public class Monster : MonoBehaviour //잡몹
     float lezong = 0.3f;//점프 시간 카운트
     public float lezonghan; //점프파워
 
-    bool K; //king
+    bool K = false; //king
     public GameObject littleslime;
 
 
@@ -123,7 +129,6 @@ public class Monster : MonoBehaviour //잡몹
 
     public Sprite redLine, blueLine;
     public GameObject redLaser, blueLaser;
-    Vector2 laserposition;
     GameObject laser;
 
 
@@ -146,41 +151,51 @@ public class Monster : MonoBehaviour //잡몹
 
     void Start()
     {
+        player = Player.player;
+
         rigid = GetComponent<Rigidbody2D>();
         nowPosition = new Vector2(999,999);
 
         hp = GameManager.hardmode ? maxhp : (maxhp + 1) / 2;
         maxhp = hp;
         C = transform.GetChild(0);
-        ModifyHp();
+        Csr = C.GetComponent<SpriteRenderer>();
 
         sr = GetComponent<SpriteRenderer>();
 
         inAttackArea = false;
 
-        K = monsterNum == 5;
-
         pol = transform.GetChild(1);
+        polsr = pol.GetComponent<SpriteRenderer>();
 
         switch (monsterNum)
         {
             case 3: bulletTime = 2; break;
 
+            case 5:
+                K = true;
+                Cmoresr = C.GetChild(0).GetComponent<SpriteRenderer>();
+                break;
+
             case 10:
                 speed = 1;
-                InvokeRepeating(nameof(Pawn), 0.1f * Random.Range(10, 50), 5);
+                InvokeRepeating(nameof(Pawn), 0.1f * Random.Range(10, 40), 4);
                 break;
             case 11:
                 speed = 1;
-                InvokeRepeating(nameof(Knight), 0.1f * Random.Range(10, 60), 6);
+                InvokeRepeating(nameof(Knight), 0.1f * Random.Range(10, 50), 5);
                 break;
             case 12:
-                InvokeRepeating(nameof(Bishop), 0.1f * Random.Range(10, 70), 7);
+                InvokeRepeating(nameof(Bishop), 0.1f * Random.Range(10, 60), 6);
                 break;
             case 13:
-                InvokeRepeating(nameof(Rook), 0.1f * Random.Range(10, 40), 4);
+                InvokeRepeating(nameof(Rook), 0.1f * Random.Range(10, 50), 5);
                 break;
         }
+
+        ModifyHp();
+
+        StartCoroutine(Coroutine01());
 
     } //Start End
 
@@ -191,308 +206,228 @@ public class Monster : MonoBehaviour //잡몹
 
     void Update()
     {
+        //원위치
         if (GameManager.mapouterror)
         {
             transform.position = firstP;
             moving = false;
         }
 
-        Vector2 pp = Player.player.transform.position;
-
-        //플레이어와 적 사이의 거리
-        dist = Vector2.Distance(tp, pp);
-
-
-        switch (monsterNum)
-        {
-            case 0: //spider
-                //플레이어를 향해 이동 방향을 변경한다 (아프면 빨라짐)
-                if (tp.x > pp.x) H = hp == maxhp ? -2 : -4;
-                else H = hp == maxhp ? 2 : 4;
-
-                Targeting();
-                break;
-
-            //packman은 Update 없음
-
-            case 2: //slime
-            case 5: //kingslime
-                //플레이어를 향해 이동 방향을 변경한다
-                H = tp.x > pp.x ? -3 : 3;
-                if (K) H *= 2;
-
-                Targeting();
-
-                //점프를 위한 시간 변수 값 조정
-                if (moving && Mathf.Abs(rigid.velocity.y) < 0.1f)
-                    lezong -= Time.deltaTime;
-                break;
-
-            case 3: //turret
-                Targeting();
-
-                //탄막 발사
-                if (bulletTime <= 0 && moving)
-                {
-                    bulletTime = 3;
-                    AngleSelected = Quaternion.Euler(0, 0, Mathf.Rad2Deg *
-                        Mathf.Atan2(Player.player.transform.position.y - tp.y,
-                        Player.player.transform.position.x - tp.x));
-                    ShootBullet();
-                }
-                else bulletTime -= Time.deltaTime;
-                break;
-
-            case 4: //ice
-            case 6: //fire
-            case 8: //dark
-                H = tp.x > pp.x ? -2 : 2;
-                Targeting();
-
-                if (shsr != null) shsr.flipX = sr.flipX;
-
-                if (moving && !repeated)
-                {
-                    repeated = true;
-                    InvokeRepeating(nameof(FrontJump), 1, 7); //앞으로 점프
-                    InvokeRepeating(nameof(JumpStop), 2, 7); //점프 끝
-                    InvokeRepeating(nameof(OnShoot), 5, 7); //장전
-                    InvokeRepeating(nameof(forfiresound), 6, 7); // ++ 발사소리 추가
-                    InvokeRepeating(nameof(OffShoot), 6, 7); //발사
-
-                    InvokeRepeating(nameof(ReturnDown), 7, 7); //원상복귀
-                }
-
-                bulletTime += Time.deltaTime;
-                break;
-
-            case 7: //ghost
-                H = 5.0f / dist;
-                Targeting();
-                if (dist < 0.5f) Pokbal();
-                break;
-
-            case 10: //pon
-                H = tp.x > pp.x ? -speed : speed;
-                Targeting();
-                break;
-
-            case 11: //knight
-                H = tp.x > pp.x ? -100 : 100;
-                Targeting();
-                sr.color = dashing ? new(0.3f, 0.3f, 0.3f) : Color.white;
-                break;
-
-            case 12: //bishop
-                //플레이어를 향해 이동 방향을 변경한다 (아프면 빨라짐)
-                if (tp.x > pp.x) H = hp == maxhp ? -2 : -4;
-                else H = hp == maxhp ? 2 : 4;
-
-                Targeting();
-                break;
-            case 13: //look
-                //플레이어를 향해 이동 방향을 변경한다 (아프면 빨라짐)
-                if (tp.x > pp.x) H = hp == maxhp ? -2 : -4;
-                else H = hp == maxhp ? 2 : 4;
-
-                Targeting();
-                break;
-
-        } //switch
-
-
-
-
-
-
-        //가깝거나 딜을 입으면 hp 표시
-        if (monsterNum < 10 || monsterNum > 15)
-            C.gameObject.SetActive(dist < 5 || hp < maxhp);
-
-
-        ModifyHp();
-
         //피 닳는 시스템
-        if (inAttackArea && (Input.GetMouseButtonDown(0)
-            || Input.GetKeyDown("j") ) && //내가 마우스가 없어서 임시로 설정한 키
-            PlayerAttack.curAttackCooltime >= PlayerAttack.maxAttackCooltime
-             && GameManager.prgEnd)
+        if (inAttackArea && (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.J)) //일반 공격에 맞음
+            && PlayerAttack.curAttackCooltime >= PlayerAttack.maxAttackCooltime && GameManager.prgEnd)
         {
             Apa(Color.red);
-            hp -= Player.player.atkPower;
+            hp -= player.atkPower;
 
             int r = Random.Range(0, 5);
-            if (r < Player.player.purple)
+            if (r < player.purple)
             {
                 hp--;
-                Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
+                player.MakeEffect(new Vector2(tp.x, tp.y + 2), player.critical, 5, 1);
             }
-            if (Player.player.poison) RepeatAD();
+            if (player.poison) RepeatAD();
 
             PlayerAttack.curAttackCooltime = 0;
             PlayerAttack.attackuse = false ;
-
         }
-
-
-
-
-        ////스킬 범위 내에 있음
-        //if (Mathf.Abs(PlayerAttack.skillP.y) < 200 &&
-        //    Vector2.Distance(tp, PlayerAttack.skillP) < (monsterNum >= 10 && monsterNum <= 15 ? 8f : 5.5f))
-        //{
-        //    Apa(Color.red);
-        //    hp -= Player.player.skillPower;
-
-        //    int r = Random.Range(0, 5);
-        //    if (r < Player.player.purple)
-        //    {
-        //        hp--;
-        //        Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
-        //    }
-        //    if (Player.player.poison) RepeatAD();
-        //}
-
-
-
-        //무기 파생 스킬 범위 내에 있음
-        //Vector2 wsp = PlayerAttack.wsP;
-
-        //if (Mathf.Abs(wsp.y) < 200)
-        //{
-        //    switch (PlayerAttack.weaponNum.Item1)
-        //    {
-        //        case 0:
-        //            bool inX = monsterNum >= 10 && monsterNum <= 15 ?
-        //                Mathf.Abs(wsp.x - tp.x) < 8.5f && Mathf.Abs(wsp.y - tp.y) < 3 :
-        //                Mathf.Abs(wsp.x - tp.x) < 7.5f && Mathf.Abs(wsp.y - tp.y) < 1;
-        //            bool inY = monsterNum >= 10 && monsterNum <= 15 ?
-        //                Mathf.Abs(wsp.y - tp.y) < 9.5f && Mathf.Abs(wsp.x - tp.x) < 2 :
-        //                Mathf.Abs(wsp.y - tp.y) < 7.5f && Mathf.Abs(wsp.x - tp.x) < 1;
-        //            if (inX || inY)
-        //            {
-        //                Apa(Color.red);
-        //                hp -= Player.player.skillPower + 1;
-
-        //                int r = Random.Range(0, 5);
-        //                if (r < Player.player.purple)
-        //                {
-        //                    hp--;
-        //                    Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
-        //                }
-        //                if (Player.player.poison) RepeatAD();
-        //            }
-        //        break;
-        //    }
-        //}
-
-        /*
-        //위치 저장 데미지 입음
-        if (Mathf.Abs(Player.posP[0].y) < 100)
-        {
-            for(int i = 0; i < 2; i++)
-            {
-                if (Vector2.Distance(tp, Player.posP[i]) < 3)
-                {
-                    if (Player.player.berserker && Player.player.hp <= 2) hp -= 2;
-                    else hp--;
-                    sr.sprite = Hurt;
-                    ModifyHp();
-                }
-            }
-        }
-        */
-
-        //자동 공격 오염
-        polluted = pollution == 1;
-
-        if (polluted) Invoke(nameof(RemovePollution), 1);
-        else if (pollution > 0 && !polluted) pollution -= 0.3f * Time.deltaTime;
-
-        transform.GetChild(1).GetComponent<SpriteRenderer>().color
-            = new Color(1, 1, 1, pollution);
-
-        transform.GetChild(1).gameObject.SetActive(pollution > 0);
-
-
-
-        //쉐이망 - hp, mp 오브 확률적으로 내놓기
-        if (hp <= 0)
-        {
-            int r;
-
-            if (!Player.player.selfinjury && !Player.player.berserker)
-            {
-                r = Random.Range(0, 25 - 10 * Player.player.pink);
-                if (r < 1) Instantiate(hpOrb, tp, Quaternion.identity);
-            }
-
-            r = Random.Range(0, 25 - 10 * Player.player.blue);
-            if (r < 1) Instantiate(mpOrb, tp, Quaternion.identity);
-
-            r = Random.Range(0, 10);
-            if (monsterNum >= 20)
-            {
-                for (int i = 0; i < (monsterNum == 20 ? 2 : 1); i++)
-                    Instantiate(coinOrb, tp, Quaternion.Euler(0, 0, i * 72));
-            }
-            else if (r < 4) Instantiate(coinOrb, tp, Quaternion.identity);
-
-            if (K)
-            {
-                for (int i = 0; i < 2; i++)
-                {
-                    GameObject s = Instantiate(littleslime,
-                        new Vector2(tp.x + i - 0.5f, tp.y), Quaternion.identity);
-                    s.transform.SetParent(transform.parent);
-                    s.SetActive(true);
-                    GameManager.realkilled--;
-                }
-            }
-
-            GameManager.gameManager.KillPlus();
-            withPlayer = false;
-
-            //DecideEffect(Color.white);
-
-            Soundmanager.soundmanager.diesounds[monsterNum].Play();
-            Player.player.pickupcoin.Play();
-
-            Destroy(this.gameObject);
-        }
-
-
-
-
-        //플레이어와 오래 닿아있으면 데미지를 준다
-        if (withPlayer) withPlayerTime += Time.deltaTime;
-        else withPlayerTime = 0;
-
-        if (withPlayerTime > 0.29f)
-        {
-            withPlayerTime = -0.5f;
-            if ((monsterNum < 3 || monsterNum > 9) && Player.unbeatableTime <= 0) Player.hurted = true;
-
-
-        }
-
-
-        //좌표가 이상해지면 돌아오는 로직
-        int m = GameManager.mapNum;
-
-        // maplimit
-
-        //if (tp.x<limitX[m,0] || tp.x > limitX[m, 1]
-           // || tp.y < limitY[m, 0] || tp.y > limitY[m, 1]) transform.position = firstP;
-
-
 
     } //Update End
 
 
+    IEnumerator Coroutine01() //0.1초마다 반복
+    {
+        WaitForSeconds wait = new(0.1f);
+
+        while (true)
+        {
+            F = sr.flipX;
+
+            tp = transform.position;
+            pp = player.transform.position;
+
+            //플레이어와 적 사이의 거리
+            dist = Vector2.Distance(tp, pp);
+
+
+            switch (monsterNum)
+            {
+                case 0: //spider
+                        //플레이어를 향해 이동 방향을 변경한다 (아프면 빨라짐)
+                    if (tp.x > pp.x) H = hp == maxhp ? -2 : -4;
+                    else H = hp == maxhp ? 2 : 4;
+
+                    Targeting();
+                    break;
+
+                //packman은 Update 없음
+
+                case 2: //slime
+                case 5: //kingslime
+                        //플레이어를 향해 이동 방향을 변경한다
+                    H = tp.x > pp.x ? -3 : 3;
+                    if (K) H *= 2;
+
+                    Targeting();
+
+                    //점프를 위한 시간 변수 값 조정
+                    if (moving && Mathf.Abs(rigid.velocity.y) < 0.1f)
+                        lezong -= Time.deltaTime;
+                    break;
+
+                case 3: //turret
+                    Targeting();
+
+                    //탄막 발사
+                    if (bulletTime <= 0 && moving)
+                    {
+                        bulletTime = 3;
+                        AngleSelected = Quaternion.Euler(0, 0, Mathf.Rad2Deg * Mathf.Atan2(pp.y - tp.y, pp.x - tp.x));
+                        ShootBullet();
+                    }
+                    else bulletTime -= 0.1f;
+                    break;
+
+                case 4: //ice
+                case 6: //fire
+                case 8: //dark
+                    H = tp.x > pp.x ? -2 : 2;
+                    Targeting();
+
+                    if (shsr != null) shsr.flipX = F;
+
+                    if (moving && !repeated)
+                    {
+                        repeated = true;
+                        InvokeRepeating(nameof(FrontJump), 1, 7); //앞으로 점프
+                        InvokeRepeating(nameof(JumpStop), 2, 7); //점프 끝
+                        InvokeRepeating(nameof(OnShoot), 5, 7); //장전
+                        InvokeRepeating(nameof(forfiresound), 6, 7); // ++ 발사소리 추가
+                        InvokeRepeating(nameof(OffShoot), 6, 7); //발사
+
+                        InvokeRepeating(nameof(ReturnDown), 7, 7); //원상복귀
+                    }
+
+                    bulletTime += 0.1f;
+                    break;
+
+                case 7: //ghost
+                    H = 8 / dist;
+                    Targeting();
+                    if (dist < 0.5f) Pokbal();
+                    break;
+
+                case 10: //pon
+                    H = tp.x > pp.x ? -speed : speed;
+                    Targeting();
+                    break;
+
+                case 11: //knight
+                    H = tp.x > pp.x ? -100 : 100;
+                    Targeting();
+                    sr.color = dashing ? new(0.3f, 0.3f, 0.3f) : Color.white;
+                    break;
+
+                case 12: //bishop
+                         //플레이어를 향해 이동 방향을 변경한다 (아프면 빨라짐)
+                    if (tp.x > pp.x) H = hp == maxhp ? -2 : -4;
+                    else H = hp == maxhp ? 2 : 4;
+
+                    Targeting();
+                    break;
+                case 13: //look
+                         //플레이어를 향해 이동 방향을 변경한다 (아프면 빨라짐)
+                    if (tp.x > pp.x) H = hp == maxhp ? -2 : -4;
+                    else H = hp == maxhp ? 2 : 4;
+
+                    Targeting();
+                    break;
+
+            } //switch
+
+
+            //가깝거나 딜을 입으면 hp 표시
+            if (monsterNum < 10 || monsterNum > 15)
+                C.gameObject.SetActive(dist < 5 || hp < maxhp);
+
+            ModifyHp();
+
+
+            //플레이어와 접촉
+            if (withPlayer) withPlayerTime += 0.1f;
+            else withPlayerTime = 0;
+
+            if (withPlayerTime > 0.29f)
+            {
+                withPlayerTime = -0.5f;
+                if ((monsterNum < 3 || monsterNum > 9) && Player.unbeatableTime <= 0) Player.hurted = true;
+            }
+
+
+            //자동 공격 오염
+            polluted = pollution == 1;
+
+            if (polluted) Invoke(nameof(RemovePollution), 1);
+            else if (pollution > 0 && !polluted) pollution -= 0.03f;
+
+            polsr.color = new Color(1, 1, 1, pollution);
+
+            pol.gameObject.SetActive(pollution > 0);
+
+
+            //쉐이망 - hp, mp 오브 확률적으로 내놓기
+            if (hp <= 0)
+            {
+                int r;
+
+                if (!player.selfinjury && !player.berserker)
+                {
+                    r = Random.Range(0, 25 - 10 * player.pink);
+                    if (r < 1) Instantiate(hpOrb, tp, Quaternion.identity);
+                }
+
+                r = Random.Range(0, 25 - 10 * player.blue);
+                if (r < 1) Instantiate(mpOrb, tp, Quaternion.identity);
+
+                r = Random.Range(0, 10);
+                if (monsterNum >= 20)
+                {
+                    for (int i = 0; i < (monsterNum == 20 ? 2 : 1); i++)
+                        Instantiate(coinOrb, tp, Quaternion.Euler(0, 0, i * 72));
+                }
+                else if (r < 4) Instantiate(coinOrb, tp, Quaternion.identity);
+
+                if (K)
+                {
+                    for (int i = 0; i < 2; i++)
+                    {
+                        GameObject s = Instantiate(littleslime,
+                            new Vector2(tp.x + i - 0.5f, tp.y), Quaternion.identity);
+                        s.transform.SetParent(transform.parent);
+                        s.SetActive(true);
+                        GameManager.realkilled--;
+                    }
+                }
+
+                GameManager.gameManager.KillPlus();
+                withPlayer = false;
+
+                Soundmanager.soundmanager.diesounds[monsterNum].Play();
+                player.pickupcoin.Play();
+
+                Destroy(this.gameObject);
+            }
+
+
+            yield return wait;
+        }
+
+    } //Coroutine01 End
+
+
     void Targeting() //타겟팅형 몬스터를 위해
     {
-        sr.flipX = tp.x < Player.player.transform.position.x - 0.3f;
+        sr.flipX = tp.x < player.transform.position.x - 0.3f;
 
         //가까우면 이동 시작
         if (dist < noticeDist)
@@ -534,15 +469,15 @@ public class Monster : MonoBehaviour //잡몹
     public void SkillDamage(int more)
     {
         Apa(Color.red);
-        hp -= Player.player.skillPower + more;
+        hp -= player.skillPower + more;
 
         int r = Random.Range(0, 5);
-        if (r < Player.player.purple)
+        if (r < player.purple)
         {
             hp--;
-            Player.player.MakeEffect(new Vector2(tp.x, tp.y + (monsterNum >= 10 && monsterNum <= 15 ? 4 : 2)), Player.player.critical, 5, 1);
+            player.MakeEffect(new Vector2(tp.x, tp.y + (monsterNum >= 10 && monsterNum <= 15 ? 4 : 2)), player.critical, 5, 1);
         }
-        if (Player.player.poison) RepeatAD();
+        if (player.poison) RepeatAD();
     }
 
 
@@ -585,8 +520,8 @@ public class Monster : MonoBehaviour //잡몹
         shooter.GetComponent<Fade>().k = 1;
 
         AngleSelected = Quaternion.Euler(0, 0, Mathf.Rad2Deg *
-            Mathf.Atan2(Player.player.transform.position.y - tp.y,
-            Player.player.transform.position.x - tp.x)); //어느 각도로 쏠 거냐
+            Mathf.Atan2(player.transform.position.y - tp.y,
+            player.transform.position.x - tp.x)); //어느 각도로 쏠 거냐
 
         sr.sprite = Up; //손 올림
         D_U = false;
@@ -643,33 +578,32 @@ public class Monster : MonoBehaviour //잡몹
 
     void Knight()
     {
-        rigid.AddForce(new Vector2(Mathf.Abs(Player.player.transform.position.x - tp.x) > 2 ? speed * H : 0, 100 * speed * (1 - pollution)));
-        speed += 1 / speed;
+        rigid.AddForce(new Vector2(Mathf.Abs(player.transform.position.x - tp.x) > 2 ? speed * H : 0, 100 * speed * (1 - pollution)));
+        speed += 1.5f / speed;
         dashing = true;
     }
 
     void Bishop()
     {
-        laserposition = tp;
-
         GameObject line = Instantiate(fadeEffect, tp, Quaternion.identity);
+        line.transform.SetParent(transform);
         line.GetComponent<SpriteRenderer>().sprite = redLine;
-        line.GetComponent<Fade>().up_down = true;
-        line.GetComponent<Fade>().k = 1;
+        Fade linef = line.GetComponent<Fade>();
+        linef.up_down = true;
+        linef.k = 1;
 
         Invoke(nameof(BishopLaser), 1);
     }
     void BishopLaser()
     {
-        laser = Instantiate(redLaser, laserposition, Quaternion.identity);
+        laser = Instantiate(redLaser, tp, Quaternion.identity);
         Destroy(laser, 0.75f);
     }
 
     void Rook()
     {
-        laserposition = tp;
-
         GameObject line = Instantiate(fadeEffect, tp, Quaternion.identity);
+        line.transform.SetParent(transform);
         line.GetComponent<SpriteRenderer>().sprite = blueLine;
         line.GetComponent<Fade>().up_down = true;
         line.GetComponent<Fade>().k = 1;
@@ -678,7 +612,7 @@ public class Monster : MonoBehaviour //잡몹
     }
     void RookLaser()
     {
-        laser = Instantiate(blueLaser, laserposition, Quaternion.identity);
+        laser = Instantiate(blueLaser, tp, Quaternion.identity);
         Destroy(laser, 0.75f);
     }
 
@@ -700,7 +634,7 @@ public class Monster : MonoBehaviour //잡몹
     void FixedUpdate()
     {
         tp = transform.position;
-        Vector2 pp = Player.player.transform.position;
+        pp = player.transform.position;
 
         switch (monsterNum)
         {
@@ -717,7 +651,7 @@ public class Monster : MonoBehaviour //잡몹
                             0.3f * (1 - pollution) * Vector2.up, ForceMode2D.Impulse);
 
                         if (Mathf.Abs(tp.y - nowPosition.y) < 0.01f)
-                            rigid.AddForce((sr.flipX ? 0.1f : -0.1f) * (1 - pollution) *
+                            rigid.AddForce((F ? 0.1f : -0.1f) * (1 - pollution) *
                                 Vector2.right, ForceMode2D.Impulse);
                     }
 
@@ -739,8 +673,7 @@ public class Monster : MonoBehaviour //잡몹
                 RaycastHit2D hit3 = Physics2D.Raycast(
                     new Vector2(tp.x, tp.y + 0.4f), h * transform.right, 1, pf);
 
-                if (hit1.transform != null || hit2.transform != null
-                    || hit3.transform != null) leejong = !leejong;
+                if (hit1.transform != null || hit2.transform != null || hit3.transform != null) leejong = !leejong;
 
                 sr.flipX = leejong;
 
@@ -777,39 +710,7 @@ public class Monster : MonoBehaviour //잡몹
                     * new Vector2(pp.x - tp.x, pp.y - tp.y).normalized);
                 break;
 
-
-            case 11: //knight
-                transform.Translate(H / 100 * speed * (1 - pollution) * Time.deltaTime * Vector2.right);
-                break;
-
-            case 12: //bishop
-                if (moving)
-                {
-                    transform.Translate(H * (1 - pollution) *
-                        Time.deltaTime * Vector2.right);
-
-                    //벽에 막혀 안 움직이면 점프
-
-
-
-
-
-                }
-                break;
-            case 13: //look
-                if (moving)
-                {
-                    transform.Translate(H * (1 - pollution) *
-                        Time.deltaTime * Vector2.right);
-
-                    //벽에 막혀 안 움직이면 점프
-
-
-
-
-
-                }
-                break;
+                //체스말들은 FixedUpdate 없음
         }
 
     } //FixedUpdate End
@@ -925,7 +826,7 @@ public class Monster : MonoBehaviour //잡몹
             Quaternion.identity);
 
         SpriteRenderer hsr = hurt.transform.GetComponent<SpriteRenderer>();
-        //hsr.flipX = sr.flipX;
+        hsr.flipX = F;
         hsr.sortingOrder = 5;
 
         if (monsterNum == 4 || monsterNum == 6 || monsterNum == 8)
@@ -943,14 +844,13 @@ public class Monster : MonoBehaviour //잡몹
         {
             if (hp > 0 && hp <= 5)
             {
-                C.transform.GetComponent<SpriteRenderer>().sprite = hc[hp - 1];
+                Csr.sprite = hc[hp - 1];
                 if (C.childCount == 1) Destroy(C.GetChild(0).gameObject);
             }
             else if (hp > 5 && hp <= 10)
             {
-                C.transform.GetComponent<SpriteRenderer>().sprite = hc[hp - 6];
-                C.transform.GetChild(0).
-                    transform.GetComponent<SpriteRenderer>().sprite = hc[4];
+                Csr.sprite = hc[hp - 6];
+                Cmoresr.sprite = hc[4];
             }
         }
 
@@ -972,10 +872,10 @@ public class Monster : MonoBehaviour //잡몹
         hp--;
 
         int r = Random.Range(0, 5);
-        if (r < Player.player.purple)
+        if (r < player.purple)
         {
             hp--;
-            Player.player.MakeEffect(new Vector2(tp.x, tp.y + 2), Player.player.critical, 5, 1);
+            player.MakeEffect(new Vector2(tp.x, tp.y + 2), player.critical, 5, 1);
         }
     }
 

@@ -8,12 +8,17 @@ public class Itemcube : MonoBehaviour
     public int cubeNum;
     float dist;
 
+    GameObject E, nearps;
+
     public bool IsPickaxe = false; // 보스전 곡괭이
 
 
 
     void Start()
     {
+        E = transform.GetChild(0).gameObject;
+        nearps = transform.GetChild(2).gameObject;
+
         var particleColor = cubeNum switch
         {
             0 => new Color(1, 0.7f, 0),
@@ -34,12 +39,13 @@ public class Itemcube : MonoBehaviour
 
     } //Start End
 
+
     void Update()
     {
         dist = Vector2.Distance(transform.position, Player.player.transform.position);
 
-        transform.GetChild(0).gameObject.SetActive(dist < 1 && Mainmenu.markkey); // [E]
-        transform.GetChild(2).gameObject.SetActive(dist < 1);
+        E.SetActive(dist < 1 && Mainmenu.markkey); // eeeeee
+        nearps.SetActive(dist < 1); // Particle System (1)
 
         if (!IsPickaxe) {
             if (dist < 1 && Input.GetKeyDown("e"))

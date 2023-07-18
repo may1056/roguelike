@@ -55,7 +55,7 @@ MonoBehaviour:
   fadeEffect: {fileID: 8326106217213998104, guid: c32a19154cf10874f974978490ab09ef, type: 3}
   doubleCircle: {fileID: 21300000, guid: bc8cdb377d76208459a0ccc268b24045, type: 3}
   hp: 0
-  maxhp: 6
+  maxhp: 5
   hc:
   - {fileID: -508144027, guid: 5e38e6b0e5266ec44ab65d691d41382f, type: 3}
   - {fileID: 921054833, guid: 5e38e6b0e5266ec44ab65d691d41382f, type: 3}
@@ -300,7 +300,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 6
   m_Sprite: {fileID: 21300000, guid: 608e61deb05c54660bebf5a4dd2ee02d, type: 3}
-  m_Color: {r: 0.2735849, g: 0.2735849, b: 0.2735849, a: 1}
+  m_Color: {r: 0.67058825, g: 0.67058825, b: 0.67058825, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
