@@ -59,11 +59,8 @@ public class PlayerAttack : MonoBehaviour
 
     //weapon skill
     float wsCool = 0;
-    bool wsAvailable = false;
-    float wsgoing = 3;
-    int wscount = 0;
     public Sprite ws0sprite;
-    //아 모르겠다 코드 막 짜야지.. 변수만 몇 개야
+    WaitForSeconds wait1;
 
 
 
@@ -73,6 +70,9 @@ public class PlayerAttack : MonoBehaviour
 
     public ParticleSystem usableZps, useZps, usableXps, useXps;
     public GameObject Zps, Xps;
+
+    Image XreadImage;
+    Color readColor = new(1, 1, 1, 0.4f);
 
 
 
@@ -99,6 +99,7 @@ public class PlayerAttack : MonoBehaviour
 
         skillZcooltimeText = skillZ.transform.GetChild(1).GetComponent<Text>();
         skillXcooltimeText = skillX.transform.GetChild(1).GetComponent<Text>();
+        XreadImage = GameManager.gameManager.Read.transform.GetChild(2).GetChild(1).GetComponent<Image>();
 
         GameManager.ismeleeWeapon = GameManager.gameManager.ismelee[weaponNum.Item1];
         attackani.SetBool("IsmeleeWeapon", GameManager.ismeleeWeapon); // IsmeleeWeapon 파라미터도 GameManager.ismeleeWeapon 값따라 변경
@@ -106,6 +107,8 @@ public class PlayerAttack : MonoBehaviour
         manager.ChangeHPMP();
 
         GetNewWeapon();
+
+        wait1 = new WaitForSeconds(1);
 
     } //Start End
 
@@ -268,16 +271,12 @@ public class PlayerAttack : MonoBehaviour
 
         skillX.transform.GetChild(0).GetComponent<Image>().
                 fillAmount = wsCool / (player.selfinjury ? 5.0f : 10.0f); //Filled
-        usableXps.gameObject.SetActive(wsCool <= 0 && mp >= 2 && (
-            !GameManager.shouldplaytutorial ||
-            GameManager.gameManager.Read.transform.GetChild(2).GetChild(1).GetComponent<Image>().color == new Color(1, 1, 1, 0.4f)));
+        usableXps.gameObject.SetActive(wsCool <= 0 && mp >= 2
+            && (!GameManager.shouldplaytutorial || XreadImage.color == readColor));
 
         if (wsCool <= 0 && Input.GetKeyDown(KeyCode.X) && mp >= 2
             && GameManager.prgEnd)
         {
-            wsAvailable = true;
-            wsgoing = 3;
-            wscount = 3;
             if (player.selfinjury) wsCool = 5; //자해 시 빠른 스킬
             else
             {
@@ -285,31 +284,23 @@ public class PlayerAttack : MonoBehaviour
                 mp -= 2;
                 manager.ChangeHPMP();
             }
+
+            switch (weaponNum.Item1)
+            {
+                case 0:
+                    StartCoroutine(WeaponSkill0coroutine());
+                    break;
+
+                case 1:
+                    WeaponSkill1();
+                    break;
+            }
+
             player.dontBehaveTime = 0;
             skillX.gameObject.SetActive(true);
             manager.ReadOn(2, 1);
             useXps.gameObject.SetActive(true);
             useXps.Play();
-        }
-
-        if (wsAvailable)
-        {
-            switch (weaponNum.Item1)
-            {
-                case 0:
-                    WeaponSkill0(wscount);
-                    wsgoing -= 2 * Time.deltaTime;
-                    break;
-
-                case 1:
-                    WeaponSkill1();
-                    wsAvailable = false;
-                    wsgoing = 0;
-                    wscount = 0;
-                    break;
-            }
-
-            wsAvailable = wsgoing > 0;
         }
 
         if (mp > maxmp) mp = maxmp;
@@ -400,55 +391,60 @@ public class PlayerAttack : MonoBehaviour
     }
 
 
-    void WeaponSkill0(int co) //검 스킬
+    IEnumerator WeaponSkill0coroutine()
     {
-        if (wsgoing <= co)
+        for (int i = 0; i < 3; i++)
         {
-            wscount--;
-
-            RaycastHit2D[] hitx = Physics2D.BoxCastAll(transform.position, new(14, 1), 0, Vector2.zero, 0, skillLayer);
-            RaycastHit2D[] hity = Physics2D.BoxCastAll(transform.position, new(1, 14), 0, Vector2.zero, 0, skillLayer);
-
-            foreach (var hx in hitx)
-            {
-                switch (hx.transform.tag)
-                {
-                    case "Enemy": hx.transform.GetComponent<Monster>().SkillDamage(1); break;
-                    case "Boss1": hx.transform.GetComponent<Boss1>().SkillDamage(1); break;
-                    case "Boss2": hx.transform.GetComponent<Boss2>().SkillDamage(1); break;
-                    case "Bullet":
-                        Bullet hxb = hx.transform.GetComponent<Bullet>();
-                        int t = hxb.bulletType;
-                        if (t == 0 || t == 1 || t == 2 || t == 8 || t == 9) hxb.DestroyReverb();
-                        else Destroy(hxb.gameObject);
-                        break;
-                    default: Debug.Log("X0x 스킬 태그 버그"); break;
-                }
-            }
-            foreach (var hy in hity)
-            {
-                switch (hy.transform.tag)
-                {
-                    case "Enemy": hy.transform.GetComponent<Monster>().SkillDamage(1); break;
-                    case "Boss1": hy.transform.GetComponent<Boss1>().SkillDamage(1); break;
-                    case "Boss2": hy.transform.GetComponent<Boss2>().SkillDamage(1); break;
-                    case "Bullet":
-                        Bullet hyb = hy.transform.GetComponent<Bullet>();
-                        int t = hyb.bulletType;
-                        if (t == 0 || t == 1 || t == 2 || t == 8 || t == 9) hyb.DestroyReverb();
-                        else Destroy(hyb.gameObject);
-                        break;
-                    default: Debug.Log("X0y 스킬 태그 버그"); break;
-                }
-            }
-
-            player.MakeEffect(transform.position, ws0sprite, 10, 1);
-            GameObject xps = Instantiate(Xps, transform.position, Quaternion.identity);
-            Destroy(xps, 2);
-
-            //소리
-            Soundmanager.soundmanager.swordsounds[1].Play();
+            WeaponSkill0();
+            yield return wait1;
         }
+
+        yield break;
+    }
+    void WeaponSkill0() //검 스킬
+    {
+        RaycastHit2D[] hitx = Physics2D.BoxCastAll(transform.position, new(14, 1), 0, Vector2.zero, 0, skillLayer);
+        RaycastHit2D[] hity = Physics2D.BoxCastAll(transform.position, new(1, 14), 0, Vector2.zero, 0, skillLayer);
+
+        foreach (var hx in hitx)
+        {
+            switch (hx.transform.tag)
+            {
+                case "Enemy": hx.transform.GetComponent<Monster>().SkillDamage(1); break;
+                case "Boss1": hx.transform.GetComponent<Boss1>().SkillDamage(1); break;
+                case "Boss2": hx.transform.GetComponent<Boss2>().SkillDamage(1); break;
+                case "Bullet":
+                    Bullet hxb = hx.transform.GetComponent<Bullet>();
+                    int t = hxb.bulletType;
+                    if (t == 0 || t == 1 || t == 2 || t == 8 || t == 9) hxb.DestroyReverb();
+                    else Destroy(hxb.gameObject);
+                    break;
+                default: Debug.Log("X0x 스킬 태그 버그"); break;
+            }
+        }
+        foreach (var hy in hity)
+        {
+            switch (hy.transform.tag)
+            {
+                case "Enemy": hy.transform.GetComponent<Monster>().SkillDamage(1); break;
+                case "Boss1": hy.transform.GetComponent<Boss1>().SkillDamage(1); break;
+                case "Boss2": hy.transform.GetComponent<Boss2>().SkillDamage(1); break;
+                case "Bullet":
+                    Bullet hyb = hy.transform.GetComponent<Bullet>();
+                    int t = hyb.bulletType;
+                    if (t == 0 || t == 1 || t == 2 || t == 8 || t == 9) hyb.DestroyReverb();
+                    else Destroy(hyb.gameObject);
+                    break;
+                default: Debug.Log("X0y 스킬 태그 버그"); break;
+            }
+        }
+
+        player.MakeEffect(transform.position, ws0sprite, 10, 1);
+        GameObject xps = Instantiate(Xps, transform.position, Quaternion.identity);
+        Destroy(xps, 2);
+
+        //소리
+        Soundmanager.soundmanager.swordsounds[1].Play();
 
     } //WeaponSkill0 End
 
